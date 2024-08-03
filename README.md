@@ -3,7 +3,7 @@ This repository is intended to be cloned into a `gn32` folder inside the EmptyEp
 All modules below assume that the repository is at this path.
 
 ## Core Modules
-Language-type features, constant data definitions. Few or no dependencies.
+Language-type features and constant data definitions. Few or no dependencies.
 
 ### require
 Provides a `require` function that behaves closer to standard Lua, allowing dropping the `.lua` suffix and tracking already-imported modules.
@@ -24,3 +24,11 @@ Provides event hook utilities so that multiple modules can respond to the same e
 `hook`: imports the system and integrates it with EE.
 
 Modules targeting `hook` that do not use predefined entity hooks should `require "hook-sys"` so that they can be used in non-`hook` scripts.
+
+## Main Modules
+Libraries and large game subsystems relevant across multiple scenario types.
+
+### track
+Provides entity group tracking with associated data.
+
+Depends on `hook`.
