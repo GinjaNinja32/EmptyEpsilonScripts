@@ -20,7 +20,7 @@ Modules targeting `lang-strict` should `require "lang"` for compatibility with n
 ### hook / hook-sys
 Provides event hook utilities so that multiple modules can respond to the same event without interference.
 
-`hook-sys`: provides the hook system implementation, but no default events.
+`hook-sys`: provides the hook system implementation, but no default events.  
 `hook`: imports the system and integrates it with EE.
 
 Modules targeting `hook` that do not use predefined entity hooks should `require "hook-sys"` so that they can be used in non-`hook` scripts.
