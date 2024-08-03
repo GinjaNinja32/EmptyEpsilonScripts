@@ -1,4 +1,6 @@
 # Ginja's Empty Epsilon Scripts
+This repository is intended to be cloned into a `gn32` folder inside the EmptyEpsilon scripts directory, so that this file is `scripts/gn32/README.md`.  
+All modules below assume that the repository is at this path.
 
 ## Core Modules
 Language-type features, constant data definitions. Few or no dependencies.
@@ -14,3 +16,11 @@ All other modules assume that this module has already been imported.
 `lang`: imports `lang-lax` if neither `lang-strict` nor `lang-lax` have been imported.
 
 Modules targeting `lang-strict` should `require "lang"` for compatibility with non-strict scripts.
+
+### hook / hook-sys
+Provides event hook utilities so that multiple modules can respond to the same event without interference.
+
+`hook-sys`: provides the hook system implementation, but no default events.
+`hook`: imports the system and integrates it with EE.
+
+Modules targeting `hook` that do not use predefined entity hooks should `require "hook-sys"` so that they can be used in non-`hook` scripts.
