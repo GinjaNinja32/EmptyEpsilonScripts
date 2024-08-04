@@ -71,7 +71,19 @@ end
 function track.each(coll, f)
 	local e, d = track.get(coll)
 
-	for i, ent in pairs(e) do
+	-- manual `ipairs`-like to allow entities to be removed/deleted while iterating
+	local i = 1
+	local ent = nil
+	while true do
+		if e[i] == ent then
+			i = i + 1
+		end
+
+		ent = e[i]
+		if ent == nil then
+			break
+		end
+
 		f(ent, d[ent])
 	end
 end
