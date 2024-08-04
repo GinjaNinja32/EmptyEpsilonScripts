@@ -16,6 +16,7 @@
 ]]
 
 require "gn32/lang"
+
 require "gn32/hook-sys"
 
 hook.entityEventRegistrationName = {

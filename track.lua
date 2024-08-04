@@ -18,6 +18,8 @@
 		track.each(coll, function(entity, data) ... end)
 ]]
 
+require "gn32/lang"
+
 require "gn32/hook"
 
 G.track = {}
