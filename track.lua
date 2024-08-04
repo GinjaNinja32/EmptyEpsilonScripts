@@ -27,8 +27,15 @@ local tracked = {}
 function track.set(coll, entity, data)
 	local e, d = track.get(coll)
 
-	table.insert(e, entity)
 	d[entity] = data
+
+	for i, ent in ipairs(e) do
+		if ent == entity then
+			return
+		end
+	end
+
+	table.insert(e, entity)
 
 	hook.entity[entity].on.destroyed(function()
 		track.remove(coll, entity)
