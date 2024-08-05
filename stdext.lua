@@ -15,3 +15,18 @@ function table.defaulting(f, nostore)
 		end
 	})
 end
+
+-- safecall: return `f(...)` if it does not throw an error, otherwise return `errorhandler(err, ...)`.
+-- errors in `errorhandler` are not caught.
+function G.safecall(errorhandler, f, ...)
+	local args = {...}
+	local ret
+	local ok, err = pcall(function()
+		ret = table.pack(f(table.unpack(args)))
+	end)
+	if ok then
+		return table.unpack(ret)
+	else
+		return errorhandler(err, ...)
+	end
+end

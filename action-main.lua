@@ -1,0 +1,297 @@
+-- Module: gn32/action-main
+-- Description: Adds an `action`-driven crew position menu
+--[[
+	For details of the menu item format, see `action`.
+
+	Target arguments: ship, station
+	Differences from `action` docs:
+		- Menu items support a `stations` list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.
+		- Menu items support a `requiredTaskState` bool; if set, the item will only display when there is (true) or is not (false) a task in progress.
+
+	To add a station button menu item:
+		mainMenu:add {
+			info = "Info Text",
+		}
+		mainMenu:add {
+			button = "Button Name",
+			action = function(reopen, ship, station) ... end,
+		}
+]]
+
+require "gn32/lang"
+
+require "gn32/action"
+require "gn32/hook-sys"
+require "gn32/position"
+require("batteries/sort"):export()
+
+G.mainMenu = ActionBase {
+	-- hook push/pop/reset to keep a scroll stack
+	_onPush = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+		table.insert(data.scrollstack, data.offset)
+		data.offset = 0
+	end,
+	_onPop = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+		data.offset = data.scrollstack[#data.scrollstack]
+		data.scrollstack[#data.scrollstack] = nil
+	end,
+	_onReset = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+		data.offset = 0
+		data.scrollstack = {}
+	end,
+
+	_shouldShow = function(self, item, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		if item.stations and not contains(item.stations, station) then
+			return false
+		end
+
+		if item.requiredTaskState ~= nil then
+			local doingTask = data.task ~= nil
+			if item.requiredTaskState ~= doingTask then
+				return false
+			end
+		end
+
+		return true
+	end,
+	_dataFor = function(self, ship, station)
+		if ship.__menu == nil then ship.__menu = {} end
+		if ship.__menu[station] == nil then ship.__menu[station] = {currentEntries={}} end
+		return ship.__menu[station]
+	end,
+	_startMenu = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		for _, e in ipairs(data.currentEntries) do
+			ship:removeCustom(e)
+		end
+		ship:removeCustom(station .. "menu-up")
+		ship:removeCustom(station .. "menu-down")
+
+		data.currentEntries = {}
+		data.lastRefresh = getScenarioTime()
+
+		data.queuedCalls = {}
+		if data.offset == nil then data.offset = 0 end
+		if data.maxItems == nil then data.maxItems = 10 end
+
+		return self:_doTaskMenu(ship, station)
+	end,
+	_finishMenu = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		local function orderForCall(call)
+			if call[1] == "addCustomButton" then
+				return call[2][5]
+			else
+				return call[2][4]
+			end
+		end
+		table.stable_sort(data.queuedCalls, function(a, b)
+			local a_order = orderForCall(a) or 0
+			local b_order = orderForCall(b) or 0
+
+			return a_order < b_order
+		end)
+
+		if #data.queuedCalls <= data.maxItems then
+			for _, call in ipairs(data.queuedCalls) do
+				ship[call[1]](ship, table.unpack(call[2]))
+			end
+			return
+		end
+
+		if data.offset + data.maxItems - 1 > #data.queuedCalls then
+			data.offset = #data.queuedCalls - data.maxItems
+		end
+
+		local start = data.offset
+		local end_ = data.offset + data.maxItems - 1
+
+		if data.offset > 0 then
+			start = start + 2
+			ship:addCustomButton(station, station .. "menu-up", "↑", function()
+				data.offset = data.offset - 1
+				self:refreshMenu(ship, station)
+			end, -1000000000)
+		end
+		if #data.queuedCalls == end_ + 1 then
+			end_ = end_ + 1
+		end
+		for i = start, end_ do
+			local call = data.queuedCalls[i]
+			if call ~= nil then
+				ship[call[1]](ship, table.unpack(call[2]))
+			end
+		end
+		if #data.queuedCalls > end_ then
+			ship:addCustomButton(station, station .. "menu-down", "↓", function()
+				data.offset = data.offset + 1
+				self:refreshMenu(ship, station)
+			end, 1000000000)
+		end
+	end,
+	_addButton = function(self, button, order, act, ship, station)
+		local data = self:_dataFor(ship, station)
+		local key = "b" .. station .. #data.currentEntries
+		table.insert(data.queuedCalls, {"addCustomButton", {station, key, button, act, order}})
+		table.insert(data.currentEntries, key)
+	end,
+	_addInfo = function(self, info, order, ship, station)
+		local data = self:_dataFor(ship, station)
+		local key = "i" .. station .. #data.currentEntries
+		table.insert(data.queuedCalls, {"addCustomInfo", {station, key, info, order}})
+		table.insert(data.currentEntries, key)
+	end,
+
+	_doTaskMenu = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		if data.task then
+			if data.task.finished then
+				return data.task.finished
+			end
+
+			local timeRemaining = data.task.completionAt - getScenarioTime()
+
+			local extraMenu = {}
+			if data.task.menu then
+				local m = data.task.menu
+				if type(m) == "function" then
+					m = m(ship, station)
+				end
+				for _, e in ipairs(m) do
+					table.insert(extraMenu, e)
+				end
+			else
+				table.insert(extraMenu, {info = "Task In Progress"})
+			end
+			table.insert(extraMenu, {info = "Remaining: " .. math.ceil(timeRemaining) .. "s"})
+			return extraMenu
+		end
+	end,
+	completeTask = function(self, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		if not data.task or data.task.finished then
+			self:refreshMenu(ship, station)
+			return
+		end
+
+		if data.task.complete then
+			data.task.finished = data.task.complete(ship, station)
+		end
+		if not data.task.finished or type(data.task.finished) ~= "table" then
+			data.task.finished = {
+				{info = "Task Complete"},
+			}
+		end
+		table.insert(data.task.finished, {button = "Dismiss", action=function() self:setTask(nil, ship, station) end})
+		self:refreshMenu(ship, station)
+	end,
+	updateTasks = function(self, ship)
+		local now = getScenarioTime()
+
+		for station, data in pairs(ship.__menu) do
+			if data.task and not data.task.finished then
+				if data.task.completionAt <= now then
+					self:completeTask(ship, station)
+				else
+					if data.task.update then
+						local res = data.task.update(ship, station)
+						if res ~= nil then
+							data.task.finished = {
+								{info = "Task Failed"},
+								{info = tostring(res)},
+								{button = "Dismiss", action=function() self:setTask(nil, ship, station) end},
+							}
+							self:refreshMenu(ship, station)
+						end
+					end
+
+					if data.lastRefresh + 1 < now then
+						self:refreshMenu(ship, station)
+					end
+				end
+			end
+		end
+	end,
+	setTask = function(self, task, ship, station)
+		local data = self:_dataFor(ship, station)
+
+		if task ~= nil then
+			if task.completionAt == nil then
+				if task.duration == nil then
+					error("setTask with no completionAt or duration", 2)
+				end
+
+				task.completionAt = getScenarioTime() + task.duration
+			end
+		end
+
+		data.task = task
+	end,
+}()
+
+mainMenu:add {
+	button = "Menu config",
+	action = {
+		{
+			button = "Set menu size",
+			action = function(reopen, ship, station)
+				local data = mainMenu:_dataFor(ship, station)
+				data.maxItems = 30
+				local m = {
+					allowBack = false,
+					allowHome = false,
+					allowSticky = false,
+					{info = "Select a size for the menu"},
+					{info = "Future menus will not"},
+					{info = "go below the button"},
+					{info = "you click."},
+				}
+				for i = 5, 30 do
+					table.insert(m, {button = "Size: " .. i, action = function(reopen, ship, station)
+						data.maxItems = i
+						return nil
+					end})
+				end
+				return m
+			end,
+		}
+	},
+}
+
+mainMenu:add {
+	button = "Debug: finish immediately",
+	isDebug = true,
+	requiredTaskState = true,
+	action = function(reopen, ship, station)
+		mainMenu:completeTask(ship, station)
+	end,
+}
+
+function hook.after.newPlayerShip(ship)
+	for _, station in ipairs(position.all) do
+		mainMenu:setMenu(nil, ship, station)
+	end
+end
+
+function hook.on.update()
+	for _, ship in ipairs(getActivePlayerShips()) do
+		mainMenu:updateTasks(ship)
+	end
+end
+
+hook.every[1] = function()
+	for _, ship in ipairs(getActivePlayerShips()) do
+		for _, station in ipairs(position.all) do
+			mainMenu:refreshMenu(ship, station)
+		end
+	end
+end
