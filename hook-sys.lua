@@ -66,8 +66,12 @@ hook.entity = setmetatable({}, {
 
 					local results = {}
 					for _, c in ipairs(h[event]) do
-						local res = c(entity, ...)
-						table.insert(results, res)
+						local ok, res = pcall(c, entity, ...)
+						if not ok then
+							print("Entity hook error:", entity, event, res)
+						else
+							table.insert(results, res)
+						end
 					end
 
 					return results
@@ -118,13 +122,20 @@ hook.trigger = setmetatable({}, {
 			local results = {}
 			if registered[event] then
 				for _, c in ipairs(registered[event]) do
-					local res = c(...)
-					table.insert(results, res)
+					local ok, res = pcall(c, ...)
+					if not ok then
+						print("Hook error:", event, res)
+					else
+						table.insert(results, res)
+					end
 				end
 			end
 			if registeredAfter[event] then
 				for _, c in ipairs(registeredAfter[event]) do
-					c(...)
+					local ok, res = pcall(c, ...)
+					if not ok then
+						print("Hook error:", event, res)
+					end
 				end
 			end
 
@@ -149,7 +160,10 @@ function hook.on.update(delta)
 	for _, timer in ipairs(timers) do
 		if timer.next <= now then
 			timer.next = timer.next + timer.interval
-			timer.fn()
+			local ok, res = pcall(timer.fn)
+			if not ok then
+				print("Timer error:", res)
+			end
 		end
 	end
 end
