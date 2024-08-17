@@ -33,12 +33,19 @@ G.CommsMenu = ActionBase {
 	_startMenu = function(self, source, target)
 		local data = self:_dataFor(source, target)
 		data.message = nil
+		data.button = nil
 	end,
 	_finishMenu = function(self, source, target)
 		local data = self:_dataFor(source, target)
+		if not data.button and not data.message then
+			setCommsMessage("We have nothing for you.")
+			return
+		end
 		setCommsMessage(data.message or "[Menu Error]\nno message set")
 	end,
-	_addButton = function(self, button, order, act)
+	_addButton = function(self, button, order, act, source, target)
+		local data = self:_dataFor(source, target)
+		data.button = true
 		addCommsReply(button, act)
 	end,
 	_shouldShow = function(self, item, source, target)
