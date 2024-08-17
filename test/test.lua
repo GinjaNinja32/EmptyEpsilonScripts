@@ -73,8 +73,8 @@ assert = setmetatable({}, {
 		end
 	end,
 	__index = {
-		equal = function(a, b)
-			if a ~= b then
+		equal = function(a, b, epsilon)
+			if (epsilon and math.abs(a - b) > epsilon) or (not epsilon and a ~= b) then
 				error("values not equal: " .. debug.dump(a) .. " ~= " .. debug.dump(b), 2)
 			end
 		end,

@@ -23,6 +23,28 @@ local function makeCallback(asMethod)
 
 	return set, trigger
 end
+local function makeGetSet(asMethod, argn, ...)
+	local v = {...}
+
+	local get = function()
+		return table.unpack(v)
+	end
+	local set = function(...)
+		v = {}
+		table.move({...}, 1, argn, 1, v)
+	end
+
+	if not asMethod then
+		return get, set
+	end
+
+	return
+		function(e) return get() end,
+		function(e, ...) set(...); return e end
+end
+local function addGetSet(ent, field, argn, ...)
+	ent["get"..field], ent["set"..field] = makeGetSet(true, argn, ...)
+end
 
 
 -- Global data
@@ -61,25 +83,37 @@ end
 function G.Entity()
 	local e = {}
 
-	e.onDestroyed, e.destroy = makeCallback(true)
+	e.onDestroyed,   e.destroy  = makeCallback(true)
 	e.onDestruction, e.destruct = makeCallback(true)
-	e.onExpiration, e.expire = makeCallback(true)
+	e.onExpiration,  e.expire   = makeCallback(true)
 
-	function e:getCallSign()
-		return self.callsign
-	end
-	function e:setCallSign(cs)
-		self.callsign = cs
-		return self
-	end
+	addGetSet(e, "Velocity",        2, 0, 0)
+	addGetSet(e, "AngularVelocity", 1, 0)
+	addGetSet(e, "Position",        2, 0, 0)
+	addGetSet(e, "Rotation",        1, 0)
+	addGetSet(e, "CallSign",        1, nil)
 
 	return e
+end
+
+-- CpuShip
+function G.CpuShip()
+	local s = Entity():setCallSign("CPU" .. math.random(100, 999))
+
+	return s
+end
+
+-- SpaceStation
+function G.SpaceStation()
+	local s = Entity():setCallSign("SS" .. math.random(100, 999))
+
+	return s
 end
 
 -- PlayerShip
 G.onNewPlayerShip, G.newPlayerShip = makeCallback()
 
-function G.PlayerShip()
+function G.PlayerSpaceship()
 	local s = Entity():setCallSign("PS" .. math.random(100, 999))
 
 	s.onProbeLaunch, s.probeLaunch = makeCallback(true)

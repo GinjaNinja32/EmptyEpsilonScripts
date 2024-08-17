@@ -460,7 +460,7 @@ test("action/main", function()
 		}
 	}
 
-	local ship = PlayerShip()
+	local ship = PlayerSpaceship()
 
 	local function press(btn)
 		for _, v in ipairs(ship.customButtons) do

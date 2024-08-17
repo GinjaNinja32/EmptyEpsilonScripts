@@ -46,7 +46,7 @@ test("hook/global", function()
 	hook.on.newPlayerShip(function(ship) called.b = ship end)
 	hook.on.newPlayerShip(function(ship) called.c = ship end)
 
-	local s1 = PlayerShip()
+	local s1 = PlayerSpaceship()
 	newPlayerShip(s1)
 	assert.equivalent(called, {a=s1, b=s1, c=s1})
 
