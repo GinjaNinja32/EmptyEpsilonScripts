@@ -98,3 +98,18 @@ function track.any(coll, f)
 		if v then return v end
 	end
 end
+
+local function trackCreate(f, ...)
+	local colls = {...}
+	return function()
+		local e = f()
+		for _, coll in ipairs(colls) do
+			track.set(coll, e)
+		end
+		return e
+	end
+end
+
+CpuShip = trackCreate(CpuShip, "cpuship", "ship")
+PlayerSpaceship = trackCreate(PlayerSpaceship, "playership", "ship")
+SpaceStation = trackCreate(SpaceStation, "station")
