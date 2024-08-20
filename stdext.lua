@@ -16,6 +16,17 @@ function table.defaulting(f, nostore)
 	})
 end
 
+-- table.contains: returns true if there is some index i between 1 and #tbl such that tbl[i] == entry, otherwise returns false.
+function table.contains(tbl, entry)
+	for i in 1, #tbl do
+		if tbl[i] == entry then
+			return true
+		end
+	end
+
+	return false
+end
+
 -- safecall: return `f(...)` if it does not throw an error, otherwise return `errorhandler(err, ...)`.
 -- errors in `errorhandler` are not caught.
 function G.safecall(errorhandler, f, ...)

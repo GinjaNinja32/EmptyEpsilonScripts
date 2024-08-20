@@ -23,6 +23,7 @@ require "gn32/lang"
 require "gn32/action"
 require "gn32/hook-sys"
 require "gn32/position"
+require "gn32/stdext"
 require("batteries/sort"):export()
 
 G.mainMenu = ActionBase {
@@ -46,7 +47,7 @@ G.mainMenu = ActionBase {
 	_shouldShow = function(self, item, ship, station)
 		local data = self:_dataFor(ship, station)
 
-		if item.stations and not contains(item.stations, station) then
+		if item.stations and not table.contains(item.stations, station) then
 			return false
 		end
 
