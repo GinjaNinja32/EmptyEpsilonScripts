@@ -21,6 +21,7 @@ G.position = {
 	all = {
 		"Helms", "Weapons", "Engineering", "Science", "Relay",
 		"Engineering+", "Tactical", "Operations",
+		"Single",
 	},
 
 	single = {
