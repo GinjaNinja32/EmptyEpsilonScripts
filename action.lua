@@ -66,6 +66,16 @@ local errhandler_nil = function(err)
 	return nil
 end
 
+G.MenuSet = function()
+	return setmetatable({}, {
+		__index = {
+			add = function(self, entry)
+				table.insert(self, entry)
+			end
+		}
+	})
+end
+
 local actionbase = {
 	-- Menu impl hooks
 	_dataFor = function(self, ...) error("action: _dataFor unimpl") end,

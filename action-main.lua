@@ -239,33 +239,35 @@ G.mainMenu = ActionBase {
 	end,
 }()
 
+G.mainMenuConfig = MenuSet()
+
 mainMenu:add {
 	button = "Menu config",
-	action = {
-		{
-			button = "Set menu size",
-			action = function(reopen, ship, station)
-				local data = mainMenu:_dataFor(ship, station)
-				data.maxItems = 30
-				local m = {
-					allowBack = false,
-					allowHome = false,
-					allowSticky = false,
-					{info = "Select a size for the menu"},
-					{info = "Future menus will not"},
-					{info = "go below the button"},
-					{info = "you click."},
-				}
-				for i = 5, 30 do
-					table.insert(m, {button = "Size: " .. i, action = function(reopen, ship, station)
-						data.maxItems = i
-						return nil
-					end})
-				end
-				return m
-			end,
+	action = mainMenuConfig,
+}
+
+mainMenuConfig:add {
+	button = "Set menu size",
+	action = function(reopen, ship, station)
+		local data = mainMenu:_dataFor(ship, station)
+		data.maxItems = 30
+		local m = {
+			allowBack = false,
+			allowHome = false,
+			allowSticky = false,
+			{info = "Select a size for the menu"},
+			{info = "Future menus will not"},
+			{info = "go below the button"},
+			{info = "you click."},
 		}
-	},
+		for i = 5, 30 do
+			table.insert(m, {button = "Size: " .. i, action = function(reopen, ship, station)
+				data.maxItems = i
+				return nil
+			end})
+		end
+		return m
+	end,
 }
 
 mainMenu:add {
