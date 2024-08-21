@@ -52,7 +52,7 @@ G.mainMenu = ActionBase {
 		end
 
 		if item.requiredTaskState ~= nil then
-			local doingTask = data.task ~= nil
+			local doingTask = not not (data.task and not data.task.finished)
 			if item.requiredTaskState ~= doingTask then
 				return false
 			end
