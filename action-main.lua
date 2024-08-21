@@ -192,7 +192,7 @@ G.mainMenu = ActionBase {
 				{info = "Task Complete"},
 			}
 		end
-		table.insert(data.task.finished, {button = "Dismiss", action=function() self:setTask(nil, ship, station) end})
+		table.insert(data.task.finished, {button = "Dismiss", action=function() self:setTask(nil, ship, station); return false end})
 		self:refreshMenu(ship, station)
 	end,
 	updateTasks = function(self, ship)
@@ -209,7 +209,7 @@ G.mainMenu = ActionBase {
 							data.task.finished = {
 								{info = "Task Failed"},
 								{info = tostring(res)},
-								{button = "Dismiss", action=function() self:setTask(nil, ship, station) end},
+								{button = "Dismiss", action=function() self:setTask(nil, ship, station); return false end},
 							}
 							self:refreshMenu(ship, station)
 						end
