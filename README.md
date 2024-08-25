@@ -73,6 +73,16 @@ Provides configurable drag on entities, slowing and eventually stopping them.
 Depends on `hook-sys`.
 Required hooks: `update`.
 
+### exchange
+Provides utilities for adding, removing, and exchanging various types of ship resources.
+
+Optionally depends on `cargo`, if the cargo exchange source is used.
+
+### crafting
+Provides configurable player-facing crafting menus.
+
+Depends on `action-main`, `exchange`.
+
 ### track
 Provides entity group tracking with associated data.
 
