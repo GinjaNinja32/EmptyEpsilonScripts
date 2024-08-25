@@ -58,6 +58,21 @@ Required hooks: `update`.
 Depends on `action`, `hook-sys`, `position`, `batteries/sort`.  
 Required hooks: `newPlayerShip`, `update`.
 
+### cargo / cargo-menu
+Provides a cargo system for ships, allowing them to carry items.
+
+`cargo`: Provides the cargo system implementation.
+No dependencies.
+
+`cargo-menu`: Provides a player-facing menu for players to view the current cargo, transfer it to a docked ship, or jettison it into space.
+Depends on `cargo`, `action-main`, `drag`.
+
+### drag
+Provides configurable drag on entities, slowing and eventually stopping them.
+
+Depends on `hook-sys`.
+Required hooks: `update`.
+
 ### track
 Provides entity group tracking with associated data.
 
