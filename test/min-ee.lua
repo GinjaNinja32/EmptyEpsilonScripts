@@ -96,16 +96,35 @@ function G.Entity()
 	return e
 end
 
--- CpuShip
-function G.CpuShip()
-	local s = Entity():setCallSign("CPU" .. math.random(100, 999))
+function G.STBO()
+	local s = Entity():setCallSign("STBO" .. math.random(100, 999))
+
+	addGetSet(s, "Hull", 1, 0)
+	addGetSet(s, "HullMax", 1, 0)
 
 	return s
 end
 
 -- SpaceStation
 function G.SpaceStation()
-	local s = Entity():setCallSign("SS" .. math.random(100, 999))
+	local s = STBO():setCallSign("SS" .. math.random(100, 999))
+
+	return s
+end
+
+-- SpaceShip
+function G.SpaceShip()
+	local s = STBO():setCallSign("SH" .. math.random(100, 999))
+
+	addGetSet(s, "Energy", 1, 0)
+	addGetSet(s, "MaxEnergy", 1, 0)
+
+	return s
+end
+
+-- CpuShip
+function G.CpuShip()
+	local s = SpaceShip():setCallSign("CPU" .. math.random(100, 999))
 
 	return s
 end
@@ -114,9 +133,13 @@ end
 G.onNewPlayerShip, G.newPlayerShip = makeCallback()
 
 function G.PlayerSpaceship()
-	local s = Entity():setCallSign("PS" .. math.random(100, 999))
+	local s = SpaceShip():setCallSign("PS" .. math.random(100, 999))
 
 	s.onProbeLaunch, s.probeLaunch = makeCallback(true)
+
+	addGetSet(s, "MaxCoolant", 1, 10)
+	addGetSet(s, "MaxScanProbeCount", 1, 10)
+	addGetSet(s, "ScanProbeCount", 1, 10)
 
 	s.customButtons = {}
 	function s:addCustomButton(station, id, button, action)
