@@ -40,6 +40,8 @@
 		cargo.formatLong({ Ti=2, Si=1 })   -- returns "1 silicon, 2 titanium"
 ]]
 
+require "gn32/lang"
+
 G.cargo = {}
 
 cargo.items = {}
