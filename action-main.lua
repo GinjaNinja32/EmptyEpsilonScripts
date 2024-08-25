@@ -79,7 +79,7 @@ G.mainMenu = ActionBase {
 
 		data.queuedCalls = {}
 		if data.offset == nil then data.offset = 0 end
-		if data.maxItems == nil then data.maxItems = 10 end
+		if data.maxItems == nil then data.maxItems = 25 end
 
 		return self:_doTaskMenu(ship, station)
 	end,
@@ -250,7 +250,7 @@ mainMenuConfig:add {
 	button = "Set menu size",
 	action = function(reopen, ship, station)
 		local data = mainMenu:_dataFor(ship, station)
-		data.maxItems = 30
+		data.maxItems = 50
 		local m = {
 			allowBack = false,
 			allowHome = false,
@@ -260,7 +260,7 @@ mainMenuConfig:add {
 			{info = "go below the button"},
 			{info = "you click."},
 		}
-		for i = 5, 30 do
+		for i = 5, 50 do
 			table.insert(m, {button = "Size: " .. i, action = function(reopen, ship, station)
 				data.maxItems = i
 				return nil
