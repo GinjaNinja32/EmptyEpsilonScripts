@@ -89,7 +89,7 @@ assert = setmetatable({}, {
 						p = debug.dump(e)
 					end
 				end
-				err = "values not equivalent at " .. p .. ": " .. debug.dump(x) .. " ~= " .. debug.dump(y) .. "\na = " .. debug.dump(a, "\n", "  ") .. "\nb = " .. debug.dump(b, "\n", "  ")
+				err = "values not equivalent at " .. (p or "$root") .. ": " .. debug.dump(x) .. " ~= " .. debug.dump(y) .. "\na = " .. debug.dump(a, "\n", "  ") .. "\nb = " .. debug.dump(b, "\n", "  ")
 			end) then
 				error(err, 2)
 			end
