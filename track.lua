@@ -27,6 +27,8 @@ G.track = {}
 local tracked = {}
 
 function track.set(coll, entity, data)
+	if entity == nil then error("nil entity", 2) end
+
 	local e, d = track.get(coll)
 
 	d[entity] = data
