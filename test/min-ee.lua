@@ -102,6 +102,29 @@ function G.STBO()
 	addGetSet(s, "Hull", 1, 0)
 	addGetSet(s, "HullMax", 1, 0)
 
+	s.systemData = {}
+	s.getSystemData = function(s, sys)
+		if not s.systemData[sys] then
+			s.systemData[sys] = {}
+		end
+		return s.systemData[sys]
+	end
+
+	function s:getSystemHealthMax(sys)
+		return self:getSystemData(sys).max or 1
+	end
+	function s:setSystemHealthMax(sys, h)
+		self:getSystemData(sys).max = h
+		return self
+	end
+	function s:getSystemHealth(sys)
+		return self:getSystemData(sys).cur or 1
+	end
+	function s:setSystemHealth(sys, h)
+		self:getSystemData(sys).cur = h
+		return self
+	end
+
 	return s
 end
 
