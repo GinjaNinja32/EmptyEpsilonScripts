@@ -1,44 +1,23 @@
--- Module: gn32/cargo
--- Description: Adds inventory functionality to ships.
---[[
-	To define items that can be carried by ships:
-		cargo.addItems(
-			{ id = "Ti", name = "titanium", desc = "a strong metal" },
-			{ id = "Si", name = "silicon", desc = "a semiconductor" }
-		)
-
-	To enable a ship to carry cargo:
-		ship.cargo = {}            -- unlimited space
-		ship.cargo = {limit = 20}  -- can carry 20 items
-
-	To create a cargo drop entity:
-		CargoDrop("Ti")    -- can be picked up immediately
-		CargoDrop("Ti", 5) -- cannot be picked up for 5 seconds
-
-
-	The below functions also accept an optional final parameter `mult` which is applied as a multiplier to each entry.
-	Each function returns whether the operation was successful unless otherwise specified.
-
-	To add or remove cargo to a ship:
-		cargo.adjust(ship, { Ti=2, Si=-1 })  -- add 2 Ti, remove 1 Si
-
-	To remove cargo from a ship:
-		cargo.use(ship, { Ti=2 })
-
-	To check if a ship has at least specific cargo:
-		cargo.has(ship, { Ti=2 })
-
-	To check how many of a specific set of cargo a ship has:
-		cargo.count(ship, { Ti=2, Si=1 })  -- how many times could the ship provide 2 Ti + 1 Si?
-
-	To check if a ship has space to accept cargo:
-		cargo.hasSpace(ship, 2)         -- space for 2 items
-		cargo.hasSpace(ship, { Ti=2 })  -- space for this specific set of items
-
-	To format a cargo list:
-		cargo.formatShort({ Ti=2, Si=1 })  -- returns "1Si, 2Ti"
-		cargo.formatLong({ Ti=2, Si=1 })   -- returns "1 silicon, 2 titanium"
-]]
+--- Adds inventory functionality to ships.
+--
+-- Item definition format:
+--	{
+--		-- ID of the item.
+--		-- Should be short and descriptive. Must not start with a number.
+--		id = "Ti",
+--
+--		-- Name of the item. Should be in mid-sentence case.
+--		name = "titanium",
+--
+--		-- Description of the item.
+--		desc = "a strong metal",
+--	}
+--
+-- To enable a ship to carry cargo:
+--	ship.cargo = {}            -- unlimited space
+--	ship.cargo = {limit = 20}  -- can carry 20 items
+--
+-- @pragma nostrip
 
 require "gn32/lang"
 
@@ -46,6 +25,8 @@ G.cargo = {}
 
 cargo.items = {}
 
+--- Add items that can be carried by ships.
+-- @param ... A list of cargo item definitions.
 function cargo.addItems(...)
 	for _, item in ipairs{...} do
 		if type(item.id) ~= "string" then
@@ -69,6 +50,10 @@ end
 
 -- ENTITIES
 
+--- Create a cargo drop entity.
+-- @function CargoDrop
+-- @param ty The cargo type held by this entity
+-- @param timeout The timeout before this drop can be picked up; default 0.
 G.CargoDrop = function(ty, timeout)
 	local pickupAfter = getScenarioTime() + (timeout or 0)
 	return Artifact()
@@ -87,6 +72,11 @@ end
 
 -- EXPORTS
 
+--- Count how many times over a ship has some cargo.
+-- @param ship The ship to check.
+-- @param entries The base cargo to check for.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return The number of instances of the cargo the ship has.
 function cargo.count(ship, entries, mult)
 	if not mult then mult = 1 end
 	if not ship.cargo then return 0 end
@@ -110,6 +100,11 @@ function cargo.count(ship, entries, mult)
 	return n
 end
 
+--- Check whether a ship has some cargo.
+-- @param ship The ship to check.
+-- @param entries The base cargo to check for.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return Whether the ship has at least the specified cargo.
 function cargo.has(ship, entries, mult)
 	if not mult then mult = 1 end
 	if not ship.cargo then return false end
@@ -126,6 +121,11 @@ function cargo.has(ship, entries, mult)
 	return true
 end
 
+--- Check whether a ship has space for some cargo.
+-- @param ship The ship to check.
+-- @param n The number of items to add, or the cargo to add.
+-- @param mult The amount to multiply the base value by; default 1.
+-- @return Whether the ship has space for the specified cargo.
 function cargo.hasSpace(ship, n, mult)
 	if not mult then mult = 1 end
 	if not ship.cargo then return false end
@@ -154,11 +154,23 @@ function cargo.hasSpace(ship, n, mult)
 	return true
 end
 
+--- Attempt to remove cargo from a ship.
+-- This operation is atomic; if the ship is missing any cargo from the list, then no cargo will be removed.
+-- @param ship The ship to remove cargo from.
+-- @param entries The base cargo to attempt to remove.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return Whether the cargo was successfully removed.
 function cargo.use(ship, entries, mult)
 	if not mult then mult = 1 end
 	return cargo.adjust(ship, entries, -mult)
 end
 
+--- Adjust a ship's cargo by an amount.
+-- This operation is atomic; if the ship is missing any removed cargo, or does not have space to accept added cargo, then no cargo will be adjusted.
+-- @param ship The ship to adjust cargo for
+-- @param entries The base cargo to attempt to adjust.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return Whether the cargo was successfully adjusted.
 function cargo.adjust(ship, entries, mult)
 	if not mult then mult = 1 end
 	if not ship.cargo then return false end
@@ -191,6 +203,10 @@ function cargo.adjust(ship, entries, mult)
 	return true
 end
 
+--- Format a cargo list in a short format such as `"3Ti, 2Si"`.
+-- @param entries The base cargo to format.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return A short string describing the cargo.
 function cargo.formatShort(entries, mult)
 	if entries == nil then error("nil cargo entries", 2) end
 
@@ -208,6 +224,10 @@ function cargo.formatShort(entries, mult)
 	return table.concat(res, ", ")
 end
 
+--- Format a cargo list in a long format such as `"3 titanium, 2 silicon"`.
+-- @param entries The base cargo to format.
+-- @param mult The amount to multiply the base cargo by; default 1.
+-- @return A string describing the cargo.
 function cargo.formatLong(entries, mult)
 	if not mult then mult = 1 end
 

@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><a href="../modules/action-main.html">action-main</a></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
+  <li><strong>cargo</strong></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/hook-sys.html">hook-sys</a></li>
+  <li><a href="../modules/hook.html">hook</a></li>
+  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><a href="../modules/lang-strict.html">lang-strict</a></li>
+  <li><a href="../modules/lang.html">lang</a></li>
+  <li><a href="../modules/require.html">require</a></li>
+  <li><a href="../modules/stdext.html">stdext</a></li>
+  <li><a href="../modules/track.html">track</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>cargo</code></h1>
+<p>Adds inventory functionality to ships.</p>
+<p>
+
+
+<p> Item definition format:</p>
+
+<pre>
+{
+    <span class="comment">-- ID of the item.
+</span>    <span class="comment">-- Should be short and descriptive. Must not start with a number.
+</span>    id = <span class="string">"Ti"</span>,
+
+    <span class="comment">-- Name of the item. Should be in mid-sentence case.
+</span>    name = <span class="string">"titanium"</span>,
+
+    <span class="comment">-- Description of the item.
+</span>    desc = <span class="string">"a strong metal"</span>,
+}
+</pre>
+
+<p> To enable a ship to carry cargo:</p>
+
+<pre>
+ship.cargo = {}            <span class="comment">-- unlimited space
+</span>ship.cargo = {limit = <span class="number">20</span>}  <span class="comment">-- can carry 20 items</span>
+</pre>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#cargo.addItems">cargo.addItems (...)</a></td>
+	<td class="summary">Add items that can be carried by ships.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#CargoDrop">CargoDrop (ty, timeout)</a></td>
+	<td class="summary">Create a cargo drop entity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.count">cargo.count (ship, entries, mult)</a></td>
+	<td class="summary">Count how many times over a ship has some cargo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.has">cargo.has (ship, entries, mult)</a></td>
+	<td class="summary">Check whether a ship has some cargo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.hasSpace">cargo.hasSpace (ship, n, mult)</a></td>
+	<td class="summary">Check whether a ship has space for some cargo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.use">cargo.use (ship, entries, mult)</a></td>
+	<td class="summary">Attempt to remove cargo from a ship.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.adjust">cargo.adjust (ship, entries, mult)</a></td>
+	<td class="summary">Adjust a ship's cargo by an amount.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.formatShort">cargo.formatShort (entries, mult)</a></td>
+	<td class="summary">Format a cargo list in a short format such as <code>&quot;3Ti, 2Si&quot;</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo.formatLong">cargo.formatLong (entries, mult)</a></td>
+	<td class="summary">Format a cargo list in a long format such as <code>&quot;3 titanium, 2 silicon&quot;</code>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "cargo.addItems"></a>
+    <strong>cargo.addItems (...)</strong>
+    </dt>
+    <dd>
+    Add items that can be carried by ships.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+         A list of cargo item definitions.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "CargoDrop"></a>
+    <strong>CargoDrop (ty, timeout)</strong>
+    </dt>
+    <dd>
+    Create a cargo drop entity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ty</span>
+         The cargo type held by this entity
+        </li>
+        <li><span class="parameter">timeout</span>
+         The timeout before this drop can be picked up; default 0.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.count"></a>
+    <strong>cargo.count (ship, entries, mult)</strong>
+    </dt>
+    <dd>
+    Count how many times over a ship has some cargo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ship</span>
+         The ship to check.
+        </li>
+        <li><span class="parameter">entries</span>
+         The base cargo to check for.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The number of instances of the cargo the ship has.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.has"></a>
+    <strong>cargo.has (ship, entries, mult)</strong>
+    </dt>
+    <dd>
+    Check whether a ship has some cargo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ship</span>
+         The ship to check.
+        </li>
+        <li><span class="parameter">entries</span>
+         The base cargo to check for.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Whether the ship has at least the specified cargo.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.hasSpace"></a>
+    <strong>cargo.hasSpace (ship, n, mult)</strong>
+    </dt>
+    <dd>
+    Check whether a ship has space for some cargo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ship</span>
+         The ship to check.
+        </li>
+        <li><span class="parameter">n</span>
+         The number of items to add, or the cargo to add.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base value by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Whether the ship has space for the specified cargo.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.use"></a>
+    <strong>cargo.use (ship, entries, mult)</strong>
+    </dt>
+    <dd>
+    Attempt to remove cargo from a ship.
+ This operation is atomic; if the ship is missing any cargo from the list, then no cargo will be removed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ship</span>
+         The ship to remove cargo from.
+        </li>
+        <li><span class="parameter">entries</span>
+         The base cargo to attempt to remove.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Whether the cargo was successfully removed.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.adjust"></a>
+    <strong>cargo.adjust (ship, entries, mult)</strong>
+    </dt>
+    <dd>
+    Adjust a ship's cargo by an amount.
+ This operation is atomic; if the ship is missing any removed cargo, or does not have space to accept added cargo, then no cargo will be adjusted.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ship</span>
+         The ship to adjust cargo for
+        </li>
+        <li><span class="parameter">entries</span>
+         The base cargo to attempt to adjust.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Whether the cargo was successfully adjusted.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.formatShort"></a>
+    <strong>cargo.formatShort (entries, mult)</strong>
+    </dt>
+    <dd>
+    Format a cargo list in a short format such as <code>&quot;3Ti, 2Si&quot;</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">entries</span>
+         The base cargo to format.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        A short string describing the cargo.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo.formatLong"></a>
+    <strong>cargo.formatLong (entries, mult)</strong>
+    </dt>
+    <dd>
+    Format a cargo list in a long format such as <code>&quot;3 titanium, 2 silicon&quot;</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">entries</span>
+         The base cargo to format.
+        </li>
+        <li><span class="parameter">mult</span>
+         The amount to multiply the base cargo by; default 1.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        A string describing the cargo.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

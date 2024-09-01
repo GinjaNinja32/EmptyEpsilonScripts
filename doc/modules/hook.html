@@ -41,10 +41,10 @@
   <li><a href="../modules/action.html">action</a></li>
   <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
   <li><a href="../modules/cargo.html">cargo</a></li>
-  <li><strong>drag</strong></li>
+  <li><a href="../modules/drag.html">drag</a></li>
   <li><a href="../modules/ecs.html">ecs</a></li>
   <li><a href="../modules/hook-sys.html">hook-sys</a></li>
-  <li><a href="../modules/hook.html">hook</a></li>
+  <li><strong>hook</strong></li>
   <li><a href="../modules/lang-lax.html">lang-lax</a></li>
   <li><a href="../modules/lang-strict.html">lang-strict</a></li>
   <li><a href="../modules/lang.html">lang</a></li>
@@ -58,24 +58,29 @@
 
 <div id="content">
 
-<h1>Module <code>drag</code></h1>
-<p>Slows down specified entities over time, eventually stopping them.</p>
-<p> On non-ECS EmptyEpsilon, also provides an entity velocity comp.
- To apply drag to an entity:</p>
+<h1>Module <code>hook</code></h1>
+<p>Integrates the <a href="../modules/hook-sys.html#">hook-sys</a> library into EmptyEpsilon, registering relevant events automatically.</p>
+<p>
 
-<pre>
-<span class="function-name">comps</span>(ent).drag = {}  <span class="comment">-- default slowdown parameter; retain 50% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.8</span>}  <span class="comment">-- retain 80% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.4</span>}  <span class="comment">-- retain 40% speed after 1 second</span>
-</pre>
+<p> For documentation on how to call the library, see <a href="../modules/hook-sys.html#">hook-sys</a>.</p>
 
-<p> [non-ECS] To apply velocity to an entity:</p>
+<p> Global hooks:</p>
 
-<pre>
-<span class="function-name">comps</span>(ent).velocity = {linear = {<span class="number">10</span>, <span class="number">20</span>}}  <span class="comment">-- set x velocity to 10 and y velocity to 20</span>
-</pre>
+<ul>
+    <li><code>init</code>: on scenario initialisation (no args)</li>
+    <li><code>update</code>: on scenario update (args: delta)</li>
+    <li><code>newPlayerShip</code>: on new player ship creation (args: ship)</li>
+    <li><code>probeLaunch</code>: when a player ship launches a probe (args: ship, probe)</li>
+</ul>
 
-<p> When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On non-ECS EE, its velocity comp is also removed.</p>
+<p> Entity hooks:</p>
+
+<ul>
+    <li><code>destroyed</code>: when the entity is removed from the game by any means (args: entity)</li>
+    <li><code>destruction</code>: when the entity is destroyed by damage (args: entity)</li>
+    <li><code>expiration</code>: when the scan probe expires (args: entity)</li>
+</ul>
+</p>
 
 
 

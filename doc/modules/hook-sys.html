@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Entity">Entity </a></li>
+<li><a href="#Global">Global </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><a href="../modules/action-main.html">action-main</a></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
+  <li><a href="../modules/cargo.html">cargo</a></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><strong>hook-sys</strong></li>
+  <li><a href="../modules/hook.html">hook</a></li>
+  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><a href="../modules/lang-strict.html">lang-strict</a></li>
+  <li><a href="../modules/lang.html">lang</a></li>
+  <li><a href="../modules/require.html">require</a></li>
+  <li><a href="../modules/stdext.html">stdext</a></li>
+  <li><a href="../modules/track.html">track</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>hook-sys</code></h1>
+<p>Provides utilities for allowing multiple systems to hook the same set of events without interfering with each other or requiring coordination.</p>
+<p> Anywhere the text EVENT appears in the function documentation below, this should be substituted for the name of an event, such as <code>init</code> or <code>destroyed</code>.</p>
+
+
+<h2><a href="#Entity">Entity </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#hook.entity">hook.entity</a></td>
+	<td class="summary">Access hooks for an entity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#.on.EVENT">.on.EVENT (callback)</a></td>
+	<td class="summary">Register to receive a callback when an event happens on this entity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#.trigger.EVENT">.trigger.EVENT (...)</a></td>
+	<td class="summary">Trigger an event on this entity.</td>
+	</tr>
+</table>
+<h2><a href="#Global">Global </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#hook.on.EVENT">hook.on.EVENT (callback)</a></td>
+	<td class="summary">Register to receive a callback when an event happens.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hook.after.EVENT">hook.after.EVENT (callback)</a></td>
+	<td class="summary">Register to receive a callback when an event happens, after all normal callbacks have been called.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hook.trigger.EVENT">hook.trigger.EVENT (...)</a></td>
+	<td class="summary">Trigger an event.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hook.every">hook.every (interval, callback)</a></td>
+	<td class="summary">Register to receive a callback on an interval.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Entity"></a>Entity </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "hook.entity"></a>
+    <strong>hook.entity</strong>
+    </dt>
+    <dd>
+    Access hooks for an entity.
+ This table should be indexed with the entity you wish to set or trigger hooks for.
+ The remaining functions in this section are accessed on the table returned from this index operation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = ".on.EVENT"></a>
+    <strong>.on.EVENT (callback)</strong>
+    </dt>
+    <dd>
+    Register to receive a callback when an event happens on this entity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+         The callback to register. Callbacks will receive a first parameter of the entity itself, followed by any arguments passed to <a href="../modules/hook-sys.html#.trigger.EVENT">.trigger.EVENT</a>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = ".trigger.EVENT"></a>
+    <strong>.trigger.EVENT (...)</strong>
+    </dt>
+    <dd>
+    Trigger an event on this entity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+         The additional arguments to pass to each callback.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Global"></a>Global </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "hook.on.EVENT"></a>
+    <strong>hook.on.EVENT (callback)</strong>
+    </dt>
+    <dd>
+    Register to receive a callback when an event happens.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+         The callback to register.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hook.after.EVENT"></a>
+    <strong>hook.after.EVENT (callback)</strong>
+    </dt>
+    <dd>
+    Register to receive a callback when an event happens, after all normal callbacks have been called.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+         The callback to register.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hook.trigger.EVENT"></a>
+    <strong>hook.trigger.EVENT (...)</strong>
+    </dt>
+    <dd>
+    Trigger an event.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+         The arguments to pass to each callback.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hook.every"></a>
+    <strong>hook.every (interval, callback)</strong>
+    </dt>
+    <dd>
+    Register to receive a callback on an interval.  This function depends on the <code>update</code> hook being triggered regularly.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">interval</span>
+         The interval to call on.
+        </li>
+        <li><span class="parameter">callback</span>
+         The callback to register.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

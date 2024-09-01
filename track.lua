@@ -1,22 +1,5 @@
--- Module: gn32/track
--- Description: Utility for tracking collections of entities
---[[
-	To begin tracking an entity:
-		track.set(
-			coll,	-- The collection to track the entity in; must be usable as a table key
-			entity,	-- The entity to track
-			data	-- Optionally, data to store with this tracking entry
-		)
-
-	To retrieve data for a tracked entity:
-		track.get(coll, entity)
-
-	To retrieve a list of tracked entities and/or a map of entity data:
-		entities, data = track.get(coll)
-
-	To do something for each tracked entity:
-		track.each(coll, function(entity, data) ... end)
-]]
+--- Utility for tracking collections of entities.
+-- @pragma nostrip
 
 require "gn32/lang"
 
@@ -26,6 +9,10 @@ G.track = {}
 
 local tracked = {}
 
+--- Set tracking on an entity.
+-- @param coll The collection to track the entity in.
+-- @param entity The entity to track.
+-- @param data Optional; data to store along with this tracking entry.
 function track.set(coll, entity, data)
 	if entity == nil then error("nil entity", 2) end
 
@@ -46,6 +33,9 @@ function track.set(coll, entity, data)
 	end)
 end
 
+--- Stop tracking an entity.
+-- @param coll The collection to stop tracking the entity in.
+-- @param entity The entity to stop tracking.
 function track.remove(coll, entity)
 	local e, d = track.get(coll)
 	for i, ent in pairs(e) do
@@ -57,6 +47,10 @@ function track.remove(coll, entity)
 	d[entity] = nil
 end
 
+--- Get the set of entities in a collection, or get the data associated with a specific entity.
+-- @param coll The collection to read.
+-- @param entity The entity to read data for, or omitted/nil to get the set of entities in the collection.
+-- @return The data for the entity if passed, otherwise the collection of entities and mapping of data for this collection.
 function track.get(coll, entity)
 	if tracked[coll] == nil then
 		tracked[coll] = {
@@ -72,6 +66,9 @@ function track.get(coll, entity)
 	return tracked[coll].entities, tracked[coll].data
 end
 
+--- Do something for each tracked entity in a collection.
+-- @param coll The collection to iterate.
+-- @param f The function to call for each entity. Will be called with `(entity, data)`.
 function track.each(coll, f)
 	local e, d = track.get(coll)
 
@@ -92,6 +89,10 @@ function track.each(coll, f)
 	end
 end
 
+--- Check whether any entity in a collection matches a predicate.
+-- @param coll The collection to check.
+-- @param f The predicate to check for each entity.
+-- @return The return value of the first invocation of `f` that returned a non-`false` non-`nil` value, if present; otherwise `nil`.
 function track.any(coll, f)
 	local e, d = track.get(coll)
 

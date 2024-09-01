@@ -1,5 +1,4 @@
--- Module: gn32/cargo-menu
--- Description: Provides a player-facing menu for interacting with `cargo`.
+--- Provides a player-facing menu for interacting with `cargo`.
 
 require "gn32/action-main"
 require "gn32/drag"

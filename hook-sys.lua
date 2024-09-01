@@ -1,21 +1,5 @@
--- Name: gn32/hook-sys
--- Description: Provides utilities for allowing multiple systems to hook the same set of events without interfering with each other or requiring coordination.
---[[
-	To register to receive a global hook:
-		hook.on.<event>(<callback>)
-		hook.on.<event> = <callback>
-		function hook.on.<event>(...) ... end
-
-	To trigger a global hook:
-		hook.trigger.<event>(<args>)
-
-	To register to receive an entity hook:
-		hook.entity[<ent>].on.<event>(<callback>)
-		hook.entity[<ent>].on.<event> = <callback>
-
-	To trigger an entity hook:
-		hook.entity[<ent>].trigger.<event>(<args>)
-]]
+--- Provides utilities for allowing multiple systems to hook the same set of events without interfering with each other or requiring coordination.
+-- Anywhere the text EVENT appears in the function documentation below, this should be substituted for the name of an event, such as `init` or `destroyed`.
 
 require "gn32/lang"
 
@@ -26,6 +10,13 @@ local registeredAfter = {}
 
 hook.entityEventRegistrationName = {}
 
+--- Entity.
+-- @section Entity
+
+--- Access hooks for an entity.
+-- This table should be indexed with the entity you wish to set or trigger hooks for.
+-- The remaining functions in this section are accessed on the table returned from this index operation.
+-- @table hook.entity
 hook.entity = setmetatable({}, {
 	__index = function(t, entity)
 		if entity.__hooks == nil then
@@ -35,6 +26,9 @@ hook.entity = setmetatable({}, {
 
 		local ehook = {}
 
+		--- Register to receive a callback when an event happens on this entity.
+		-- @function .on.EVENT
+		-- @param callback The callback to register. Callbacks will receive a first parameter of the entity itself, followed by any arguments passed to `.trigger.EVENT`.
 		ehook.on = setmetatable({}, {
 			__index = function(t, event)
 				return function(callback)
@@ -57,6 +51,9 @@ hook.entity = setmetatable({}, {
 			end
 		})
 
+		--- Trigger an event on this entity.
+		-- @function .trigger.EVENT
+		-- @param ... The additional arguments to pass to each callback.
 		ehook.trigger = setmetatable({}, {
 			__index = function(t, event)
 				return function(...)
@@ -83,6 +80,12 @@ hook.entity = setmetatable({}, {
 	end
 })
 
+--- Global.
+-- @section Global
+
+--- Register to receive a callback when an event happens.
+-- @function hook.on.EVENT
+-- @param callback The callback to register.
 hook.on = setmetatable({}, {
 	__index = function(t, event)
 		return function(callback)
@@ -99,6 +102,10 @@ hook.on = setmetatable({}, {
 		hook.on[event](callback)
 	end
 })
+
+--- Register to receive a callback when an event happens, after all normal callbacks have been called.
+-- @function hook.after.EVENT
+-- @param callback The callback to register.
 hook.after = setmetatable({}, {
 	__index = function(t, event)
 		return function(callback)
@@ -116,6 +123,9 @@ hook.after = setmetatable({}, {
 	end
 })
 
+--- Trigger an event.
+-- @function hook.trigger.EVENT
+-- @param ... The arguments to pass to each callback.
 hook.trigger = setmetatable({}, {
 	__index = function(t, event)
 		return function(...)
@@ -145,14 +155,22 @@ hook.trigger = setmetatable({}, {
 })
 
 local timers = {}
+
+--- Register to receive a callback on an interval. This function depends on the `update` hook being triggered regularly.
+-- @function hook.every
+-- @param interval The interval to call on.
+-- @param callback The callback to register.
+local addTimer = function(_, time, fn)
+	table.insert(timers, {
+		interval = time,
+		next = getScenarioTime(),
+		fn = fn,
+	})
+end
+
 hook.every = setmetatable({}, {
-	__newindex = function(t, time, fn)
-		table.insert(timers, {
-			interval = time,
-			next = getScenarioTime(),
-			fn = fn,
-		})
-	end
+	__call = addTimer,
+	__newindex = addTimer,
 })
 
 function hook.on.update(delta)

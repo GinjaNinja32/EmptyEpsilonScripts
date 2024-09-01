@@ -1,5 +1,8 @@
--- Module: gn32/require
--- Description: Provide `require` behaviour closer to standard Lua
+--- Provide `require` behaviour closer to standard Lua.
+-- Differences from standard EE `require`:
+--
+-- - Modules do not require a `.lua` suffix; the suffix is still permitted.
+-- - Modules that are `require`d multiple times will only be executed the first time.
 
 if _LOADED then return end
 _LOADED = {}

@@ -1,9 +1,13 @@
--- Module: gn32/stdext
--- Description: Standard library extensions
+--- Standard library extensions.
+-- @alias G
 
+--- table.
+-- @section table
 
--- table.defaulting: returns a table which sets tbl[idx] = f() when indexed with a key that does not exist.
--- if `nostore` is true, the constructed value is only returned from the index operation, and not stored in the table.
+--- Create a defaulting table, which returns a default value when indexed with a key that does not exist.
+-- @param f The function to default values in the table to.
+-- @param nostore Optional; if true, the constructed value is only returned from the index operation, and not stored in the table.
+-- @return The constructed table.
 function table.defaulting(f, nostore)
 	return setmetatable({}, {
 		__index = function(tbl, idx)
@@ -16,7 +20,10 @@ function table.defaulting(f, nostore)
 	})
 end
 
--- table.contains: returns true if there is some index i between 1 and #tbl such that tbl[i] == entry, otherwise returns false.
+--- Check whether a table contains an entry.
+-- @param tbl The table to check for.
+-- @param entry The entry to check for.
+-- @return `true` if there is some index `i` between 1 and `#tbl` such that `tbl[i] == entry`, otherwise `false`.
 function table.contains(tbl, entry)
 	for i = 1, #tbl do
 		if tbl[i] == entry then
@@ -27,8 +34,14 @@ function table.contains(tbl, entry)
 	return false
 end
 
--- safecall: return `f(...)` if it does not throw an error, otherwise return `errorhandler(err, ...)`.
--- errors in `errorhandler` are not caught.
+--- global.
+-- @section global
+
+--- Call a function, or call an error handler with the raised error.
+-- @param errorhandler The function to call if `f` throws an error. Errors in this function are not caught.
+-- @param f The function to call.
+-- @param ... The arguments to pass to the function.
+-- @return `f(...)` if that call does not throw an error, otherwise `errorhandler(err, ...)`.
 function G.safecall(errorhandler, f, ...)
 	local args = {...}
 	local ret

@@ -41,11 +41,11 @@
   <li><a href="../modules/action.html">action</a></li>
   <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
   <li><a href="../modules/cargo.html">cargo</a></li>
-  <li><strong>drag</strong></li>
+  <li><a href="../modules/drag.html">drag</a></li>
   <li><a href="../modules/ecs.html">ecs</a></li>
   <li><a href="../modules/hook-sys.html">hook-sys</a></li>
   <li><a href="../modules/hook.html">hook</a></li>
-  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><strong>lang-lax</strong></li>
   <li><a href="../modules/lang-strict.html">lang-strict</a></li>
   <li><a href="../modules/lang.html">lang</a></li>
   <li><a href="../modules/require.html">require</a></li>
@@ -58,24 +58,11 @@
 
 <div id="content">
 
-<h1>Module <code>drag</code></h1>
-<p>Slows down specified entities over time, eventually stopping them.</p>
-<p> On non-ECS EmptyEpsilon, also provides an entity velocity comp.
- To apply drag to an entity:</p>
+<h1>Module <code>lang-lax</code></h1>
+<p>Provides the interface of <a href="../modules/lang-strict.html#">lang-strict</a> without any enforcement, for script compatibility purposes.</p>
+<p>
 
-<pre>
-<span class="function-name">comps</span>(ent).drag = {}  <span class="comment">-- default slowdown parameter; retain 50% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.8</span>}  <span class="comment">-- retain 80% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.4</span>}  <span class="comment">-- retain 40% speed after 1 second</span>
-</pre>
-
-<p> [non-ECS] To apply velocity to an entity:</p>
-
-<pre>
-<span class="function-name">comps</span>(ent).velocity = {linear = {<span class="number">10</span>, <span class="number">20</span>}}  <span class="comment">-- set x velocity to 10 and y velocity to 20</span>
-</pre>
-
-<p> When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On non-ECS EE, its velocity comp is also removed.</p>
+</p>
 
 
 
