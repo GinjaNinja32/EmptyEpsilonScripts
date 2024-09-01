@@ -4,6 +4,7 @@
 require "gn32/action-main"
 require "gn32/drag"
 require "gn32/cargo"
+require "gn32/vector"
 
 mainMenu:add {
 	sticky = true,
@@ -154,14 +155,21 @@ mainMenu:add {
 								if cargo.use(ship, {[def.id]=1}) then
 									local vx, vy = ship:getVelocity()
 
-									vx = vx + random(-50, 50)
-									vy = vy + random(-50, 50)
+									local fx, fy = vector.xyFromRadialDeg(400, ship:getRotation())
+
+									vx = vx - fx + random(-100, 100)
+									vy = vy - fy + random(-100, 100)
 
 									local d = CargoDrop(def.id, 10)
 										:setPosition(ship:getPosition())
-										:setVelocity(vx, vy)
 
-									drag.apply(d)
+									if G.createEntity then
+										d:setVelocity(vx, vy)
+									else
+										comps(d).velocity = {linear = {vx, vy}}
+									end
+
+									comps(d).drag = {}
 								end
 
 								return false
