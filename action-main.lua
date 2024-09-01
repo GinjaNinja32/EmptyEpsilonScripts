@@ -1,22 +1,43 @@
--- Module: gn32/action-main
--- Description: Adds an `action`-driven crew position menu
---[[
-	For details of the menu item format, see `action`.
-
-	Target arguments: ship, station
-	Differences from `action` docs:
-		- Menu items support a `stations` list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.
-		- Menu items support a `requiredTaskState` bool; if set, the item will only display when there is (true) or is not (false) a task in progress.
-
-	To add a station button menu item:
-		mainMenu:add {
-			info = "Info Text",
-		}
-		mainMenu:add {
-			button = "Button Name",
-			action = function(reopen, ship, station) ... end,
-		}
-]]
+--- Adds an `action`-driven crew position menu.
+-- For details of the menu item format, see `action`.
+--
+-- Target arguments: ship, station  
+-- Differences from `action` docs:
+--
+-- - Menu items support a `stations` list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.
+-- - Menu items support a `requiredTaskState` bool; if set, the item will only display when there is (`true`) or is not (`false`) a task in progress.
+-- 
+-- To add a station button menu item:
+--	mainMenu:add {
+--		info = "Info Text",
+--	}
+--	mainMenu:add {
+--		button = "Button Name",
+--		action = function(reopen, ship, station) ... end,
+--	}
+--
+-- To set the task that a station is working on:
+--	mainMenu:setTask(task, ship, station)
+--
+-- Task structure:
+--	{
+--		-- Exactly one of the following two fields should be set.
+--		-- The scenario time that the task will be complete at.
+--		completionAt = 42,
+--		-- The time that the task takes, in seconds.
+--		duration = 42,
+--
+--		-- Update the task. This field is optional.
+--		-- If `update` returns a non-nil value, it will be treated
+--		-- as a failure to complete the task and displayed to the user.
+--		update = function(ship, station) ... end,
+--
+--		-- Complete the task. This field is optional.
+--		-- If `complete` returns a menu list, it will be used for
+--		-- the 'task complete' menu.
+--		complete = function(ship, station) ... end,
+--	}
+-- @alias G
 
 require "gn32/lang"
 
@@ -26,6 +47,7 @@ require "gn32/position"
 require "gn32/stdext"
 require("batteries/sort"):export()
 
+--- An instance of `action.ActionBase` that displays on crew consoles.
 G.mainMenu = ActionBase {
 	-- hook push/pop/reset to keep a scroll stack
 	_onPush = function(self, ship, station)
@@ -176,7 +198,7 @@ G.mainMenu = ActionBase {
 			return extraMenu
 		end
 	end,
-	completeTask = function(self, ship, station)
+	_completeTask = function(self, ship, station)
 		local data = self:_dataFor(ship, station)
 
 		if not data.task or data.task.finished then
@@ -195,13 +217,13 @@ G.mainMenu = ActionBase {
 		table.insert(data.task.finished, {button = "Dismiss", action=function() self:setTask(nil, ship, station); return false end})
 		self:refreshMenu(ship, station)
 	end,
-	updateTasks = function(self, ship)
+	_updateTasks = function(self, ship)
 		local now = getScenarioTime()
 
 		for station, data in pairs(ship.__menu) do
 			if data.task and not data.task.finished then
 				if data.task.completionAt <= now then
-					self:completeTask(ship, station)
+					self:_completeTask(ship, station)
 				else
 					if data.task.update then
 						local res = data.task.update(ship, station)
@@ -222,6 +244,12 @@ G.mainMenu = ActionBase {
 			end
 		end
 	end,
+
+	--- Set the current task that the operator at the given console is working on.
+	-- @function mainMenu:setTask
+	-- @param task The task to set.
+	-- @param ship The ship to set the task on.
+	-- @param station The console to set the task for.
 	setTask = function(self, task, ship, station)
 		local data = self:_dataFor(ship, station)
 
@@ -275,7 +303,7 @@ mainMenu:add {
 	isDebug = true,
 	requiredTaskState = true,
 	action = function(reopen, ship, station)
-		mainMenu:completeTask(ship, station)
+		mainMenu:_completeTask(ship, station)
 	end,
 }
 
@@ -288,7 +316,7 @@ end
 function hook.on.update()
 	for _, ship in ipairs(getActivePlayerShips()) do
 		if ship.__menu == nil then ship.__menu = {} end
-		mainMenu:updateTasks(ship)
+		mainMenu:_updateTasks(ship)
 	end
 end
 

@@ -1,5 +1,5 @@
 .PHONY: doc
 doc: doc/index.html
 
-doc/index.html: *.lua
-	ldoc .
+doc/index.html: config.ld *.lua
+	ldoc --date '' .

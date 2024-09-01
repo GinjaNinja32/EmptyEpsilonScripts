@@ -1,18 +1,17 @@
--- Module: gn32/action-gm
--- Description: Adds an `action`-driven GM menu
---[[
-	For details of the menu item format, see `action`.
-
-	Target arguments: (none)
-	Differences from `action` docs:
-		- 'info' entries are not fully supported; they will be displayed as buttons with a '*' prefix.
-
-	To add a GM button:
-		gmMenu:add {
-			button = "Button Name",
-			action = function(reopen) ... end,
-		}
-]]
+--- Adds an `action`-driven GM menu.
+-- For details of the menu item format, see `action`.
+--
+-- Target arguments: (none)  
+-- Differences from `action` docs:
+--
+-- - `info` entries are not fully supported; they will be displayed as buttons with a '*' prefix.
+--
+-- To add a GM button:
+--	gmMenu:add {
+--		button = "Button Name",
+--		action = function(reopen) ... end,
+--	}
+-- @alias G
 
 require "gn32/lang"
 
@@ -25,6 +24,7 @@ local data = {
 	currentEntries = {},
 }
 
+--- An instance of `action.ActionBase` that displays on the GM screen.
 G.gmMenu = ActionBase {
 	_dataFor = function(self)
 		return data

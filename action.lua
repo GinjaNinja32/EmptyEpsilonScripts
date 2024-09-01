@@ -1,42 +1,55 @@
--- Module: gn32/action
--- Description: Generic menu system for EE, flexible enough to handle GM buttons, comms menus, and custom station button menus.
---[[
-	Any `...` function argument in examples below refers to the target arguments of the menu, which should be specified in implementations.
-
-	Supported menu item list fields:
-		{
-			allowHome = true, -- Whether to allow returning directly to the top-level menu from this menu. Default true.
-			allowBack = true, -- Whether to allow returning to the parent menu. Default true.
-			allowSticky = true, -- Whether to allow sticky menu items to display with this menu. Default true.
-
-			{...},
-			{...},
-			...
-		}
-
-	Supported menu item fields:
-		{
-			-- Exactly one of the following three fields must be present.
-			button = "Button Name", -- Name of button, or function(...) returning same.
-			info = "Info Text", -- Text for info panel/comms message, or function(...) returning same. Only partially supported in GM menu.
-			expand = {}, -- List of menu items to substitute for this item if shown, or function(...) returning same.
-
-			action = ..., -- The action to perform when the button is pressed, or a function returning same. Only valid on `button` items. See below for valid values.
-			allowBack = true, -- Whether to allow returning to the current menu after this submenu is entered. Only valid on `button` items. Default true.
-
-			isDebug = false, -- Whether the item is a debug item that should only be displayed when the 'menuOptions' debug toggle is enabled. Default false.
-			order = 42, -- Order the item relative to other items.
-			when = function(...) ... end, -- Function defining when to show the menu item. If no function is provided, the item is always shown.
-			otherwise = {}, -- Menu item to replace this item with if the function provided in `when` returns false.
-
-			sticky = false, -- Top-level items only. If true, the item is 'sticky' and will display regardless of which menu is open. Default false.
-		}
-
-	Supported menu item `action` values:
-		`nil`: return to top-level menu.
-		`false`: re-display current menu.
-		menu list: display these items.
-]]
+--- Generic menu system for EE, flexible enough to handle [GM buttons](action-gm.html), [comms menus](action-comms.html), and [custom station button menus](action-main.html).
+-- Any `...` function argument in examples below refers to the target arguments of the menu, which should be specified in implementations.
+--
+-- Supported menu item list fields:
+--
+-- - `allowHome`: Whether to allow returning directly to the top-level menu from this menu. Default true.
+-- - `allowBack`:  Whether to allow returning to the parent menu. Default true.
+-- - `allowSticky`: Whether to allow sticky menu items to display with this menu. Default true.
+--
+-- Supported menu item fields:
+--
+-- Any entry with a description starting with `[F]` may be replaced with a `function(...)` returning the described value.
+--
+--	{
+--		-- Exactly one of the following three fields must be present.
+--		-- [F] Name of button.
+--		button = "Button Name",
+--		-- [F] Text for info panel/comms message.
+--		info = "Info Text",
+--		-- [F] List of menu items to substitute for this item if shown.
+--		expand = {},
+--
+--		-- [F] The action to perform when the button is pressed.
+--		-- Only valid on `button` items. See below for valid values.
+--		action = ...,
+--		-- Whether to allow returning to the current menu after this
+--		-- submenu is entered. Only valid on `button` items. Default true.
+--		allowBack = true,
+--
+--		-- Whether the item is a debug item that should only be displayed
+--		-- when the 'menuOptions' debug toggle is enabled. Default false.
+--		isDebug = false,
+--		-- Order the item relative to other items.
+--		order = 42,
+--		-- Function defining when to show the menu item. If no function is
+--		-- provided, the item is always shown.
+--		when = function(...) ... end,
+--		-- Menu item to replace this item with if the function provided in
+--		-- `when` returns false.
+--		otherwise = {},
+--
+--		-- Top-level items only. If true, the item is 'sticky' and will
+--		-- display regardless of which menu is open. Default false.
+--		sticky = false,
+--	}
+-- 
+-- Supported menu item `action` values:
+--
+-- - `nil`: return to top-level menu.
+-- - `false`: re-display current menu.
+-- - menu list: display these items.
+-- @alias G
 
 require "gn32/lang"
 
@@ -66,9 +79,16 @@ local errhandler_nil = function(err)
 	return nil
 end
 
+--- MenuSet.
+-- @section MenuSet
+
+--- Create a new MenuSet, which can be used like a menu list but has an add method for ease of use.
 G.MenuSet = function()
 	return setmetatable({}, {
 		__index = {
+			--- Add an entry to this MenuSet.
+			-- @function menuSet:add
+			-- @param entry The entry to add.
 			add = function(self, entry)
 				table.insert(self, entry)
 			end
@@ -76,17 +96,78 @@ G.MenuSet = function()
 	})
 end
 
-local actionbase = {
+--- ActionBase.
+-- @section ActionBase
+
+local actionbase = {}
+
+--- Create a new ActionBase-derived type, using the given provider implementation.
+-- @param provider The provider to use for this instance.
+-- @return A constructor function for the new type.
+G.ActionBase = function(provider)
+	local base = setmetatable(provider, {__index = actionbase})
+	return function()
+		local v = setmetatable({}, {__index = base})
+		actionbase._init(v)
+		return v
+	end
+end
+
+--- Provider.
+-- This is the interface that specific implementations must provide to `ActionBase` as `provider`.
+-- @section Provider
+
+actionbase = {
 	-- Menu impl hooks
+	
+	--- Get the data table for the given target.
+	-- @function provider:_dataFor
+	-- @param ... The target to get data for.
+	-- @return A unique table corresponding to the given set of target parameters.
 	_dataFor = function(self, ...) error("action: _dataFor unimpl") end,
+	--- Start showing a menu for the given target.
+	-- @function provider:_startMenu
+	-- @param ... The target to start showing a menu for.
 	_startMenu = function(self, ...) error("action: _startMenu unimpl") end,
+	--- Finish showing a menu for the given target.
+	-- @function provider:_finishMenu
+	-- @param ... The target to finish showing a menu for.
 	_finishMenu = function(self, ...) error("action: _finishMenu unimpl") end,
+	--- Add a button to the menu for the given target.
+	-- @function provider:_addButton
+	-- @param button The name of the button.
+	-- @param order The ordering of the button.
+	-- @param act A callback to call when the button is clicked.
+	-- @param ... The target to add a button for.
 	_addButton = function(self, button, order, act, ...) error("action: _addButton unimpl") end,
+	--- Add an info entry to the menu for the given target.
+	-- @function provider:_addInfo
+	-- @param info The text of the info entry.
+	-- @param order The ordering of the info entry.
+	-- @param ... The target to add an info entry for.
 	_addInfo = function(self, info, order, ...) error("action: _addInfo unimpl") end,
+	--- Return whether the given item should show for the given target.  
+	-- This method is optional. If not provided, defaults to showing all items.
+	-- @function provider:_shouldShow
+	-- @param item The item to check, in standard `action` format.
+	-- @param ... The target to check.
+	-- @return Whether the item should show.
 	_shouldShow = function(self, item, ...) return true end,
 
+	--- Called whenever the menu state is reset. This happens when the user returns to the top-level menu, or by an explicit setMenu call.  
+	-- This method is optional.
+	-- @function provider:_onReset
+	-- @param ... The target of the menu.
 	_onReset = function(self, ...) end,
+	--- Called whenever the user enters a sub-menu.  
+	-- This method is optional.
+	-- @function provider:_onPush
+	-- @param ... The target of the menu.
 	_onPush = function(self, ...) end,
+	--- Called whenever the user exits a sub-menu.  
+	-- This method is optional.
+	-- @function provider:_onPop
+	-- @param ... The target of the menu.
 	_onPop = function(self, ...) end,
 	-- end impl hooks
 
@@ -94,6 +175,12 @@ local actionbase = {
 		self.root = {}
 	end,
 
+	--- ActionBase.
+	-- @section ActionBase
+
+	--- Add a top-level entry to this Menu
+	-- @function actionBase:add
+	-- @param entry The entry to add.
 	add = function(self, entry)
 		table.insert(self.root, entry)
 		return self
@@ -278,6 +365,10 @@ local actionbase = {
 		self:_setMenu(menu, false, false, ...)
 	end,
 
+	--- Set the current menu to `menu` for the provided target.
+	-- @function actionBase:setMenu
+	-- @param menu The menu to set.
+	-- @param ... The target to set the menu for.
 	setMenu = function(self, menu, ...)
 		self:callDebug("setMenu", {menu}, ...)
 		local data = self:_dataFor(...)
@@ -286,18 +377,12 @@ local actionbase = {
 		self:_setMenu(menu, false, false, ...)
 	end,
 
+	--- Refresh the currently-displayed menu for the provided target.
+	-- @function actionBase:refreshMenu
+	-- @param ... The target to refresh the menu for.
 	refreshMenu = function(self, ...)
 		self:callDebug("refreshMenu", {}, ...)
 		local data = self:_dataFor(...)
 		self:_setMenu(data.currentMenu, true, false, ...)
 	end,
 }
-
-G.ActionBase = function(provider)
-	local base = setmetatable(provider, {__index = actionbase})
-	return function()
-		local v = setmetatable({}, {__index = base})
-		actionbase._init(v)
-		return v
-	end
-end

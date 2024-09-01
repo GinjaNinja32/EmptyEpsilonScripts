@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Fields">Fields</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><strong>action-main</strong></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>action-main</code></h1>
+<p>Adds an <a href="../modules/action.html#">action</a>-driven crew position menu.</p>
+<p>
+
+<p> For details of the menu item format, see <a href="../modules/action.html#">action</a>.</p>
+
+<p> Target arguments: ship, station <br/>
+ Differences from <a href="../modules/action.html#">action</a> docs:</p>
+
+<ul>
+    <li>Menu items support a <code>stations</code> list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.</li>
+    <li>Menu items support a <code>requiredTaskState</code> bool; if set, the item will only display when there is (<code>true</code>) or is not (<code>false</code>) a task in progress.</li>
+</ul>
+
+<p> To add a station button menu item:</p>
+
+<pre>
+mainMenu:<span class="function-name">add</span> {
+    info = <span class="string">"Info Text"</span>,
+}
+mainMenu:<span class="function-name">add</span> {
+    button = <span class="string">"Button Name"</span>,
+    action = <span class="keyword">function</span>(reopen, ship, station) ... <span class="keyword">end</span>,
+}
+</pre>
+
+<p> To set the task that a station is working on:</p>
+
+<pre>
+mainMenu:<span class="function-name">setTask</span>(task, ship, station)
+</pre>
+
+<p> Task structure:</p>
+
+<pre>
+{
+    <span class="comment">-- Exactly one of the following two fields should be set.
+</span>    <span class="comment">-- The scenario time that the task will be complete at.
+</span>    completionAt = <span class="number">42</span>,
+    <span class="comment">-- The time that the task takes, in seconds.
+</span>    duration = <span class="number">42</span>,
+
+    <span class="comment">-- Update the task. This field is optional.
+</span>    <span class="comment">-- If <code>update</code> returns a non-nil value, it will be treated
+</span>    <span class="comment">-- as a failure to complete the task and displayed to the user.
+</span>    update = <span class="keyword">function</span>(ship, station) ... <span class="keyword">end</span>,
+
+    <span class="comment">-- Complete the task. This field is optional.
+</span>    <span class="comment">-- If <code>complete</code> returns a menu list, it will be used for
+</span>    <span class="comment">-- the 'task complete' menu.
+</span>    complete = <span class="keyword">function</span>(ship, station) ... <span class="keyword">end</span>,
+}
+</pre>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mainMenu:setTask">mainMenu:setTask (task, ship, station)</a></td>
+	<td class="summary">Set the current task that the operator at the given console is working on.</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mainMenu">mainMenu</a></td>
+	<td class="summary">An instance of <a href="../modules/action.html#ActionBase">action.ActionBase</a> that displays on crew consoles.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mainMenu:setTask"></a>
+    <strong>mainMenu:setTask (task, ship, station)</strong>
+    </dt>
+    <dd>
+    Set the current task that the operator at the given console is working on.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">task</span>
+         The task to set.
+        </li>
+        <li><span class="parameter">ship</span>
+         The ship to set the task on.
+        </li>
+        <li><span class="parameter">station</span>
+         The console to set the task for.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mainMenu"></a>
+    <strong>mainMenu</strong>
+    </dt>
+    <dd>
+    An instance of <a href="../modules/action.html#ActionBase">action.ActionBase</a> that displays on crew consoles.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

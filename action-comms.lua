@@ -1,29 +1,30 @@
--- Module: gn32/action-comms
--- Description: Adds an `action`-driven comms menu system
---[[
-	For details of the menu item format, see `action`.
-
-	Target arguments: source, target
-	Differences from `action` docs:
-		- 'info' entries will be merged and used as the comms message.
-		- Menu items support a `requiredDockState` bool; if set, the item will only display when the source is (true) or is not (false) docked with the target.
-
-	To create a comms menu, add entries to it, and set it as an entity's comms function:
-		local commsMenu = CommsMenu()
-		commsMenu:add {
-			info = "Comms Message",
-		}
-		commsMenu:add {
-			button = "Button Name",
-			action = function(reopen, source, target) ... end,
-		}
-		entity:setCommsFunction(commsMenu:getCommsFunction())
-]]
+--- Adds an `action`-driven comms menu system.
+-- For details of the menu item format, see `action`.
+--
+-- Target arguments: `source, target`  
+-- Differences from `action` docs:
+--
+-- - `info` entries will be merged and used as the comms message.
+-- - Menu items support a `requiredDockState` bool; if set, the item will only display when the source is (`true`) or is not (`false`) docked with the target.
+--
+-- To create a comms menu, add entries to it, and set it as an entity's comms function:
+--	local commsMenu = CommsMenu()
+--	commsMenu:add {
+--		info = "Comms Message",
+--	}
+--	commsMenu:add {
+--		button = "Button Name",
+--		action = function(reopen, source, target) ... end,
+--	}
+--	entity:setCommsFunction(commsMenu:getCommsFunction())
 
 require "gn32/lang"
 
 require "gn32/action"
 
+--- Create a new comms menu.  
+-- CommsMenu is derived from `action.ActionBase` and inherits some instance functions from there.
+-- @function CommsMenu
 G.CommsMenu = ActionBase {
 	_dataFor = function(self, source, target)
 		if target.__comms == nil then target.__comms = {} end
@@ -67,6 +68,8 @@ G.CommsMenu = ActionBase {
 		end
 	end,
 
+	--- Get a comms function that will show this menu.
+	-- @function commsMenu:getCommsFunction
 	getCommsFunction = function(self)
 		return function(comms_source, comms_target)
 			local _ = print -- give SeriousProton the environment reference it wants
