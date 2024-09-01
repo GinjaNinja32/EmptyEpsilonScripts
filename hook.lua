@@ -33,7 +33,26 @@ function G.update(delta)
 	hook.trigger.update(delta)
 end
 
-onNewPlayerShip(function(ship)
-	hook.trigger.newPlayerShip(ship)
-	ship:onProbeLaunch(hook.trigger.probeLaunch)
-end)
+if G.createEntity then
+	local new_ps = {}
+	-- TODO: ECS onNewPlayerShip does not work
+	local ps = PlayerSpaceship
+	PlayerSpaceship = function()
+		local e = ps()
+		table.insert(new_ps, e)
+		return e
+	end
+
+	hook.on.update = function()
+		for _, e in ipairs(new_ps) do
+			hook.trigger.newPlayerShip(e)
+			e:onProbeLaunch(hook.trigger.probeLaunch)
+		end
+		new_ps = {}
+	end
+else
+	onNewPlayerShip(function(ship)
+		hook.trigger.newPlayerShip(ship)
+		ship:onProbeLaunch(hook.trigger.probeLaunch)
+	end)
+end

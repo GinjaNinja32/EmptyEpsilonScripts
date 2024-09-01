@@ -287,6 +287,7 @@ end
 
 function hook.on.update()
 	for _, ship in ipairs(getActivePlayerShips()) do
+		if ship.__menu == nil then ship.__menu = {} end
 		mainMenu:updateTasks(ship)
 	end
 end

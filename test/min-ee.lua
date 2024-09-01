@@ -83,7 +83,18 @@ end
 function G.Entity()
 	local e = {}
 
-	e.onDestroyed,   e.destroy  = makeCallback(true)
+	function e:isValid()
+		return not self.destroyed
+	end
+	local onDestroy
+	function e:onDestroyed(cb)
+		onDestroy = cb
+	end
+	function e:destroy()
+		self.destroyed = true
+		if onDestroy then onDestroy(e) end
+	end
+
 	e.onDestruction, e.destruct = makeCallback(true)
 	e.onExpiration,  e.expire   = makeCallback(true)
 

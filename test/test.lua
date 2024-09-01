@@ -108,6 +108,15 @@ assert = setmetatable({}, {
 				if v == val then return end
 			end
 			error("value " .. debug.dump(val) .. " not found", 2)
-		end
+		end,
+		error = function(f, expect)
+			local ok, actual = pcall(f)
+			if ok then
+				error("function did not throw an error", 2)
+			end
+			if not string.match(tostring(actual), expect) then
+				error("function threw unexpected error: " .. tostring(actual), 2)
+			end
+		end,
 	},
 })
