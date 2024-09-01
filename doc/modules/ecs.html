@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Entity">Entity </a></li>
+<li><a href="#Comp">Comp </a></li>
+<li><a href="#System">System </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><strong>ecs</strong></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ecs</code></h1>
+<p>Provides a Lua-side ECS.</p>
+<p> Functions whose description begins with [ECS] are only available when running on the ECS branch of EmptyEpsilon.</p>
+
+
+<h2><a href="#Entity">Entity </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#entity:comps">entity:comps ()</a></td>
+	<td class="summary">[ECS] Get the comps associated with this entity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#comps">comps (e)</a></td>
+	<td class="summary">Get the comps associated with an entity.</td>
+	</tr>
+</table>
+<h2><a href="#Comp">Comp </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Comp">Comp (key)</a></td>
+	<td class="summary">Create a new Comp.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#comp:addField">comp:addField (name, default, check)</a></td>
+	<td class="summary">Add a field to a comp, with an optional default and check.</td>
+	</tr>
+</table>
+<h2><a href="#System">System </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#System">System (name)</a></td>
+	<td class="summary">Create a new System.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:addRequiredComponents">system:addRequiredComponents (...)</a></td>
+	<td class="summary">[ECS] Add EE ECS components that are required on each entity this system processes.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:addRequiredComps">system:addRequiredComps (...)</a></td>
+	<td class="summary">Add Lua ECS comps that are required on each entity this system processes.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:onUpdateGlobal">system:onUpdateGlobal (fn)</a></td>
+	<td class="summary">Add a callback to call once per update call for this system.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:onUpdateEntity">system:onUpdateEntity (fn)</a></td>
+	<td class="summary">Add a callback to call once per entity per update call for this system.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:runBefore">system:runBefore (name)</a></td>
+	<td class="summary">Enforce that this system must run before another in each update.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:runAfter">system:runAfter (name)</a></td>
+	<td class="summary">Enforce that this system must run after another in each update.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system:query">system:query ()</a></td>
+	<td class="summary">Query all entities that this system should process.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#System.update">System.update (delta)</a></td>
+	<td class="summary">Update all systems.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Entity"></a>Entity </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "entity:comps"></a>
+    <strong>entity:comps ()</strong>
+    </dt>
+    <dd>
+    [ECS] Get the comps associated with this entity.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The comps for the entity.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "comps"></a>
+    <strong>comps (e)</strong>
+    </dt>
+    <dd>
+    Get the comps associated with an entity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">e</span>
+         the entity to get comps for
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The comps for the entity.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Comp"></a>Comp </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Comp"></a>
+    <strong>Comp (key)</strong>
+    </dt>
+    <dd>
+    Create a new Comp.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+         The key of the new Comp.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The new Comp instance.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "comp:addField"></a>
+    <strong>comp:addField (name, default, check)</strong>
+    </dt>
+    <dd>
+    Add a field to a comp, with an optional default and check.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The name of the field.
+        </li>
+        <li><span class="parameter">default</span>
+         Optional. The default value of the field.
+        </li>
+        <li><span class="parameter">check</span>
+         Optional. A function(v) to check values of the field. The function should either return a bool (true = ok, false = bad value), or a string describing the problem.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="System"></a>System </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "System"></a>
+    <strong>System (name)</strong>
+    </dt>
+    <dd>
+    Create a new System.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The name of the new System.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The new System instance.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:addRequiredComponents"></a>
+    <strong>system:addRequiredComponents (...)</strong>
+    </dt>
+    <dd>
+    [ECS] Add EE ECS components that are required on each entity this system processes.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+         The component names that are required.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:addRequiredComps"></a>
+    <strong>system:addRequiredComps (...)</strong>
+    </dt>
+    <dd>
+    Add Lua ECS comps that are required on each entity this system processes.
+ If possible, the first such comp should be the least likely to appear, as it will be used to pre-filter the entity set.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+         The comp names that are required.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:onUpdateGlobal"></a>
+    <strong>system:onUpdateGlobal (fn)</strong>
+    </dt>
+    <dd>
+    Add a callback to call once per update call for this system.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+         The callback to use, which will be called with (delta, ents).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:onUpdateEntity"></a>
+    <strong>system:onUpdateEntity (fn)</strong>
+    </dt>
+    <dd>
+    Add a callback to call once per entity per update call for this system.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+         The callback to use, which will be called with (delta, ent, comps).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:runBefore"></a>
+    <strong>system:runBefore (name)</strong>
+    </dt>
+    <dd>
+    Enforce that this system must run before another in each update.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The name of the other system.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:runAfter"></a>
+    <strong>system:runAfter (name)</strong>
+    </dt>
+    <dd>
+    Enforce that this system must run after another in each update.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The name of the other system.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        self
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "system:query"></a>
+    <strong>system:query ()</strong>
+    </dt>
+    <dd>
+    Query all entities that this system should process.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        A table which when iterated over with <code>pairs()</code> will yield <code>ent, comps</code> pairs.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "System.update"></a>
+    <strong>System.update (delta)</strong>
+    </dt>
+    <dd>
+    Update all systems.
+ If <code>gn32/hook-sys</code> is present, this function is automatically installed as an update hook.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">delta</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-09-01 15:14:06 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
