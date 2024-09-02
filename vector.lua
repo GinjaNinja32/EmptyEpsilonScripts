@@ -14,11 +14,11 @@ end
 
 --- Convert r-theta coordinates to the equivalent x-y coordinates.
 function vector.xyFromRadialRad(r, thetaRad)
-	return r * math.cos(rad), r * math.sin(thetaRad)
+	return r * math.cos(thetaRad), r * math.sin(thetaRad)
 end
 --- Convert r-theta coordinates to the equivalent x-y coordinates.
 function vector.xyFromRadialDeg(r, thetaDeg)
-	return vector.xyFromRadial(r, vector.radFromDeg(thetaDeg))
+	return vector.xyFromRadialRad(r, vector.radFromDeg(thetaDeg))
 end
 
 --- Convert x-y coordinates to the equivalent r-theta coordinates.

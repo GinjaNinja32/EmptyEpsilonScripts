@@ -1,7 +1,19 @@
--- Module: gn32/debug
--- Description: debug utilities
+--- Debug utilities.
+-- @pragma nostrip
 
 require "gn32/lang"
+
+--- Toggle for debug printing. Default false.
+-- @field debug.global
+
+--- Mapping from category to whether debug is enabled for that category.
+-- When reading, if a category is not present, the value of `debug.global` is returned.
+-- @table debug.enabled
+
+--- Table of all categories that have been accessed or set in `debug.enabled`.
+-- Accessed categories are mapped to `true`.
+-- @table debug.cats
+local _ = {}
 
 G.debug = {
 	global = false,
@@ -10,16 +22,26 @@ G.debug = {
 			debug.cats[cat] = true
 			return debug.global
 		end,
+		__newindex = function(t, cat, v)
+			rawset(t, cat, v)
+			debug.cats[cat] = true
+		end,
 	}),
 	cats = {},
 }
 
+--- Print a message if global debug is enabled.
+-- @param ... The args to pass to `print`.
 function debug.print(...)
 	if debug.global then
 		print(...)
 	end
 end
 
+-- TODO improve params and document
+
+--- Dump a value as a string.
+-- @param t The value to dump.
 function debug.dump(t, nl, id, ids, gseen)
 	if t == nil then
 		return "nil"

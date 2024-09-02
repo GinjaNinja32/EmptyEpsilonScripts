@@ -1,21 +1,38 @@
--- Module: gn32/position
--- Description: Definitions and utilities for handling ship crew positions
---[[
-	Definitions:
-		position.all: A list of all primary positions (3-4 or 5-6 crew)
-
-		position.single: A list of all single-duty positions (5-6 crew)
-
-		position.combi: A list of all combination-duty positions (3-4 crew)
-
-		position.related: A mapping from crew positions to the related position(s) in the other system, e.g. Helms=>{Tactical}, Operations=>{Science,Relay}
-
-		position.to_single: A mapping from crew positions to their single-duty equivalent(s), e.g. Helms=>{Helms}, Operations=>{Science,Relay}
-
-		position.to_any: A mapping from crew positions to their equivalent(s) in any system, e.g. Helms=>{Helms,Tactical}, Operations=>{Science,Relay,Operations}
-]]
+--- Definitions and utilities for handling ship crew positions.
+-- @pragma nostrip
 
 require "gn32/lang"
+
+--- A list of all primary positions (5-6 crew, 3-4 crew, single pilot)
+-- @table position.all
+
+--- A list of all primary 5-6 crew positions.
+-- @table position.single
+
+--- A list of all primary 3-4 crew positions.
+-- @table position.combi
+
+--- A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the other system.
+--
+-- e.g.  
+-- `position.related["Helms"]` => `{"Tactical"}`  
+-- `position.related["Tactical"]` => `{"Helms", "Weapons"}`
+-- @table position.related
+
+--- A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the 5-6 crew system.
+--
+-- e.g.  
+-- `position.to_single["Helms"]` => `{"Helms"}`  
+-- `position.to_single["Tactical"]` => `{"Helms", "Weapons"}`
+-- @table position.to_single
+
+--- A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent positions in either system.
+--
+-- e.g.  
+-- `position.to_any["Helms"]` => `{"Helms", "Tactical"}`  
+-- `position.to_any["Tactical"]` => `{"Helms", "Weapons", "Tactical"}`
+-- @table position.to_any
+local _ = {}
 
 G.position = {
 	all = {

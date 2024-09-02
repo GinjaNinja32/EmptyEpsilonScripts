@@ -165,7 +165,7 @@ mainMenu:add {
 									if G.createEntity then
 										d:setVelocity(vx, vy)
 									else
-										comps(d).velocity = {linear = {vx, vy}}
+										comps(d).velocity = {x = vx, y = vy}
 									end
 
 									comps(d).drag = {}

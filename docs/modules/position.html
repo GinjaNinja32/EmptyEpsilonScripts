@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Tables">Tables</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><a href="../modules/action-main.html">action-main</a></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
+  <li><a href="../modules/cargo.html">cargo</a></li>
+  <li><a href="../modules/classutil.html">classutil</a></li>
+  <li><a href="../modules/crafting.html">crafting</a></li>
+  <li><a href="../modules/debug.html">debug</a></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/exchange.html">exchange</a></li>
+  <li><a href="../modules/hook-sys.html">hook-sys</a></li>
+  <li><a href="../modules/hook.html">hook</a></li>
+  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><a href="../modules/lang-strict.html">lang-strict</a></li>
+  <li><a href="../modules/lang.html">lang</a></li>
+  <li><a href="../modules/persistence_entity.html">persistence_entity</a></li>
+  <li><strong>position</strong></li>
+  <li><a href="../modules/require.html">require</a></li>
+  <li><a href="../modules/stdext.html">stdext</a></li>
+  <li><a href="../modules/track.html">track</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>position</code></h1>
+<p>Definitions and utilities for handling ship crew positions.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#position.all">position.all</a></td>
+	<td class="summary">A list of all primary positions (5-6 crew, 3-4 crew, single pilot)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.single">position.single</a></td>
+	<td class="summary">A list of all primary 5-6 crew positions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.combi">position.combi</a></td>
+	<td class="summary">A list of all primary 3-4 crew positions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.related">position.related</a></td>
+	<td class="summary">A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the other system.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.to_single">position.to_single</a></td>
+	<td class="summary">A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the 5-6 crew system.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.to_any">position.to_any</a></td>
+	<td class="summary">A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent positions in either system.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "position.all"></a>
+    <strong>position.all</strong>
+    </dt>
+    <dd>
+    A list of all primary positions (5-6 crew, 3-4 crew, single pilot)
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.single"></a>
+    <strong>position.single</strong>
+    </dt>
+    <dd>
+    A list of all primary 5-6 crew positions.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.combi"></a>
+    <strong>position.combi</strong>
+    </dt>
+    <dd>
+    A list of all primary 3-4 crew positions.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.related"></a>
+    <strong>position.related</strong>
+    </dt>
+    <dd>
+    A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the other system. </p>
+
+<p> e.g. <br/>
+ <code>position.related[&quot;Helms&quot;]</code> => <code>{&quot;Tactical&quot;}</code> <br/>
+ <code>position.related[&quot;Tactical&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Weapons&quot;}</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.to_single"></a>
+    <strong>position.to_single</strong>
+    </dt>
+    <dd>
+    A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent position(s) in the 5-6 crew system. </p>
+
+<p> e.g. <br/>
+ <code>position.to_single[&quot;Helms&quot;]</code> => <code>{&quot;Helms&quot;}</code> <br/>
+ <code>position.to_single[&quot;Tactical&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Weapons&quot;}</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.to_any"></a>
+    <strong>position.to_any</strong>
+    </dt>
+    <dd>
+    A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent positions in either system. </p>
+
+<p> e.g. <br/>
+ <code>position.to_any[&quot;Helms&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Tactical&quot;}</code> <br/>
+ <code>position.to_any[&quot;Tactical&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Weapons&quot;, &quot;Tactical&quot;}</code>
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

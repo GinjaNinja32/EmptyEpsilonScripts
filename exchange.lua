@@ -1,38 +1,33 @@
--- Module: gn32/exchange
--- Description: Utilities for exchanging one set of resources for another, e.g. to craft or trade
---[[
-	Resource list format:
-		{<source> = <data>, ...}
-		e.g.:
-			{rep = 5}
-			{w_hvli = 2, w_mine = 1}
-			{cargo = {Pb = 2}, custom = {add = function(ship, m) for i = 1, m do a_thing() end end}}
-
-	To define a source:
-		exchange.sources.<key> = {
-			format = function(data, m) ... end,        -- Format `data` as a string, after applying a multiplier `m`.
-			canTake = function(ship, data, m) ... end, -- Return true if `data` can be taken from `ship` at least `m` times.
-			take = function(ship, data, m) ... end,    -- Take `data` from `ship` `m` times. This function may assume that `canTake(ship, data, m) == true`.
-			canAdd = function(ship, data, m) .. end,   -- Return true if `data` can be added to `ship` at least `m` times.
-			add = function(ship, data, m) ... end,     -- Add `data` to `ship` `m` times. This function may assume that `canAdd(ship, data, m) == true`.
-		}
-
-	Predefined sources:
-		key         data type    description
-		---         ---------    -----------
-		rep         number       Faction reputation points
-		energy      number       Ship energy
-		hull        number       Ship hull points
-		coolant     number       Ship coolant; 1 represents 10% coolant
-		probe       number       Scan probes
-		w_hvli      number       HVLI ammo
-		w_homing    number       Homing ammo
-		w_mine      number       Mine ammo
-		w_emp       number       EMP ammo
-		w_nuke      number       Nuke ammo
-		cargo       cargolist    Ship cargo (requires gn32/cargo)
-		custom      table        Calls functions on its data table to enable one-off source functions. Function list as source definition, minus `data` parameter. If any source function is not present in the data table, it is assumed to succeed.
-]]
+--- Utilities for exchanging one set of resources for another.
+--
+-- Terminology:
+--
+-- - A "source" is a kind of resource that might be exchanged, such as rep, coolant, or HVLI ammo. Each source has a key, such as `rep`, `coolant`, or `w_hvli`.
+-- - A "resource list" is a table with source keys mapped to the data type for that source, e.g. `{rep = 5}` or `{w_hvli = 2, w_mine = 1}`
+--
+-- To define a source, see `exchange.sources`.
+-- Source definition format:
+--
+--	{
+--		-- Format `data` as a string, with a multiplier `mult`
+--		format = function(data, mult) ... end,
+--
+--		-- Return true if `data` can be taken from ship at least `mult` times
+--		canTake = function(ship, data, mult) ... end,
+--
+--		-- Take `data` from `ship`, `mult` times.
+--		-- This function may assume that `canTake(ship, data, mult)` is true.
+--		take = function(ship, data, mult) ... end,
+--
+--		-- Return true if `data` can be added to ship at least `mult` times
+--		canAdd = function(ship, data, mult) ... end,
+--
+--		-- Add `data` to `ship`, `mult` times.
+--		-- This function may assume that `canAdd(ship, data, mult)` is true.
+--		add = function(ship, data, mult) ... end,
+--	}
+--
+-- @pragma nostrip
 
 require "gn32/lang"
 
@@ -40,8 +35,19 @@ G.exchange = {}
 
 local sourcesList = {}
 
+-- define functions first so that it goes above sources in the output
+
+--- Functions.
+-- @section function
+
+--- Sources
+-- @section sources
+
 --[[ SOURCES ]]
 
+--- Mapping of source key => source.
+-- To register a new source, assign to `exchange.sources[key]` with a source definition.
+-- @table exchange.sources
 exchange.sources = setmetatable({}, {
 	__index = sourcesList,
 	__newindex = function(_, key, val)
@@ -108,40 +114,76 @@ function exchange.autoGetSet(ty, sg, pl, ...) -- build an automatic get/set sour
 	}
 end
 
+--- Predefined Sources.
+-- @section sources
+
+--- Forwards method calls to its data.
+-- The data format for this source is similar to the source definition format, with the `data` parameter removed and with all functions made optional.
+-- @table custom
+-- @field format `function(mult)`: Format this entry. If not present, omit this entry from the formatted list.
+-- @field canTake `function(ship, mult)`: Return true if the entry can be taken. If not present, treat as returned `true`.
+-- @field take `function(ship, mult)`: Take this entry. If not present, do nothing.
+-- @field canAdd `function(ship, mult)`: Return true if the entry can be added. If not present, treat as returned `true`.
+-- @field add `function(ship, mult)`: Add this entry. If not present, do nothing.
 exchange.sources.custom = {
-	format = function(data, m)
-		if data.format then return data.format(m) end
+	format = function(data, mult)
+		if data.format then return data.format(mult) end
 		return nil
 	end,
-	canTake = function(ship, data, m)
-		if data.canTake then return data.canTake(ship, m) end
+	canTake = function(ship, data, mult)
+		if data.canTake then return data.canTake(ship, mult) end
 		return true
 	end,
-	take = function(ship, data, m)
-		if data.take then data.take(ship, m) end
+	take = function(ship, data, mult)
+		if data.take then data.take(ship, mult) end
 	end,
-	canAdd = function(ship, data, m)
-		if data.canAdd then return data.canAdd(ship, m) end
+	canAdd = function(ship, data, mult)
+		if data.canAdd then return data.canAdd(ship, mult) end
 		return true
 	end,
-	add = function(ship, data, m)
-		if data.add then data.add(ship, m) end
+	add = function(ship, data, mult)
+		if data.add then data.add(ship, mult) end
 	end,
 }
 
+--- Faction reputation points. Data type: number.
+-- @table rep
 exchange.sources.rep     = exchange.autoGetSet("ReputationPoints", "%d rep", "%d rep")
+--- Ship energy. Data type: number.
+-- @table energy
 exchange.sources.energy  = exchange.autoGetSet("Energy",           "%d energy",     "%d energy")
+--- Ship hull points. Data type: number.
+-- @table hull
 exchange.sources.hull    = exchange.autoGetSet("Hull",             "%d hull",       "%d hull")
+--- Ship coolant. Data type: number, where 1 represents 10% coolant.
+-- @table coolant
 exchange.sources.coolant = exchange.autoGetSet("MaxCoolant",       "%d0%% coolant", "%d0%% coolant")
+--- Ship scan probes. Data type: integer.
+-- @table probe
 exchange.sources.probe   = exchange.autoGetSet("ScanProbeCount",   "%d probe",      "%d probes")
 
+--- HVLI ammunition. Data type: integer.
+-- @table w_hvli
 exchange.sources.w_hvli   = exchange.autoGetSet("WeaponStorage", "%d HVLI",   "%d HVLIs",   "HVLI")
+--- Homing ammunition. Data type: integer.
+-- @table w_homing
 exchange.sources.w_homing = exchange.autoGetSet("WeaponStorage", "%d homing", "%d homings", "Homing")
+--- Mine ammunition. Data type: integer.
+-- @table w_mine
 exchange.sources.w_mine   = exchange.autoGetSet("WeaponStorage", "%d mine",   "%d mines",   "Mine")
+--- EMP ammunition. Data type: integer.
+-- @table w_emp
 exchange.sources.w_emp    = exchange.autoGetSet("WeaponStorage", "%d EMP",    "%d EMPs",    "EMP")
+--- Nuke ammunition. Data type: integer.
+-- @table w_nuke
 exchange.sources.w_nuke   = exchange.autoGetSet("WeaponStorage", "%d nuke",   "%d nukes",   "Nuke")
 
--- soft-depends: gn32/cargo
+-- if the doc is attached to `exchange.sources.cargo` then it shows the format, canTake etc, and I can't work out how to get it to not do that.
+
+--- Ship `cargo`. Requires `cargo` to function. Data type: cargo list.
+-- @table cargo
+local _ = {}
+
 exchange.sources.cargo = {
 	format = function(c, m) return cargo.formatShort(c, m) end,
 	canTake = function(ship, c, m)
@@ -158,7 +200,15 @@ exchange.sources.cargo = {
 
 --[[ EXPORTS ]]
 
-function exchange.each(resources, fn) -- do something for each entry in a resource list. Intended for internal use; exposed in case it's useful for some use case.
+--- Functions.
+-- @section function
+
+--- Do something for each entry in a resource list. Primarily intended for internal use.  
+-- If the provided function returns a non-nil first result for any entry, the iteration is terminated and the results of that call are returned from this function.
+-- @param resources The resource list to iterate.
+-- @param fn A `function(source, data)` to call for each entry.
+-- @return The results of the first call of `fn` that returned a non-nil first result, or nil if no call had a non-nil first result.
+function exchange.each(resources, fn)
 	for ty, data in pairs(resources) do
 		local source = sourcesList[ty]
 		if not source then
@@ -175,10 +225,16 @@ function exchange.each(resources, fn) -- do something for each entry in a resour
 	end
 end
 
-function exchange.formatString(resources, mult) -- format a list of resources in a human-readable format. returns a string, e.g. "3 energy, 5 HVLIs"
+--- Format a resource list in a human-readable format, as a string such as `"3 energy, 5 HVLIs"`.
+-- @param resources The resource list to format.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+function exchange.formatString(resources, mult)
 	return table.concat(exchange.format(resources, mult), ", ")
 end
-function exchange.format(resources, mult) -- format a list of resources in a human-readable format. returns a list of entries, e.g. {"3 energy", "5 HVLIs"}
+--- Format a resource list in a human-readable format, as a table such as `{"3 energy", "5 HVLIs"}`.
+-- @param resources The resource list to format.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+function exchange.format(resources, mult)
 	mult = mult or 1
 	local types = {}
 	for ty, _ in pairs(resources) do table.insert(types, ty) end
@@ -200,6 +256,11 @@ function exchange.format(resources, mult) -- format a list of resources in a hum
 	return entries
 end
 
+--- Check whether a ship could supply resources.
+-- @param ship The ship to check.
+-- @param resources The resource list to check.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the ship could provide the resources; otherwise false
 function exchange.canTake(ship, resources, mult) -- return true if the ship could supply the specified resources; otherwise, return false.
 	mult = mult or 1
 	local bad, why = exchange.each(resources, function(source, data)
@@ -211,11 +272,21 @@ function exchange.canTake(ship, resources, mult) -- return true if the ship coul
 	return not bad, why
 end
 
-function exchange.take(ship, resources, mult) -- take the specified resources from the ship. Results undefined if `exchange.canTake(ship, resources)` would return false.
+--- Take resources from a ship.
+-- The behaviour of this function is undefined if `exchange.canTake` would return false given the same arguments.
+-- @param ship The ship to take from.
+-- @param resources The resource list to take.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+function exchange.take(ship, resources, mult)
 	mult = mult or 1
 	exchange.each(resources, function(source, data) source.take(ship, data, mult) end)
 end
 
+--- Attempt to take resources from a ship. This operation is atomic; if any resources cannot be taken, then no resources are taken.
+-- @param ship The ship to take from.
+-- @param resources The resource list to take.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the resources were successfully taken; otherwise false
 function exchange.tryTake(ship, resources, mult) -- if the ship can supply the specified resources, take them and return true; otherwise, return false.
 	mult = mult or 1
 	if not exchange.canTake(ship, resources, mult) then return false end
@@ -223,7 +294,12 @@ function exchange.tryTake(ship, resources, mult) -- if the ship can supply the s
 	return true
 end
 
-function exchange.canAdd(ship, resources, mult) -- return true if the ship could accept the specified resources; otherwise, return false.
+--- Check whether a ship could accept resources.
+-- @param ship The ship to check.
+-- @param resources The resource list to check.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the ship could accept the resources; otherwise false
+function exchange.canAdd(ship, resources, mult)
 	mult = mult or 1
 	local bad, why = exchange.each(resources, function(source, data)
 		local ok, why = source.canAdd(ship, data, mult)
@@ -234,32 +310,60 @@ function exchange.canAdd(ship, resources, mult) -- return true if the ship could
 	return not bad, why
 end
 
-function exchange.add(ship, resources, mult) -- add the specified resources to the ship. Results undefined if `exchange.canAdd(ship, resources)` would return false.
+--- Add resources to a ship.
+-- The behaviour of this function is undefined if `exchange.canAdd` would return false given the same arguments.
+-- @param ship The ship to add to.
+-- @param resources The resource list to add.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+function exchange.add(ship, resources, mult)
 	mult = mult or 1
 	exchange.each(resources, function(source, data) source.add(ship, data, mult) end)
 end
 
-function exchange.tryAdd(ship, resources, mult) -- if the ship can accept the specified resources, add them and return true; otherwise, return false.
+--- Attempt to add resources to a ship. This operation is atomic; if any resources cannot be added, then no resources are added.
+-- @param ship The ship to add to.
+-- @param resources The resource list to add.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the resources were successfully added; otherwise false
+function exchange.tryAdd(ship, resources, mult)
 	mult = mult or 1
 	if not exchange.canAdd(ship, resources, mult) then return false end
 	exchange.add(ship, resources, mult)
 	return true
 end
 
-function exchange.canSwap(ship, from, to, mult) -- return true if the ship could swap the specified resources; otherwise; return false.
+--- Check whether a ship could swap one set of resources for another.
+-- @param ship The ship to check.
+-- @param from The resource list to swap from.
+-- @param to The resource list to swap to.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+-- @return true if the ship could swap the resources; otherwise false
+function exchange.canSwap(ship, from, to, mult)
 	mult = mult or 1
 	local ok, why = exchange.canTake(ship, from, mult)
 	if not ok then return false, why end
 	return exchange.canAdd(ship, to, mult)
 end
 
-function exchange.swap(ship, from, to, mult) -- swap the specified resources on the ship. Results undefined if `exchange.canSwap(ship, from, to)` would return false.
+--- Swap resources on a ship.
+-- The behaviour of this function is undefined if `exchange.canSwap` would return false given the same arguments.
+-- @param ship The ship to swap on.
+-- @param from The resource list to swap from.
+-- @param to The resource list to swap to.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+function exchange.swap(ship, from, to, mult)
 	mult = mult or 1
 	exchange.take(ship, from, mult)
 	exchange.add(ship, to, mult)
 end
 
-function exchange.trySwap(ship, from, to, mult) -- if the ship can swap the specified resources, swap them and return true; otherwise, return false.
+--- Attempt to swap resources on a ship. This operation is atomic; if any resources cannot be added or removed, then no resources are added or removed.
+-- @param ship The ship to swap on.
+-- @param from The resource list to swap from.
+-- @param to The resource list to swap to.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+-- @return true if the resources were successfully added; otherwise false
+function exchange.trySwap(ship, from, to, mult)
 	mult = mult or 1
 	if not exchange.canSwap(ship, from, to, mult) then return false end
 	exchange.swap(ship, from, to, mult)

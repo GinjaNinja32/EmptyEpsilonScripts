@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Recipe_format">Recipe format </a></li>
+<li><a href="#Functions">Functions </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><a href="../modules/action-main.html">action-main</a></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
+  <li><a href="../modules/cargo.html">cargo</a></li>
+  <li><a href="../modules/classutil.html">classutil</a></li>
+  <li><strong>crafting</strong></li>
+  <li><a href="../modules/debug.html">debug</a></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/exchange.html">exchange</a></li>
+  <li><a href="../modules/hook-sys.html">hook-sys</a></li>
+  <li><a href="../modules/hook.html">hook</a></li>
+  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><a href="../modules/lang-strict.html">lang-strict</a></li>
+  <li><a href="../modules/lang.html">lang</a></li>
+  <li><a href="../modules/persistence_entity.html">persistence_entity</a></li>
+  <li><a href="../modules/position.html">position</a></li>
+  <li><a href="../modules/require.html">require</a></li>
+  <li><a href="../modules/stdext.html">stdext</a></li>
+  <li><a href="../modules/track.html">track</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>crafting</code></h1>
+<p>Adds functionality for player-facing crafting menus.</p>
+<p> By default, adds a menu named "Build..." that fetches entries from <code>ship.buildable</code>.</p>
+
+
+<h2><a href="#Recipe_format">Recipe format </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#recipe">recipe</a></td>
+	<td class="summary">Recipe table format.</td>
+	</tr>
+</table>
+<h2><a href="#Functions">Functions </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#crafting.addMenu">crafting.addMenu (menuName, actionName, getEntries)</a></td>
+	<td class="summary">Add a crafting menu to the main menu.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#crafting.buildMenu">crafting.buildMenu (menuName, actionName, getEntries)</a></td>
+	<td class="summary">Builds a crafting menu for the main menu.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Recipe_format"></a>Recipe format </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "recipe"></a>
+    <strong>recipe</strong>
+    </dt>
+    <dd>
+    Recipe table format.
+
+
+    <ul>
+        <li><span class="parameter">stations</span>
+         A list of stations that can build the recipe. If not present, all stations can build the recipe.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">action</span>
+         The displayed action to build the recipe. If not present, the default action for the menu is used.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">name</span>
+         The name of the recipe.
+        </li>
+        <li><span class="parameter">take</span>
+         An <a href="../modules/exchange.html#">exchange</a> resource list containing the resources required to build the recipe.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">add</span>
+         An <a href="../modules/exchange.html#">exchange</a> resource list containing the resources resulting from building the recipe.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">time</span>
+         The time required to build the recipe.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">multi</span>
+         Whether more than one of this recipe can be built at once.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Functions"></a>Functions </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "crafting.addMenu"></a>
+    <strong>crafting.addMenu (menuName, actionName, getEntries)</strong>
+    </dt>
+    <dd>
+    Add a crafting menu to the main menu.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">menuName</span>
+         The name of the menu.
+        </li>
+        <li><span class="parameter">actionName</span>
+         The default action for the menu.
+        </li>
+        <li><span class="parameter">getEntries</span>
+         A <code>function(ship)</code> that returns a list of entries to use for the menu.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/action-main.html#">action-main</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "crafting.buildMenu"></a>
+    <strong>crafting.buildMenu (menuName, actionName, getEntries)</strong>
+    </dt>
+    <dd>
+    Builds a crafting menu for the main menu.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">menuName</span>
+         The name of the menu.
+        </li>
+        <li><span class="parameter">actionName</span>
+         The default action for the menu.
+        </li>
+        <li><span class="parameter">getEntries</span>
+         A <code>function(ship)</code> that returns a list of entries to use for the menu.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/action-main.html#">action-main</a>
+    </ul>
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

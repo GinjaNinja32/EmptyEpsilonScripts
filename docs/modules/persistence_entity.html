@@ -1,0 +1,716 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>EEScripts</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions </a></li>
+<li><a href="#Persistable_fields">Persistable fields </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/action-comms.html">action-comms</a></li>
+  <li><a href="../modules/action-gm.html">action-gm</a></li>
+  <li><a href="../modules/action-main.html">action-main</a></li>
+  <li><a href="../modules/action.html">action</a></li>
+  <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
+  <li><a href="../modules/cargo.html">cargo</a></li>
+  <li><a href="../modules/classutil.html">classutil</a></li>
+  <li><a href="../modules/crafting.html">crafting</a></li>
+  <li><a href="../modules/debug.html">debug</a></li>
+  <li><a href="../modules/drag.html">drag</a></li>
+  <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/exchange.html">exchange</a></li>
+  <li><a href="../modules/hook-sys.html">hook-sys</a></li>
+  <li><a href="../modules/hook.html">hook</a></li>
+  <li><a href="../modules/lang-lax.html">lang-lax</a></li>
+  <li><a href="../modules/lang-strict.html">lang-strict</a></li>
+  <li><a href="../modules/lang.html">lang</a></li>
+  <li><strong>persistence_entity</strong></li>
+  <li><a href="../modules/position.html">position</a></li>
+  <li><a href="../modules/require.html">require</a></li>
+  <li><a href="../modules/stdext.html">stdext</a></li>
+  <li><a href="../modules/track.html">track</a></li>
+  <li><a href="../modules/vector.html">vector</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>persistence_entity</code></h1>
+<p>Helper functions and utilities for persisting entity data.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#persistence.entity.defineField">persistence.entity.defineField (name, key, get, set, getDefaultM, addArgs)</a></td>
+	<td class="summary">Define a persistable entity field.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#persistence.entity.save">persistence.entity.save (e, fields)</a></td>
+	<td class="summary">Save entity data to a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#persistence.entity.load">persistence.entity.load (e, fields, data)</a></td>
+	<td class="summary">Load entity data from a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#persistence.entity.saveCpuShip">persistence.entity.saveCpuShip (e)</a></td>
+	<td class="summary">Save typical CpuShip data to a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#persistence.entity.loadCpuShip">persistence.entity.loadCpuShip (e, data)</a></td>
+	<td class="summary">Load typical CpuShip data from a table.</td>
+	</tr>
+</table>
+<h2><a href="#Persistable_fields">Persistable fields </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#template">template</a></td>
+	<td class="summary">Template.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#callsign">callsign</a></td>
+	<td class="summary">Callsign.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hull">hull</a></td>
+	<td class="summary">Current hull.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hullMax">hullMax</a></td>
+	<td class="summary">Max hull.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#energy">energy</a></td>
+	<td class="summary">Energy.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#energyMax">energyMax</a></td>
+	<td class="summary">Max energy.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#coolant">coolant</a></td>
+	<td class="summary">Total available coolant.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hvli">hvli</a></td>
+	<td class="summary">HVLI ammunition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#homing">homing</a></td>
+	<td class="summary">Homing ammunition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#emp">emp</a></td>
+	<td class="summary">EMP ammunition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#nuke">nuke</a></td>
+	<td class="summary">Nuke ammunition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mine">mine</a></td>
+	<td class="summary">Mine ammunition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shield">shield</a></td>
+	<td class="summary">Current shields.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shieldMax">shieldMax</a></td>
+	<td class="summary">Max shields.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position">position</a></td>
+	<td class="summary">Position.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#velocity">velocity</a></td>
+	<td class="summary">Velocity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysHealthMax">sysHealthMax</a></td>
+	<td class="summary">System max health.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysHealth">sysHealth</a></td>
+	<td class="summary">System current health.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysHacked">sysHacked</a></td>
+	<td class="summary">System hacked level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysHeat">sysHeat</a></td>
+	<td class="summary">System heat level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysPowerReq">sysPowerReq</a></td>
+	<td class="summary">System power request.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysPower">sysPower</a></td>
+	<td class="summary">System power level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysCoolantReq">sysCoolantReq</a></td>
+	<td class="summary">System coolant request.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sysCoolant">sysCoolant</a></td>
+	<td class="summary">System coolant level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cargo">cargo</a></td>
+	<td class="summary">Ship <a href="../modules/cargo.html#">cargo</a>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "persistence.entity.defineField"></a>
+    <strong>persistence.entity.defineField (name, key, get, set, getDefaultM, addArgs)</strong>
+    </dt>
+    <dd>
+    Define a persistable entity field.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         The name of the field. Must be unique.
+        </li>
+        <li><span class="parameter">key</span>
+         The storage key of the field. Must be unique. Should be short.
+        </li>
+        <li><span class="parameter">get</span>
+         Either the name of an entity method or a <code>function(e, ...)</code> to get the stored data from an entity. If a function, a second return value defines the default value.
+        </li>
+        <li><span class="parameter">set</span>
+         Either the name of an entity method or a <code>function(e, ..., val)</code> to set the stored data on an entity.
+        </li>
+        <li><span class="parameter">getDefaultM</span>
+         If <code>get</code> is the name of an entity method, then the name of an entity method to get the default value, or <code>nil</code>.
+        </li>
+        <li><span class="parameter">addArgs</span>
+         The value(s) to pass in place of <code>...</code> in <code>get</code>, <code>set</code>, and <code>getDefaultM</code>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "persistence.entity.save"></a>
+    <strong>persistence.entity.save (e, fields)</strong>
+    </dt>
+    <dd>
+    Save entity data to a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">e</span>
+         The entity to save data from.
+        </li>
+        <li><span class="parameter">fields</span>
+         The list of fields to save.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        A table containing the entity data.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "persistence.entity.load"></a>
+    <strong>persistence.entity.load (e, fields, data)</strong>
+    </dt>
+    <dd>
+    Load entity data from a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">e</span>
+         The entity to apply loaded data to.
+        </li>
+        <li><span class="parameter">fields</span>
+         The list of fields to load.
+        </li>
+        <li><span class="parameter">data</span>
+         A table containing the entity data.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "persistence.entity.saveCpuShip"></a>
+    <strong>persistence.entity.saveCpuShip (e)</strong>
+    </dt>
+    <dd>
+    Save typical CpuShip data to a table.
+ Equivalent to <a href="../modules/persistence_entity.html#persistence.entity.save">persistence.entity.save</a> with a preset list of fields.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">e</span>
+         The CpuShip to save data from.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        A table containing the entity data.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "persistence.entity.loadCpuShip"></a>
+    <strong>persistence.entity.loadCpuShip (e, data)</strong>
+    </dt>
+    <dd>
+    Load typical CpuShip data from a table.
+ Equivalent to <a href="../modules/persistence_entity.html#persistence.entity.load">persistence.entity.load</a> with a preset list of fields.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">e</span>
+         The CpuShip to apply loaded data to.
+        </li>
+        <li><span class="parameter">data</span>
+         A table containing the entity data.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Persistable_fields"></a>Persistable fields </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "template"></a>
+    <strong>template</strong>
+    </dt>
+    <dd>
+    Template.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "callsign"></a>
+    <strong>callsign</strong>
+    </dt>
+    <dd>
+    Callsign.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hull"></a>
+    <strong>hull</strong>
+    </dt>
+    <dd>
+    Current hull.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hullMax"></a>
+    <strong>hullMax</strong>
+    </dt>
+    <dd>
+    Max hull.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "energy"></a>
+    <strong>energy</strong>
+    </dt>
+    <dd>
+    Energy.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "energyMax"></a>
+    <strong>energyMax</strong>
+    </dt>
+    <dd>
+    Max energy.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "coolant"></a>
+    <strong>coolant</strong>
+    </dt>
+    <dd>
+    Total available coolant.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hvli"></a>
+    <strong>hvli</strong>
+    </dt>
+    <dd>
+    HVLI ammunition.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "homing"></a>
+    <strong>homing</strong>
+    </dt>
+    <dd>
+    Homing ammunition.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "emp"></a>
+    <strong>emp</strong>
+    </dt>
+    <dd>
+    EMP ammunition.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "nuke"></a>
+    <strong>nuke</strong>
+    </dt>
+    <dd>
+    Nuke ammunition.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mine"></a>
+    <strong>mine</strong>
+    </dt>
+    <dd>
+    Mine ammunition.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shield"></a>
+    <strong>shield</strong>
+    </dt>
+    <dd>
+    Current shields.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shieldMax"></a>
+    <strong>shieldMax</strong>
+    </dt>
+    <dd>
+    Max shields.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position"></a>
+    <strong>position</strong>
+    </dt>
+    <dd>
+    Position.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "velocity"></a>
+    <strong>velocity</strong>
+    </dt>
+    <dd>
+    Velocity.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysHealthMax"></a>
+    <strong>sysHealthMax</strong>
+    </dt>
+    <dd>
+    System max health.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysHealth"></a>
+    <strong>sysHealth</strong>
+    </dt>
+    <dd>
+    System current health.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysHacked"></a>
+    <strong>sysHacked</strong>
+    </dt>
+    <dd>
+    System hacked level.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysHeat"></a>
+    <strong>sysHeat</strong>
+    </dt>
+    <dd>
+    System heat level.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysPowerReq"></a>
+    <strong>sysPowerReq</strong>
+    </dt>
+    <dd>
+    System power request.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysPower"></a>
+    <strong>sysPower</strong>
+    </dt>
+    <dd>
+    System power level.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysCoolantReq"></a>
+    <strong>sysCoolantReq</strong>
+    </dt>
+    <dd>
+    System coolant request.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sysCoolant"></a>
+    <strong>sysCoolant</strong>
+    </dt>
+    <dd>
+    System coolant level.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cargo"></a>
+    <strong>cargo</strong>
+    </dt>
+    <dd>
+    Ship <a href="../modules/cargo.html#">cargo</a>.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

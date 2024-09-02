@@ -1,4 +1,4 @@
 project = 'EEScripts'
-file = {'.'}
+file = {'.', exclude = {'test'}}
 dir = 'docs'
 format = 'markdown'

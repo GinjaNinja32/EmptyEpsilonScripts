@@ -1,5 +1,4 @@
--- Module: gn32/persistence_entity
--- Description: Helper functions and utilities for persisting entity data.
+--- Helper functions and utilities for persisting entity data.
 
 if not G.persistence then G.persistence = {} end
 
@@ -10,6 +9,16 @@ local defs = {
 	key = {},
 }
 
+--- Functions.
+-- @section functions
+
+--- Define a persistable entity field.
+-- @param name The name of the field. Must be unique.
+-- @param key The storage key of the field. Must be unique. Should be short.
+-- @param get Either the name of an entity method or a `function(e, ...)` to get the stored data from an entity. If a function, a second return value defines the default value.
+-- @param set Either the name of an entity method or a `function(e, ..., val)` to set the stored data on an entity.
+-- @param getDefaultM If `get` is the name of an entity method, then the name of an entity method to get the default value, or `nil`.
+-- @param addArgs The value(s) to pass in place of `...` in `get`, `set`, and `getDefaultM`.
 function persistence.entity.defineField(name, key, get, set, getDefaultM, addArgs)
 	if defs.name[name] then
 		error("duplicate entity field name for " .. name, 2)
@@ -53,20 +62,49 @@ function persistence.entity.defineField(name, key, get, set, getDefaultM, addArg
 	defs.key[key] = t
 end
 
+--- Persistable fields.
+-- @section fields
+
+--- Template.
+-- @table template
 persistence.entity.defineField("template",   "t", "getTemplate",       "setTemplate")
+--- Callsign.
+-- @table callsign
 persistence.entity.defineField("callsign",   "c", "getCallSign",       "setCallSign")
+--- Current hull.
+-- @table hull
 persistence.entity.defineField("hull",       "h", "getHull",           "setHull",           "getHullMax")
+--- Max hull.
+-- @table hullMax
 persistence.entity.defineField("hullMax",    "H", "getHullMax",        "setHullMax")
+--- Energy.
+-- @table energy
 persistence.entity.defineField("energy",     "e", "getEnergyLevel",    "setEnergyLevel",    "getEnergyLevelMax")
+--- Max energy.
+-- @table energyMax
 persistence.entity.defineField("energyMax",  "E", "getEnergyLevelMax", "setEnergyLevelMax")
+--- Total available coolant.
+-- @table coolant
 persistence.entity.defineField("coolant",    "T", "getMaxCoolant",     "setMaxCoolant")
 
+--- HVLI ammunition.
+-- @table hvli
 persistence.entity.defineField("hvli",   "av", "getWeaponStorage", "setWeaponStorage", "getWeaponStorageMax", {"HVLI"})
+--- Homing ammunition.
+-- @table homing
 persistence.entity.defineField("homing", "ah", "getWeaponStorage", "setWeaponStorage", "getWeaponStorageMax", {"Homing"})
+--- EMP ammunition.
+-- @table emp
 persistence.entity.defineField("emp",    "ae", "getWeaponStorage", "setWeaponStorage", "getWeaponStorageMax", {"EMP"})
+--- Nuke ammunition.
+-- @table nuke
 persistence.entity.defineField("nuke",   "an", "getWeaponStorage", "setWeaponStorage", "getWeaponStorageMax", {"Nuke"})
+--- Mine ammunition.
+-- @table mine
 persistence.entity.defineField("mine",   "am", "getWeaponStorage", "setWeaponStorage", "getWeaponStorageMax", {"Mine"})
 
+--- Current shields.
+-- @table shield
 persistence.entity.defineField("shield", "s",
 	function(e)
 		local data = {}
@@ -88,6 +126,8 @@ persistence.entity.defineField("shield", "s",
 		e:setShields(table.unpack(args))
 	end
 )
+--- Max shields.
+-- @table shieldMax
 persistence.entity.defineField("shieldMax", "S",
 	function(e)
 		local data = {}
@@ -109,6 +149,8 @@ persistence.entity.defineField("shieldMax", "S",
 		e:setShieldsMax(table.unpack(args))
 	end
 )
+--- Position.
+-- @table position
 persistence.entity.defineField("position", "p",
 	function(e)
 		local x, y = e:getPosition()
@@ -120,6 +162,8 @@ persistence.entity.defineField("position", "p",
 		e:setPosition(x, y):setRotation(r)
 	end
 )
+--- Velocity.
+-- @table velocity
 persistence.entity.defineField("velocity", "v",
 	function(e)
 		local x, y = e:getVelocity()
@@ -170,22 +214,45 @@ local function defineSystemField(name, key, get, set, default)
 	)
 end
 
+--- System max health.
+-- @table sysHealthMax
 defineSystemField("sysHealthMax",  "sH", "getSystemHealthMax",      "setSystemHealthMax",             1)
+--- System current health.
+-- @table sysHealth
 defineSystemField("sysHealth",     "sh", "getSystemHealth",         "setSystemHealth",                "getSystemHealthMax")
+--- System hacked level.
+-- @table sysHacked
 defineSystemField("sysHacked",     "sk", "getSystemHackedLevel",    "setSystemHackedLevel",           0)
+--- System heat level.
+-- @table sysHeat
 defineSystemField("sysHeat",       "st", "getSystemHeat",           "setSystemHeat",                  0)
+--- System power request.
+-- @table sysPowerReq
 defineSystemField("sysPowerReq",   "sp", "getSystemPowerRequest",   "commandSetSystemPowerRequest",   1)
+--- System power level.
+-- @table sysPower
 defineSystemField("sysPower",      "sP", "getSystemPower",          "setSystemPower",                 "getSystemPowerRequest")
+--- System coolant request.
+-- @table sysCoolantReq
 defineSystemField("sysCoolantReq", "sc", "getSystemCoolantRequest", "commandSetSystemCoolantRequest", 0)
+--- System coolant level.
+-- @table sysCoolant
 defineSystemField("sysCoolant",    "sC", "getSystemCoolant",        "setSystemCoolant",               "getSystemCoolantRequest")
 
--- soft-depends: gn32/cargo
+--- Ship `cargo`.
+-- @table cargo
 persistence.entity.defineField("cargo", "C",
 	function(ship) return ship.cargo end,
 	function(ship, n) ship.cargo = n end
 )
 
+--- Functions.
+-- @section functions
 
+--- Save entity data to a table.
+-- @param e The entity to save data from.
+-- @param fields The list of fields to save.
+-- @return A table containing the entity data.
 function persistence.entity.save(e, fields)
 	local data = {}
 
@@ -208,6 +275,10 @@ function persistence.entity.save(e, fields)
 	return data
 end
 
+--- Load entity data from a table.
+-- @param e The entity to apply loaded data to.
+-- @param fields The list of fields to load.
+-- @param data A table containing the entity data.
 function persistence.entity.load(e, fields, data)
 	for _, f in ipairs(fields) do
 		local def = defs.name[f]
@@ -240,6 +311,15 @@ persistence.entity.cpushipFields = {
 	"hull", "shield",
 	"hvli", "homing", "emp", "nuke", "mine",
 }
+
+--- Save typical CpuShip data to a table.
+-- Equivalent to `persistence.entity.save` with a preset list of fields.
+-- @param e The CpuShip to save data from.
+-- @return A table containing the entity data.
 function persistence.entity.saveCpuShip(e) return persistence.entity.save(e, persistence.entity.cpushipFields) end
+--- Load typical CpuShip data from a table.
+-- Equivalent to `persistence.entity.load` with a preset list of fields.
+-- @param e The CpuShip to apply loaded data to.
+-- @param data A table containing the entity data.
 function persistence.entity.loadCpuShip(e, data) persistence.entity.load(e, persistence.entity.cpushipFields, data) end
 

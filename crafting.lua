@@ -1,19 +1,20 @@
--- Module: gn32/crafting
--- Description: Adds functionality for player-facing crafting menus.
---[[
-	By default, there is a menu named "Build..." that fetches entries from `ship.buildable`.
+--- Adds functionality for player-facing crafting menus.
+-- By default, adds a menu named "Build..." that fetches entries from `ship.buildable`.
+-- @pragma nostrip
 
-	Crafting recipe format:
-		{
-			stations = {"Relay"}, -- optional; if not present, all stations can build this recipe
-			action = "Make",      -- optional; if not present, the default action for the menu is used
-			name = "Thing",       -- name of the recipe
-			take = {...},         -- optional; `exchange` resource list, things required to build the recipe
-			add = {...},          -- optional; `exchange` resource list, things resulting from building the recipe
-			time = 5,             -- optional; the time required to build the recipe
-			multi = true,         -- optional; whether more than 1 of this recipe can be built at once
-		}
-]]
+--- Recipe format.
+-- @section recipeformat
+
+--- Recipe table format.
+-- @table recipe
+-- @field[opt] stations A list of stations that can build the recipe. If not present, all stations can build the recipe.
+-- @field[opt] action The displayed action to build the recipe. If not present, the default action for the menu is used.
+-- @field name The name of the recipe.
+-- @field[opt] take An `exchange` resource list containing the resources required to build the recipe.
+-- @field[opt] add An `exchange` resource list containing the resources resulting from building the recipe.
+-- @field[opt] time The time required to build the recipe.
+-- @field[opt] multi Whether more than one of this recipe can be built at once.
+local _ = {}
 
 require "gn32/lang"
 
@@ -44,10 +45,23 @@ end
 
 G.crafting = {}
 
+--- Functions.
+-- @section functions
+
+--- Add a crafting menu to the main menu.
+-- @see action-main
+-- @param menuName The name of the menu.
+-- @param actionName The default action for the menu.
+-- @param getEntries A `function(ship)` that returns a list of entries to use for the menu.
 function crafting.addMenu(...) -- add a crafting menu to the main menu. arguments as crafting.buildMenu
 	mainMenu:add(crafting.buildMenu(...))
 end
 
+--- Builds a crafting menu for the main menu.
+-- @see action-main
+-- @param menuName The name of the menu.
+-- @param actionName The default action for the menu.
+-- @param getEntries A `function(ship)` that returns a list of entries to use for the menu.
 function crafting.buildMenu(menuName, actionName, getEntries) -- build a crafting menu
 	return {
 		button = menuName,

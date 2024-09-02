@@ -31,6 +31,10 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Comps">Comps </a></li>
+</ul>
 
 
 <h2>Modules</h2>
@@ -42,13 +46,18 @@
   <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
   <li><a href="../modules/cargo.html">cargo</a></li>
   <li><a href="../modules/classutil.html">classutil</a></li>
+  <li><a href="../modules/crafting.html">crafting</a></li>
+  <li><a href="../modules/debug.html">debug</a></li>
   <li><strong>drag</strong></li>
   <li><a href="../modules/ecs.html">ecs</a></li>
+  <li><a href="../modules/exchange.html">exchange</a></li>
   <li><a href="../modules/hook-sys.html">hook-sys</a></li>
   <li><a href="../modules/hook.html">hook</a></li>
   <li><a href="../modules/lang-lax.html">lang-lax</a></li>
   <li><a href="../modules/lang-strict.html">lang-strict</a></li>
   <li><a href="../modules/lang.html">lang</a></li>
+  <li><a href="../modules/persistence_entity.html">persistence_entity</a></li>
+  <li><a href="../modules/position.html">position</a></li>
   <li><a href="../modules/require.html">require</a></li>
   <li><a href="../modules/stdext.html">stdext</a></li>
   <li><a href="../modules/track.html">track</a></li>
@@ -61,29 +70,77 @@
 
 <h1>Module <code>drag</code></h1>
 <p>Slows down specified entities over time, eventually stopping them.</p>
-<p> On non-ECS EmptyEpsilon, also provides an entity velocity comp.
- To apply drag to an entity:</p>
-
-<pre>
-<span class="function-name">comps</span>(ent).drag = {}  <span class="comment">-- default slowdown parameter; retain 50% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.8</span>}  <span class="comment">-- retain 80% speed after 1 second
-</span><span class="function-name">comps</span>(ent).drag = {lambda = <span class="number">0.4</span>}  <span class="comment">-- retain 40% speed after 1 second</span>
-</pre>
-
-<p> [non-ECS] To apply velocity to an entity:</p>
-
-<pre>
-<span class="function-name">comps</span>(ent).velocity = {linear = {<span class="number">10</span>, <span class="number">20</span>}}  <span class="comment">-- set x velocity to 10 and y velocity to 20</span>
-</pre>
-
-<p> When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On non-ECS EE, its velocity comp is also removed.</p>
+<p> When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On <code>master</code>, its velocity comp is also removed.</p>
 
 
+<h2><a href="#Comps">Comps </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#drag">drag</a></td>
+	<td class="summary">Apply drag to an entity.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#velocity">velocity</a></td>
+	<td class="summary">[<code>master</code>] Move an entity at a specified velocity.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header has-description"><a name="Comps"></a>Comps </h2>
+
+          <div class="section-description">
+           See <a href="../modules/ecs.html#">ecs</a> for details of how to apply comps to an entity.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "drag"></a>
+    <strong>drag</strong>
+    </dt>
+    <dd>
+    Apply drag to an entity.
+
+
+    <ul>
+        <li><span class="parameter">lambda</span>
+            <span class="types"><span class="type">number</span></span>
+         What proportion of its speed the entity should retain after one second; default 0.5.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "velocity"></a>
+    <strong>velocity</strong>
+    </dt>
+    <dd>
+    [<code>master</code>] Move an entity at a specified velocity.
+
+
+    <ul>
+        <li><span class="parameter">x</span>
+            <span class="types"><span class="type">number</span></span>
+         The x component of the velocity.
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">number</span></span>
+         The y component of the velocity.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
