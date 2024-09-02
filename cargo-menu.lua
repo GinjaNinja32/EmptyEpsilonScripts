@@ -1,4 +1,4 @@
---- Provides a player-facing menu for interacting with `cargo`.
+--- [`action-main`] Provides an `action-main`-driven menu for interacting with `cargo`.
 
 require "gn32/action-main"
 require "gn32/drag"

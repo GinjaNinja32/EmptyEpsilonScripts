@@ -1,4 +1,7 @@
---- Adds an `action`-driven crew position menu.
+--- [`hook-sys`] Adds an `action`-driven crew position menu.
+-- Required hooks: `update`, `newPlayerShip`.
+-- This module uses `batteries/sort`.
+--
 -- For details of the menu item format, see `action`.
 --
 -- Target arguments: ship, station  

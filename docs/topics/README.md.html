@@ -31,12 +31,12 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Functions">Functions</a></li>
+
+
+<h2>Topics</h2>
+<ul class="">
+  <li><strong>README</strong></li>
 </ul>
-
-
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/action-comms.html">action-comms</a></li>
@@ -45,7 +45,7 @@
   <li><a href="../modules/action.html">action</a></li>
   <li><a href="../modules/cargo-menu.html">cargo-menu</a></li>
   <li><a href="../modules/cargo.html">cargo</a></li>
-  <li><strong>classutil</strong></li>
+  <li><a href="../modules/classutil.html">classutil</a></li>
   <li><a href="../modules/crafting.html">crafting</a></li>
   <li><a href="../modules/debug.html">debug</a></li>
   <li><a href="../modules/drag.html">drag</a></li>
@@ -63,61 +63,32 @@
   <li><a href="../modules/track.html">track</a></li>
   <li><a href="../modules/vector.html">vector</a></li>
 </ul>
-<h2>Topics</h2>
-<ul class="">
-  <li><a href="../topics/README.md.html">README</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>classutil</code></h1>
-<p>Utility for creating class-like objects with separate sets of static and instance functions.</p>
-<p>
 
-</p>
+<h1>Ginja's Empty Epsilon Scripts</h1>
+<p>This repository is intended to be cloned into a <code>gn32</code> folder inside the EmptyEpsilon scripts directory, so that this README file is <code>scripts/gn32/README.md</code>. <br/>
+All modules assume that the repository is at this path.</p>
 
+<p>Some modules additionally depend on parts of <a href="https://github.com/1bardesign/batteries">batteries</a>, which should also be cloned into the EmptyEpsilon scripts directory.
+In the documentation, these modules will specify that they use e.g. <code>batteries/sort</code>.</p>
 
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#makeClass">makeClass ()</a></td>
-	<td class="summary">Create a new class type.</td>
-	</tr>
-</table>
+<p>Note that all modules have an implicit dependency on <a href="../modules/require.html#">require</a>.</p>
 
-<br/>
-<br/>
+<p><a href="https://ginjaninja32.github.io/EmptyEpsilonScripts/">Documentation here</a></p>
 
+<p>Documentation description tags:</p>
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "makeClass"></a>
-    <strong>makeClass ()</strong>
-    </dt>
-    <dd>
-    Create a new class type.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-        <li>
-        A table for static class methods.</li>
-        <li>
-        A table for class instance methods.</li>
-        <li>
-        The metatable for class instances.</li>
-    </ol>
-
-
-
-
-</dd>
-</dl>
+<ul>
+    <li>[<code>master</code>]: This item is only available on the <code>master</code> branch of EmptyEpsilon.</li>
+    <li>[<code>ECS</code>]: This item is only available on the <code>ECS</code> branch of EmptyEpsilon.</li>
+    <li>[<a href="../modules/hook.html#">hook</a>]: This module uses <a href="../modules/hook.html#">hook</a>.</li>
+    <li>[<a href="../modules/hook-sys.html#">hook-sys</a>]: This module uses <a href="../modules/hook-sys.html#">hook-sys</a> (possibly by a transitive dependency) and requires certain hooks to be triggered manually unless <a href="../modules/hook.html#">hook</a> is used. These hooks will be listed in the first section of the module's documentation.</li>
+    <li>[<a href="../modules/action-main.html#">action-main</a>]: This module uses <a href="../modules/action-main.html#">action-main</a> (possibly by a transitive dependency) and requires certain hooks to be triggered manually unless <a href="../modules/hook.html#">hook</a> is used. These hooks are listed in the first section of <a href="../modules/action-main.html#">action-main</a>'s documentation.</li>
+</ul>
 
 
 </div> <!-- id="content" -->

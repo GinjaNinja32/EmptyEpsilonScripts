@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>Reference</title>
+    <title>EmptyEpsilonScripts</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -63,13 +63,19 @@
   <li><a href="../modules/track.html">track</a></li>
   <li><a href="../modules/vector.html">vector</a></li>
 </ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
 
 </div>
 
 <div id="content">
 
 <h1>Module <code>drag</code></h1>
-<p>Slows down specified entities over time, eventually stopping them.</p>
+<p>[<a href="../modules/hook-sys.html#">hook-sys</a>] Slows down specified entities over time, eventually stopping them.</p>
+<p> Required hooks: <code>update</code>.</p>
+
 <p> When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On <code>master</code>, its velocity comp is also removed.</p>
 
 

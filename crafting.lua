@@ -1,4 +1,4 @@
---- Adds functionality for player-facing crafting menus.
+--- [`action-main`] Adds functionality for player-facing crafting menus.
 -- By default, adds a menu named "Build..." that fetches entries from `ship.buildable`.
 -- @pragma nostrip
 

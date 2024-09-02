@@ -1,4 +1,4 @@
---- Utility for tracking collections of entities.
+--- [`hook`] Utility for tracking collections of entities.
 -- @pragma nostrip
 
 require "gn32/lang"

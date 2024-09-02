@@ -1,6 +1,8 @@
 --- Integrates the `hook-sys` library into EmptyEpsilon, registering relevant events automatically.
 -- For documentation on how to call the library, see `hook-sys`.
 --
+-- Modules targeting this library that do not use predefined entity hooks should import `hook-sys` and specify the hooks they require, to allow them to be used in scripts that do not wish to integrate `hook`.
+--
 -- Global hooks:
 --
 -- - `init`: on scenario initialisation (no args)

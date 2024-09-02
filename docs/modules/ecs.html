@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>Reference</title>
+    <title>EmptyEpsilonScripts</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -65,14 +65,18 @@
   <li><a href="../modules/track.html">track</a></li>
   <li><a href="../modules/vector.html">vector</a></li>
 </ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
 
 </div>
 
 <div id="content">
 
 <h1>Module <code>ecs</code></h1>
-<p>Provides a Lua-side ECS.</p>
-<p> Functions whose description begins with [ECS] are only available when running on the ECS branch of EmptyEpsilon.</p>
+<p>[<a href="../modules/hook-sys.html#">hook-sys</a>] Provides a Lua-side ECS.</p>
+<p> Required hooks: <code>update</code>.</p>
 
 
 <h2><a href="#Entity">Entity </a></h2>
@@ -130,10 +134,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#system:query">system:query ()</a></td>
 	<td class="summary">Query all entities that this system should process.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#System.update">System.update (delta)</a></td>
-	<td class="summary">Update all systems.</td>
 	</tr>
 </table>
 
@@ -442,29 +442,6 @@
 
         A table which when iterated over with <code>pairs()</code> will yield <code>ent, comps</code> pairs.
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "System.update"></a>
-    <strong>System.update (delta)</strong>
-    </dt>
-    <dd>
-    Update all systems.
- If <code>gn32/hook-sys</code> is present, this function is automatically installed as an update hook.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">delta</span>
-
-
-
-        </li>
-    </ul>
-
 
 
 

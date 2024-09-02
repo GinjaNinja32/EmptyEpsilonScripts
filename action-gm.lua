@@ -1,4 +1,6 @@
---- Adds an `action`-driven GM menu.
+--- [`hook-sys`] Adds an `action`-driven GM menu.
+-- Required hooks: `update`.
+--
 -- For details of the menu item format, see `action`.
 --
 -- Target arguments: (none)  

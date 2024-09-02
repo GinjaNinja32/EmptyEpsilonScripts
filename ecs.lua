@@ -1,7 +1,8 @@
---- Provides a Lua-side ECS.
--- Functions whose description begins with [ECS] are only available when running on the ECS branch of EmptyEpsilon.
+--- [`hook-sys`] Provides a Lua-side ECS.
+-- Required hooks: `update`.
 
 require "gn32/lang"
+require "gn32/hook-sys"
 require "gn32/classutil"
 
 -- [[ GLOBAL DATA STORAGE ]]
@@ -298,8 +299,6 @@ function system:_update(delta)
 	end
 end
 
---- Update all systems.
--- If `gn32/hook-sys` is present, this function is automatically installed as an update hook.
 function System.update(delta)
 	local doneList = {}
 	local doneMap = {}
@@ -375,6 +374,4 @@ function System.update(delta)
 	end
 end
 
-if G.hook then
-	hook.on.update = System.update
-end
+hook.on.update = System.update
