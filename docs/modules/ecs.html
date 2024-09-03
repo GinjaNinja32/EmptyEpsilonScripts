@@ -78,6 +78,10 @@
 <p>[<a href="../modules/hook-sys.html#">hook-sys</a>] Provides a Lua-side ECS.</p>
 <p> Required hooks: <code>update</code>.</p>
 
+<p> To interact with comps defined by a library, see <a href="../modules/ecs.html#comps">comps</a>.</p>
+
+<p> To define your own comps, see <a href="../modules/ecs.html#Comp">Comp</a> and <a href="../modules/ecs.html#System">System</a>.</p>
+
 
 <h2><a href="#Entity">Entity </a></h2>
 <table class="function_list">
@@ -89,6 +93,10 @@
 	<td class="name" nowrap><a href="#comps">comps (e)</a></td>
 	<td class="summary">Get the comps associated with an entity.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#EntityComps">EntityComps</a></td>
+	<td class="summary">Holds the comp instances associated with the entity it was accessed from.</td>
+	</tr>
 </table>
 <h2><a href="#Comp">Comp </a></h2>
 <table class="function_list">
@@ -98,7 +106,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#comp:addField">comp:addField (name, default, check)</a></td>
-	<td class="summary">Add a field to a comp, with an optional default and check.</td>
+	<td class="summary">Add a field to a comp, with an optional default and validation function.</td>
 	</tr>
 </table>
 <h2><a href="#System">System </a></h2>
@@ -141,8 +149,11 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Entity"></a>Entity </h2>
+    <h2 class="section-header has-description"><a name="Entity"></a>Entity </h2>
 
+          <div class="section-description">
+           An entity is a thing that exists in the world of EmptyEpsilon. On <code>master</code>, this is a SpaceObject; on <code>ECS</code>, an Entity.
+          </div>
     <dl class="function">
     <dt>
     <a name = "entity:comps"></a>
@@ -156,7 +167,7 @@
     <h3>Returns:</h3>
     <ol>
 
-        The comps for the entity.
+        The <a href="../modules/ecs.html#EntityComps">EntityComps</a> for the entity.
     </ol>
 
 
@@ -181,16 +192,49 @@
     <h3>Returns:</h3>
     <ol>
 
-        The comps for the entity.
+        The <a href="../modules/ecs.html#EntityComps">EntityComps</a> for the entity.
     </ol>
 
 
 
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Comp"></a>Comp </h2>
+    <dt>
+    <a name = "EntityComps"></a>
+    <strong>EntityComps</strong>
+    </dt>
+    <dd>
+    Holds the comp instances associated with the entity it was accessed from. </p>
 
+<ul>
+    <li>To set a comp, set <code>comps[name] = {...}</code>.</li>
+    <li>To read a comp, read <code>comps[name]</code>.</li>
+    <li>To edit a comp in-place, set the desired fields on <code>comps[name]</code>.</li>
+</ul>
+
+<p> For example, with a hypothetical "position" comp defined as having fields "x" and "y":</p>
+
+<ul>
+    <li>To set the position: <code>comps.position = {x = 1, y = 2}</code></li>
+    <li>To read the x coordinate: <code>local x = comps.position.x</code></li>
+    <li>To set only the y coordinate: <code>comps.position.y = 42</code></li>
+</ul>
+
+<p> For details of what fields are available on each comp, refer to the documentation for the specific comp.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Comp"></a>Comp </h2>
+
+          <div class="section-description">
+           A Comp defines a collection of data that can be attached to an entity.
+          </div>
     <dl class="function">
     <dt>
     <a name = "Comp"></a>
@@ -222,7 +266,7 @@
     <strong>comp:addField (name, default, check)</strong>
     </dt>
     <dd>
-    Add a field to a comp, with an optional default and check.
+    Add a field to a comp, with an optional default and validation function.
 
 
     <h3>Parameters:</h3>
@@ -234,7 +278,15 @@
          Optional. The default value of the field.
         </li>
         <li><span class="parameter">check</span>
-         Optional. A function(v) to check values of the field. The function should either return a bool (true = ok, false = bad value), or a string describing the problem.
+         Optional. A function(v) to check values of the field. The function should return one of:</p>
+
+<ul>
+    <li><code>nil</code> or <code>true</code> (value ok)</li>
+    <li><code>false</code> (value not ok)</li>
+    <li>a string describing the problem with the value</li>
+</ul>
+
+<p> If <code>check(default)</code> is not <code>nil</code> or <code>true</code>, then this field must be provided when setting the comp on an entity.
         </li>
     </ul>
 
@@ -249,8 +301,11 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="System"></a>System </h2>
+    <h2 class="section-header has-description"><a name="System"></a>System </h2>
 
+          <div class="section-description">
+           A <a href="../modules/ecs.html#System">System</a> processes a set of entities, typically which share some set of comps and/or components in common.
+          </div>
     <dl class="function">
     <dt>
     <a name = "System"></a>

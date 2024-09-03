@@ -1,5 +1,9 @@
 --- [`hook-sys`] Provides a Lua-side ECS.
 -- Required hooks: `update`.
+--
+-- To interact with comps defined by a library, see `comps`.
+--
+-- To define your own comps, see `Comp` and `System`.
 
 require "gn32/lang"
 require "gn32/hook-sys"
@@ -18,7 +22,8 @@ local map_comp_ent_data = {}
 -- entity.comp => entity
 local ecomp_entity = setmetatable({}, {__mode = "kv"})
 
---- Entity
+--- Entity.
+-- An entity is a thing that exists in the world of EmptyEpsilon. On `master`, this is a SpaceObject; on `ECS`, an Entity.
 -- @section Entity
 
 local ecompMetatable = {
@@ -77,7 +82,7 @@ if G.createEntity then
 	local entity = getLuaEntityFunctionTable()
 
 	--- [ECS] Get the comps associated with this entity.
-	-- @return The comps for the entity.
+	-- @return The `EntityComps` for the entity.
 	function entity:comps()
 		local ec = setmetatable({}, ecompMetatable)
 
@@ -90,7 +95,7 @@ end
 G.comps = nil
 --- Get the comps associated with an entity.
 -- @param e the entity to get comps for
--- @return The comps for the entity.
+-- @return The `EntityComps` for the entity.
 function comps(e)
 	local ec = setmetatable({}, ecompMetatable)
 
@@ -99,7 +104,23 @@ function comps(e)
 	return ec
 end
 
---- Comp
+--- Holds the comp instances associated with the entity it was accessed from.
+--
+-- - To set a comp, set `comps[name] = {...}`.
+-- - To read a comp, read `comps[name]`.
+-- - To edit a comp in-place, set the desired fields on `comps[name]`.
+--
+-- For example, with a hypothetical "position" comp defined as having fields "x" and "y":
+--
+-- - To set the position: `comps.position = {x = 1, y = 2}`
+-- - To read the x coordinate: `local x = comps.position.x`
+-- - To set only the y coordinate: `comps.position.y = 42`
+--
+-- For details of what fields are available on each comp, refer to the documentation for the specific comp.
+-- @table EntityComps
+
+--- Comp.
+-- A Comp defines a collection of data that can be attached to an entity.
 -- @section comp
 
 local Comp, comp = makeClass()
@@ -116,10 +137,16 @@ function comp:_init(key)
 	defs_component[key] = self
 end
 
---- Add a field to a comp, with an optional default and check.
+--- Add a field to a comp, with an optional default and validation function.
 -- @param name The name of the field.
 -- @param default Optional. The default value of the field.
--- @param check Optional. A function(v) to check values of the field. The function should either return a bool (true = ok, false = bad value), or a string describing the problem.
+-- @param check Optional. A function(v) to check values of the field. The function should return one of:
+--
+-- - `nil` or `true` (value ok)
+-- - `false` (value not ok)
+-- - a string describing the problem with the value
+--
+-- If `check(default)` is not `nil` or `true`, then this field must be provided when setting the comp on an entity.
 -- @return self
 function comp:addField(name, default, check)
 	self.fields[name] = {default=default, check=check}
@@ -160,7 +187,8 @@ function comp:_validateObject(data, n)
 	end
 end
 
---- System
+--- System.
+-- A `System` processes a set of entities, typically which share some set of comps and/or components in common.
 -- @section System
 
 local all_systems = {}
