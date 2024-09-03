@@ -24,11 +24,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Lua
+        working-directory: ..
         uses: leafo/gh-actions-lua@v8
         with:
           luaVersion: 5.3
 
       - name: Setup LuaRocks
+        working-directory: ..
         uses: leafo/gh-actions-luarocks@v4
 
       - name: Setup dependencies
