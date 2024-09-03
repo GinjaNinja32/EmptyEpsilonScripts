@@ -8,6 +8,7 @@
 require "gn32/lang"
 require "gn32/hook-sys"
 require "gn32/classutil"
+require "gn32/schema"
 
 -- [[ GLOBAL DATA STORAGE ]]
 
@@ -37,15 +38,7 @@ local ecompMetatable = {
 		local data = map_ent_comp_data[ent] and map_ent_comp_data[ent][key]
 		if not data then return nil end
 
-		return setmetatable({}, {
-			__index = function(_, k)
-				return def:_readField(k, data[k], 2)
-			end,
-			__newindex = function(tbl, k, v)
-				def:_validateWriteField(k, v, 3)
-				data[k] = v
-			end,
-		})
+		return data
 	end,
 	__newindex = function(ecomp, key, val)
 		local def = defs_component[key]
@@ -62,13 +55,21 @@ local ecompMetatable = {
 			return
 		end
 
-		local t = {}
+		local t = schema.makeTable(def.schema, ("comps.%s."):format(key))
 
-		for k, v in pairs(val) do
-			t[k] = v
+		local ok, e = pcall(function()
+			for k, v in pairs(val) do
+				t[k] = v
+			end
+		end)
+		if not ok then
+			error(e:sub(e:find(": ")+2, -1), 2)
 		end
 
-		def:_validateObject(t, 3)
+		local e = schema.checkTable(t, def.schema)
+		if e then
+			error(("comps.%s.%s"):format(key, e), 2)
+		end
 
 		if not map_ent_comp_data[ent] then map_ent_comp_data[ent] = {} end
 		if not map_comp_ent_data[key] then map_comp_ent_data[key] = setmetatable({}, {__mode="k"}) end
@@ -132,59 +133,18 @@ G.Comp = Comp
 -- @return The new Comp instance.
 function comp:_init(key)
 	self.key = key
-	self.fields = {}
+	self.schema = {}
 
 	defs_component[key] = self
 end
 
---- Add a field to a comp, with an optional default and validation function.
--- @param name The name of the field.
--- @param default Optional. The default value of the field.
--- @param check Optional. A function(v) to check values of the field. The function should return one of:
---
--- - `nil` or `true` (value ok)
--- - `false` (value not ok)
--- - a string describing the problem with the value
---
--- If `check(default)` is not `nil` or `true`, then this field must be provided when setting the comp on an entity.
+--- Set the schema for a comp. If this method is not called, the comp will not permit any fields.
+-- For details on the schema format, see `schema.tableSchema`.
 -- @return self
-function comp:addField(name, default, check)
-	self.fields[name] = {default=default, check=check}
+function comp:setSchema(schema)
+	if type(schema) ~= "table" then error("schema must be a table", 2) end
+	self.schema = schema
 	return self
-end
-
-function comp:_readField(name, val, n)
-	local fdef = self.fields[name]
-	if not fdef then error("comp " .. self.key .. " has no field " .. name, n) end
-
-	if val then return val end
-
-	return fdef.default
-end
-
-function comp:_validateWriteField(name, val, n)
-	local fdef = self.fields[name]
-	if not fdef then error("comp " .. self.key .. " has no field " .. name, n) end
-
-	if fdef.check then
-		local e = fdef.check(val)
-		if e ~= true and e ~= nil then
-			if e == false then e = "bad value " .. tostring(val) end
-			error("comp " .. self.key .. " field " .. name .. ": " .. e, n)
-		end
-	end
-end
-
-function comp:_validateObject(data, n)
-	for k, v in pairs(data) do
-		self:_validateWriteField(k, v, n+1)
-	end
-
-	for k, fdef in pairs(self.fields) do
-		if not data[k] then
-			self:_validateWriteField(k, fdef.default, n+1)
-		end
-	end
 end
 
 --- System.

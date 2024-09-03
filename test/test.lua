@@ -114,7 +114,7 @@ assert = setmetatable({}, {
 			if ok then
 				error("function did not throw an error", 2)
 			end
-			if not string.match(tostring(actual), expect) then
+			if not string.match(tostring(actual), "^" .. expect .. "$") then
 				error("function threw unexpected error: " .. tostring(actual), 2)
 			end
 		end,

@@ -12,8 +12,9 @@ require "gn32/ecs"
 --- Apply drag to an entity.
 -- @table drag
 -- @number[opt] lambda What proportion of its speed the entity should retain after one second; default 0.5.
-Comp("drag")
-	:addField("lambda", 0.5, function(v) return type(v) == "number" and 0 < v and v < 1 end)
+Comp("drag"):setSchema({
+	lambda = {_default = 0.5, _type = "number", _min = 0, _minExclusive = true, _max = 1, _maxExclusive = true},
+})
 
 local dragSystem = System("drag")
 	:addRequiredComps("drag")
@@ -23,9 +24,10 @@ if not G.createEntity then
 	-- @table velocity
 	-- @number x The x component of the velocity.
 	-- @number y The y component of the velocity.
-	Comp("velocity")
-		:addField("x", nil, function(v) return type(v) == "number" end)
-		:addField("y", nil, function(v) return type(v) == "number" end)
+	Comp("velocity"):setSchema({
+		x = {_type = "number"},
+		y = {_type = "number"},
+	})
 
 	dragSystem:addRequiredComps("velocity")
 end
