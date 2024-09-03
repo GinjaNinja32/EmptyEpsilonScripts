@@ -8,8 +8,11 @@
 -- Differences from `action` docs:
 --
 -- - Menu items support a `stations` list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.
+-- - Menu items support an `area` field; items will only be displayed on stations that handle the area (see `position` for details on areas). Items without this field will show on all stations.
 -- - Menu items support a `requiredTaskState` bool; if set, the item will only display when there is (`true`) or is not (`false`) a task in progress.
 -- 
+-- If both `stations` and `area` are provided, only stations that match both restrictions will be able to see the item.
+--
 -- To add a station button menu item:
 --	mainMenu:add {
 --		info = "Info Text",
@@ -73,6 +76,10 @@ G.mainMenu = ActionBase {
 		local data = self:_dataFor(ship, station)
 
 		if item.stations and not table.contains(item.stations, station) then
+			return false
+		end
+
+		if item.area and not table.contains(position.area_to_pos[item.area], station) then
 			return false
 		end
 

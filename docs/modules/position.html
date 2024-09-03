@@ -33,7 +33,9 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Functions">Functions</a></li>
 <li><a href="#Tables">Tables</a></li>
+<li><a href="#Areas">Areas </a></li>
 </ul>
 
 
@@ -79,6 +81,17 @@
 </p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#position.defineArea">position.defineArea (area, ...)</a></td>
+	<td class="summary">Define a new area handled by a set of positions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.defineAreaDefault">position.defineAreaDefault (area, ...)</a></td>
+	<td class="summary">Define a new area handled by a set of positions, unless the area has already been defined.</td>
+	</tr>
+</table>
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
@@ -105,12 +118,121 @@
 	<td class="name" nowrap><a href="#position.to_any">position.to_any</a></td>
 	<td class="summary">A mapping from positions in either 3-4 crew or 5-6 crew system to the equivalent positions in either system.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.area_to_pos">position.area_to_pos</a></td>
+	<td class="summary">A mapping from area to positions that handle that area.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#position.pos_to_area">position.pos_to_area</a></td>
+	<td class="summary">A mapping from position to the areas it handles.</td>
+	</tr>
+</table>
+<h2><a href="#Areas">Areas </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#helms">helms</a></td>
+	<td class="summary">Move and turn the ship.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#weapons">weapons</a></td>
+	<td class="summary">Select weapon targets, fire missiles.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shields">shields</a></td>
+	<td class="summary">Raise, lower, and calibrate the shields.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#power">power</a></td>
+	<td class="summary">Monitor and set system power and coolant levels.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#damage">damage</a></td>
+	<td class="summary">View and repair system damage.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scan">scan</a></td>
+	<td class="summary">Select and scan unknown entities, view data on scanned entities.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#database">database</a></td>
+	<td class="summary">View science database entries.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waypoints">waypoints</a></td>
+	<td class="summary">Add, remove, and move waypoints.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#probes">probes</a></td>
+	<td class="summary">Launch scan probes.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hack">hack</a></td>
+	<td class="summary">Hack other ships.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#map">map</a></td>
+	<td class="summary">View a non-ship-centred map.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#comms">comms</a></td>
+	<td class="summary">Hail other ships and stations, receive incoming hails.</td>
+	</tr>
 </table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "position.defineArea"></a>
+    <strong>position.defineArea (area, ...)</strong>
+    </dt>
+    <dd>
+    Define a new area handled by a set of positions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">area</span>
+         The name of the new area.
+        </li>
+        <li><span class="parameter">...</span>
+         The positions that handle this area.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.defineAreaDefault"></a>
+    <strong>position.defineAreaDefault (area, ...)</strong>
+    </dt>
+    <dd>
+    Define a new area handled by a set of positions, unless the area has already been defined.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">area</span>
+         The name of the new area.
+        </li>
+        <li><span class="parameter">...</span>
+         The positions that handle this area.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
@@ -202,6 +324,210 @@
 <p> e.g. <br/>
  <code>position.to_any[&quot;Helms&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Tactical&quot;}</code> <br/>
  <code>position.to_any[&quot;Tactical&quot;]</code> => <code>{&quot;Helms&quot;, &quot;Weapons&quot;, &quot;Tactical&quot;}</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.area_to_pos"></a>
+    <strong>position.area_to_pos</strong>
+    </dt>
+    <dd>
+    A mapping from area to positions that handle that area.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position.pos_to_area"></a>
+    <strong>position.pos_to_area</strong>
+    </dt>
+    <dd>
+    A mapping from position to the areas it handles.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Areas"></a>Areas </h2>
+
+          <div class="section-description">
+           The areas defined in this module correspond to the parts of standard ship operations that are handled by each console; for example, missiles may be fired from Weapons, Tactical, or Single Pilot.
+ Other modules may define other areas by calling <a href="../modules/position.html#position.defineArea">position.defineArea</a> or <a href="../modules/position.html#position.defineAreaDefault">position.defineAreaDefault</a>; see their documentation for details on the areas they define.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "helms"></a>
+    <strong>helms</strong>
+    </dt>
+    <dd>
+    Move and turn the ship.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "weapons"></a>
+    <strong>weapons</strong>
+    </dt>
+    <dd>
+    Select weapon targets, fire missiles.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shields"></a>
+    <strong>shields</strong>
+    </dt>
+    <dd>
+    Raise, lower, and calibrate the shields.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "power"></a>
+    <strong>power</strong>
+    </dt>
+    <dd>
+    Monitor and set system power and coolant levels.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "damage"></a>
+    <strong>damage</strong>
+    </dt>
+    <dd>
+    View and repair system damage.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scan"></a>
+    <strong>scan</strong>
+    </dt>
+    <dd>
+    Select and scan unknown entities, view data on scanned entities.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "database"></a>
+    <strong>database</strong>
+    </dt>
+    <dd>
+    View science database entries.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waypoints"></a>
+    <strong>waypoints</strong>
+    </dt>
+    <dd>
+    Add, remove, and move waypoints.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "probes"></a>
+    <strong>probes</strong>
+    </dt>
+    <dd>
+    Launch scan probes.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hack"></a>
+    <strong>hack</strong>
+    </dt>
+    <dd>
+    Hack other ships.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "map"></a>
+    <strong>map</strong>
+    </dt>
+    <dd>
+    View a non-ship-centred map.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "comms"></a>
+    <strong>comms</strong>
+    </dt>
+    <dd>
+    Hail other ships and stations, receive incoming hails.
 
 
 

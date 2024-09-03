@@ -87,8 +87,11 @@
 
 <ul>
     <li>Menu items support a <code>stations</code> list; items will only be displayed on stations contained in the list. Items without a list will show on all stations.</li>
+    <li>Menu items support an <code>area</code> field; items will only be displayed on stations that handle the area (see <a href="../modules/position.html#">position</a> for details on areas). Items without this field will show on all stations.</li>
     <li>Menu items support a <code>requiredTaskState</code> bool; if set, the item will only display when there is (<code>true</code>) or is not (<code>false</code>) a task in progress.</li>
 </ul>
+
+<p> If both <code>stations</code> and <code>area</code> are provided, only stations that match both restrictions will be able to see the item.</p>
 
 <p> To add a station button menu item:</p>
 

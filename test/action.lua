@@ -567,6 +567,11 @@ test("action/main", function()
 		{ id="bEngineering3", station="Engineering", button="Failing Task", action=equivalentAny },
 	}
 
+	do
+		local data = mainMenu:_dataFor(ship, "Engineering")
+		data.maxItems = 10
+	end
+
 	mainMenu:setMenu(nil, ship, "Engineering")
 	assert.equivalent(ship.customButtons, homeMenu)
 
@@ -692,7 +697,7 @@ test("action/main", function()
 	})
 
 	scenarioTime = scenarioTime + 2
-	mainMenu:updateTasks(ship)
+	mainMenu:_updateTasks(ship)
 
 	assert.equivalent(ship.customButtons, {
 		{ id="iEngineering0", station="Engineering", info="Short task in progress..." },
@@ -708,7 +713,7 @@ test("action/main", function()
 	})
 
 	scenarioTime = scenarioTime + 3
-	mainMenu:updateTasks(ship)
+	mainMenu:_updateTasks(ship)
 
 	assert.equivalent(ship.customButtons, {
 		{ id="iEngineering0", station="Engineering", info="Task Complete" },
@@ -743,7 +748,7 @@ test("action/main", function()
 	})
 
 	scenarioTime = scenarioTime + 55
-	mainMenu:updateTasks(ship)
+	mainMenu:_updateTasks(ship)
 
 	assert.equivalent(ship.customButtons, {
 		{ id="iEngineering0", station="Engineering", info="Long task in progress..." },
@@ -759,7 +764,7 @@ test("action/main", function()
 	})
 
 	scenarioTime = scenarioTime + 6
-	mainMenu:updateTasks(ship)
+	mainMenu:_updateTasks(ship)
 
 	assert.equivalent(ship.customButtons, {
 		{ id="iEngineering0", station="Engineering", info="Task Complete" },
@@ -794,7 +799,7 @@ test("action/main", function()
 	})
 
 	scenarioTime = scenarioTime + 55
-	mainMenu:updateTasks(ship)
+	mainMenu:_updateTasks(ship)
 
 	assert.equivalent(ship.customButtons, {
 		{ id="iEngineering0", station="Engineering", info="Task Failed" },

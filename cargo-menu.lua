@@ -1,9 +1,13 @@
 --- [`action-main`] Provides an `action-main`-driven menu for interacting with `cargo`.
+--
+-- Defines defaults for an area `"cargo"` for cargo transfer/jettison menu items. See `position` for details on areas, including how to override the default stations.
 
 require "gn32/action-main"
 require "gn32/drag"
 require "gn32/cargo"
 require "gn32/vector"
+
+position.defineAreaDefault("cargo", "Relay", "Operations", "Single")
 
 mainMenu:add {
 	sticky = true,
@@ -111,7 +115,7 @@ mainMenu:add {
 			end,
 		},
 		{
-			stations = {"Relay", "Operations", "Single"},
+			area = "cargo",
 			button = "Transfer Cargo...",
 			action = function(reopen, ship, station)
 				local menu = {}
@@ -139,7 +143,7 @@ mainMenu:add {
 			end,
 		},
 		{
-			stations = {"Relay", "Operations", "Single"},
+			area = "cargo",
 			button = "Jettison Cargo...",
 			action = function(reopen, ship, station)
 				local menu = {}
