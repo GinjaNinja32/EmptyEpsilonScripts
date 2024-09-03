@@ -22,27 +22,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: ./ees
 
       - name: Setup Lua
-        working-directory: ..
         uses: leafo/gh-actions-lua@v8
         with:
           luaVersion: 5.3
 
       - name: Setup LuaRocks
-        working-directory: ..
         uses: leafo/gh-actions-luarocks@v4
 
       - name: Setup dependencies
         run: luarocks install ldoc
 
       - name: Build docs
-        run: make docs
+        run: cd ees && make docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs
+          path: ./ees/docs
 
       - name: Deploy to GitHub Pages
         id: deployment
