@@ -12,27 +12,28 @@ require "gn32/ecs"
 --- Apply drag to an entity.
 -- @table drag
 -- @number[opt] lambda What proportion of its speed the entity should retain after one second; default 0.5.
-Comp("drag"):setSchema({
+local c_drag = Comp("drag"):setSchema({
 	lambda = {_default = 0.5, _type = "number", _gt = 0, _lt = 1},
 })
 
-local dragSystem = System("drag")
+local s_drag = System("drag")
 	:addRequiredComps("drag")
 
+local c_velocity
 if not G.createEntity then
 	--- [`master`] Move an entity at a specified velocity.
 	-- @table velocity
 	-- @number x The x component of the velocity.
 	-- @number y The y component of the velocity.
-	Comp("velocity"):setSchema({
+	c_velocity = Comp("velocity"):setSchema({
 		x = {_type = "number"},
 		y = {_type = "number"},
 	})
 
-	dragSystem:addRequiredComps("velocity")
+	s_drag:addRequiredComps("velocity")
 end
 
-dragSystem:onUpdateEntity(function(delta, ent, comps)
+s_drag:onUpdateEntity(function(delta, ent, comps)
 	local x, y
 	if G.createEntity then
 		x, y = table.unpack(ent.components.physics.linear_velocity)
