@@ -165,6 +165,11 @@ end
 
 -- PlayerShip
 G.onNewPlayerShip, G.newPlayerShip = makeCallback()
+G.activePlayerShips = {}
+
+function G.getActivePlayerShips()
+	return activePlayerShips
+end
 
 function G.PlayerSpaceship()
 	local s = SpaceShip():setCallSign("PS" .. math.random(100, 999))

@@ -5,13 +5,33 @@ require "gn32/test/min-ee"
 
 G.testcode = 0
 
+G.printed = {}
+G.testPrint = print
+function print(...)
+	table.insert(printed, {...})
+end
+function G.consumePrinted()
+	local p = printed
+	printed = {}
+	return p
+end
+
 function G.test(name, f)
 	local ok, err = pcall(f)
+
+	local output = consumePrinted()
+	if #output > 0 then
+		testPrint(name .. " ...")
+		for _, line in ipairs(output) do
+			testPrint(table.unpack(line))
+		end
+	end
+
 	if ok then
-		print(name .. " OK")
+		testPrint(name .. " OK")
 	else
 		if err == nil then err = "<nil>" end
-		print(name .. " FAIL " .. tostring(err))
+		testPrint(name .. " FAIL " .. tostring(err))
 		testcode = 1
 	end
 	collectgarbage()

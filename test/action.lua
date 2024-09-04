@@ -174,6 +174,7 @@ test("action/comms", function()
 	assert.equivalent(commsData, functionMenu)
 	press "Error"
 	assert.equivalent(commsData, errorMenu)
+	assert.equivalent(consumePrinted(), {{"Menu error: bang"}})
 	press "Home"
 	assert.equivalent(commsData, homeMenu)
 
@@ -325,6 +326,7 @@ test("action/gm", function()
 	assert.equivalent(gmFunctions, functionMenu)
 	press "Error"
 	assert.equivalent(gmFunctions, errorMenu)
+	assert.equivalent(consumePrinted(), {{"Menu error: bang"}})
 	press "Home"
 	assert.equivalent(gmFunctions, homeMenu)
 end)
@@ -636,6 +638,7 @@ test("action/main", function()
 	assert.equivalent(ship.customButtons, functionMenu)
 	press "Error"
 	assert.equivalent(ship.customButtons, errorMenu)
+	assert.equivalent(consumePrinted(), {{"Menu error: bang"}})
 	press "Home"
 	assert.equivalent(ship.customButtons, homeMenu)
 
@@ -864,6 +867,13 @@ test("action/main", function()
 		{ id="bEngineering1", station="Engineering", button="<ERR: button bang>", action=equivalentAny },
 		{ id="iEngineering2", station="Engineering", info="<ERR: info bang>" },
 		{ id="iEngineering3", station="Engineering", info="order string" },
+	})
+	assert.equivalent(consumePrinted(), {
+		{"Menu error: item has no info or button? {}"},
+		{"Menu error: button bang"},
+		{"Menu error: info bang"},
+		{"Menu error: when bang"},
+		{"Menu error: order must be a number, got string"},
 	})
 
 	press "Home"

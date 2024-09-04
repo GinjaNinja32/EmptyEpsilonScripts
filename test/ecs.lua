@@ -143,6 +143,12 @@ test("ecs/system", function()
 		.. "system e should run after c\n"
 		.. "system f should run after e\n")
 
+	assert.equivalent(consumePrinted(), {
+		{"gn32/ecs: ignoring run-before constraint p on d: no such system"},
+		{"gn32/ecs: ignoring run-after constraint q on e: no such system"},
+		{"gn32/ecs: ignoring run-after constraint x on c: no such system"},
+	})
+
 	for _, sys in ipairs{a, b, c, d, e, f} do sys:destroy() end
 end)
 
