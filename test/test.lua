@@ -3,6 +3,8 @@ require "gn32/debug"
 
 require "gn32/test/min-ee"
 
+G.testcode = 0
+
 function G.test(name, f)
 	local ok, err = pcall(f)
 	if ok then
@@ -10,7 +12,9 @@ function G.test(name, f)
 	else
 		if err == nil then err = "<nil>" end
 		print(name .. " FAIL " .. tostring(err))
+		testcode = 1
 	end
+	collectgarbage()
 end
 
 G.equivalentAny = {}
