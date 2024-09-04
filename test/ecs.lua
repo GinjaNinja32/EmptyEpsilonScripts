@@ -15,7 +15,7 @@ test("ecs/filter", function()
 
 	local seenEnts = {}
 
-	local asdf = System("asdf")
+	local s_asdf = System("asdf")
 		:addRequiredComps("foo", "name")
 		:onUpdateGlobal(function(delta, ents)
 			for ent, comps in pairs(ents) do
@@ -68,6 +68,10 @@ test("ecs/filter", function()
 	collectgarbage()
 
 	assert.equivalent(doRun(), { e1 = 42 })
+
+	c_name:destroy()
+	c_foo:destroy()
+	s_asdf:destroy()
 end)
 
 test("ecs/schema", function()
@@ -102,6 +106,8 @@ test("ecs/schema", function()
 	assert.error(function()
 		comps(e1).bar = {}
 	end, "./gn32/test/ecs.lua:%d+: comp bar is not defined")
+
+	c:destroy()
 end)
 
 test("ecs/system", function()
@@ -121,8 +127,7 @@ test("ecs/system", function()
 	assert.equal(System.update(0.02), 1)
 	assert.equivalent(systemOrder, {"a", "b", "x", "c", "d", "e"})
 
-	x = nil
-	collectgarbage()
+	x:destroy()
 
 	systemOrder = {}
 	assert.equal(System.update(0.02), 1)
@@ -137,9 +142,11 @@ test("ecs/system", function()
 		.. "system d should run after c\n"
 		.. "system e should run after c\n"
 		.. "system f should run after e\n")
+
+	for _, sys in ipairs{a, b, c, d, e, f} do sys:destroy() end
 end)
 
-test("ecs/comp_gc", function()
+test("ecs/comp_destroy", function()
 	local c = Comp("test_comp"):setSchema({ foo = {} })
 
 	local e1 = Entity():setCallSign("e1")
@@ -148,8 +155,7 @@ test("ecs/comp_gc", function()
 
 	assert.equal(comps(e1).test_comp.foo, "bar")
 
-	c = nil
-	collectgarbage()
+	c:destroy()
 
 	assert.error(function()
 		return comps(e1).test_comp

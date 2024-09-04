@@ -13,7 +13,7 @@ require "gn32/schema"
 -- [[ GLOBAL DATA STORAGE ]]
 
 -- component_key => Comp
-local defs_component = setmetatable({}, {__mode="v"})
+local defs_component = {}
 
 -- entity => Comp => component_data
 local map_ent_comp_data = setmetatable({}, {__mode = "k"})
@@ -128,8 +128,6 @@ local Comp, comp = makeClass()
 G.Comp = Comp
 
 --- Create a new Comp.
---
--- Note that Comps are subject to GC; the returned Comp should usually be stored in a package local or global.
 -- @function Comp
 -- @param key The key of the new Comp.
 -- @return The new Comp instance.
@@ -149,19 +147,22 @@ function comp:setSchema(schema)
 	return self
 end
 
+--- Destroy this comp, removing it from all entities.
+function comp:destroy()
+	defs_component[self.key] = nil
+end
+
 --- System.
 -- A `System` processes a set of entities, typically which share some set of comps and/or components in common.
 -- @section System
 
-local all_systems = setmetatable({}, {__mode="v"})
+local all_systems = {}
 local systems_by_name = setmetatable({}, {__mode="v"})
 
 local System, system = makeClass()
 G.System = System
 
 --- Create a new System.
---
--- Note that Systems are subject to GC; the returned System should usually be stored in a package local or global.
 -- @function System
 -- @param name The name of the new System.
 -- @return The new System instance.
@@ -245,6 +246,17 @@ function system:_entitySatisfiesRequirements(ent, data)
 	return true
 end
 
+--- Destroy this system, stopping it from processing.
+function system:destroy()
+	systems_by_name[self.name] = nil
+	for i, v in ipairs(all_systems) do
+		if v == self then
+			table.remove(all_systems, i)
+			return
+		end
+	end
+end
+
 local queryMetatable = {
 	__pairs = function(t)
 		local tbl = map_ent_comp_data
@@ -293,7 +305,7 @@ function system:_update(delta)
 end
 
 function System.update(delta)
-	local doneList = setmetatable({}, {__mode="v"})
+	local doneList = {}
 	local doneMap = {}
 
 	local queue = {}
@@ -313,19 +325,6 @@ function System.update(delta)
 				end
 			end
 			sys.before = nil
-		end
-	end
-
-	local missed_idx = {}
-	for i, v in pairs(all_systems) do
-		if not queue[i] then
-			table.insert(missed_idx, i)
-		end
-	end
-	if #missed_idx > 0 then
-		table.sort(missed_idx)
-		for _, idx in ipairs(missed_idx) do
-			table.insert(queue, all_systems[idx])
 		end
 	end
 
