@@ -10,7 +10,7 @@ test("ecs", function()
 
 	Comp("foo")
 		:setSchema({
-			bar = {_default=0, _type="number", _min=0, _max=100},
+			bar = {_default=0, _type="number", _ge=0, _le=100},
 		})
 
 	local seenEnts = {}

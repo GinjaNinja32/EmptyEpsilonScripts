@@ -13,7 +13,7 @@ require "gn32/ecs"
 -- @table drag
 -- @number[opt] lambda What proportion of its speed the entity should retain after one second; default 0.5.
 Comp("drag"):setSchema({
-	lambda = {_default = 0.5, _type = "number", _min = 0, _minExclusive = true, _max = 1, _maxExclusive = true},
+	lambda = {_default = 0.5, _type = "number", _gt = 0, _lt = 1},
 })
 
 local dragSystem = System("drag")
