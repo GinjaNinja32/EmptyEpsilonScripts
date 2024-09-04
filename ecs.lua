@@ -13,12 +13,12 @@ require "gn32/schema"
 -- [[ GLOBAL DATA STORAGE ]]
 
 -- component_key => Comp
-local defs_component = {}
+local defs_component = setmetatable({}, {__mode="v"})
 
--- entity => component_key => component_data
+-- entity => Comp => component_data
 local map_ent_comp_data = setmetatable({}, {__mode = "k"})
--- component_key => entity => component_data
-local map_comp_ent_data = {}
+-- Comp => entity => component_data
+local map_comp_ent_data = setmetatable({}, {__mode = "k"})
 
 -- entity.comp => entity
 local ecomp_entity = setmetatable({}, {__mode = "kv"})
@@ -35,7 +35,7 @@ local ecompMetatable = {
 		local ent = ecomp_entity[ecomp]
 		if not ent or not ent:isValid() then error("attempt to access comps of destroyed entity", 2) end
 
-		local data = map_ent_comp_data[ent] and map_ent_comp_data[ent][key]
+		local data = map_ent_comp_data[ent] and map_ent_comp_data[ent][def]
 		if not data then return nil end
 
 		return data
@@ -49,8 +49,8 @@ local ecompMetatable = {
 
 		if val == nil then
 			if map_ent_comp_data[ent] then
-				map_ent_comp_data[ent][key] = nil
-				map_comp_ent_data[key][ent] = nil
+				map_ent_comp_data[ent][def] = nil
+				map_comp_ent_data[def][ent] = nil
 			end
 			return
 		end
@@ -71,11 +71,11 @@ local ecompMetatable = {
 			error(("comps.%s.%s"):format(key, e), 2)
 		end
 
-		if not map_ent_comp_data[ent] then map_ent_comp_data[ent] = {} end
-		if not map_comp_ent_data[key] then map_comp_ent_data[key] = setmetatable({}, {__mode="k"}) end
+		if not map_ent_comp_data[ent] then map_ent_comp_data[ent] = setmetatable({}, {__mode="k"}) end
+		if not map_comp_ent_data[def] then map_comp_ent_data[def] = setmetatable({}, {__mode="k"}) end
 
-		map_ent_comp_data[ent][key] = t
-		map_comp_ent_data[key][ent] = t
+		map_ent_comp_data[ent][def] = t
+		map_comp_ent_data[def][ent] = t
 	end,
 }
 
@@ -128,6 +128,8 @@ local Comp, comp = makeClass()
 G.Comp = Comp
 
 --- Create a new Comp.
+--
+-- Note that Comps are subject to GC; the returned Comp should usually be stored in a package local or global.
 -- @function Comp
 -- @param key The key of the new Comp.
 -- @return The new Comp instance.
@@ -151,13 +153,15 @@ end
 -- A `System` processes a set of entities, typically which share some set of comps and/or components in common.
 -- @section System
 
-local all_systems = {}
-local systems_by_name = {}
+local all_systems = setmetatable({}, {__mode="v"})
+local systems_by_name = setmetatable({}, {__mode="v"})
 
 local System, system = makeClass()
 G.System = System
 
 --- Create a new System.
+--
+-- Note that Systems are subject to GC; the returned System should usually be stored in a package local or global.
 -- @function System
 -- @param name The name of the new System.
 -- @return The new System instance.
@@ -227,7 +231,7 @@ end
 
 function system:_entitySatisfiesRequirements(ent, data)
 	for _, req in ipairs(self.requiredComps) do
-		if not data[req] then
+		if not data[defs_component[req]] then
 			return false
 		end
 	end
@@ -245,7 +249,8 @@ local queryMetatable = {
 	__pairs = function(t)
 		local tbl = map_ent_comp_data
 		if #t.sys.requiredComps > 0 then
-			tbl = map_comp_ent_data[t.sys.requiredComps[1]] or {}
+			local def = defs_component[t.sys.requiredComps[1]]
+			tbl = map_comp_ent_data[def] or {}
 		end
 
 		return function(_, ent)
@@ -288,7 +293,7 @@ function system:_update(delta)
 end
 
 function System.update(delta)
-	local doneList = {}
+	local doneList = setmetatable({}, {__mode="v"})
 	local doneMap = {}
 
 	local queue = {}
@@ -308,6 +313,19 @@ function System.update(delta)
 				end
 			end
 			sys.before = nil
+		end
+	end
+
+	local missed_idx = {}
+	for i, v in pairs(all_systems) do
+		if not queue[i] then
+			table.insert(missed_idx, i)
+		end
+	end
+	if #missed_idx > 0 then
+		table.sort(missed_idx)
+		for _, idx in ipairs(missed_idx) do
+			table.insert(queue, all_systems[idx])
 		end
 	end
 

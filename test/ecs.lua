@@ -2,13 +2,13 @@ require "gn32/test/test"
 
 require "gn32/ecs"
 
-test("ecs", function()
-	Comp("name")
+test("ecs/filter", function()
+	local c_name = Comp("name")
 		:setSchema({
 			name = {_type="string"},
 		})
 
-	Comp("foo")
+	local c_foo = Comp("foo")
 		:setSchema({
 			bar = {_default=0, _type="number", _ge=0, _le=100},
 		})
@@ -68,10 +68,20 @@ test("ecs", function()
 	collectgarbage()
 
 	assert.equivalent(doRun(), { e1 = 42 })
+end)
+
+test("ecs/schema", function()
+	local c = Comp("foo")
+		:setSchema({
+			bar = {_type="number", _ge=0, _le=100},
+		})
+
+	local e1 = Entity()
+	comps(e1).foo = {bar = 42}
 
 	assert.error(function()
-		comps(e1).name = {}
-	end, "./gn32/test/ecs.lua:%d+: comps.name.name: bad type nil: expected string")
+		comps(e1).foo = {}
+	end, "./gn32/test/ecs.lua:%d+: comps.foo.bar: field is required, expected number")
 
 	assert.error(function()
 		comps(e1).foo.stuff = 1234
@@ -83,32 +93,42 @@ test("ecs", function()
 
 	assert.error(function()
 		comps(e1).foo.bar = 1234
-	end, "./gn32/test/ecs.lua:%d+: comps.foo.bar: bad value 1234: expected value <= 100")
+	end, "./gn32/test/ecs.lua:%d+: comps.foo.bar: bad value 1234: expected 0 <= value <= 100")
 
 	assert.error(function()
 		comps(e1).foo = {bar = 1234}
-	end, "./gn32/test/ecs.lua:%d+: comps.foo.bar: bad value 1234: expected value <= 100")
+	end, "./gn32/test/ecs.lua:%d+: comps.foo.bar: bad value 1234: expected 0 <= value <= 100")
 
 	assert.error(function()
 		comps(e1).bar = {}
 	end, "./gn32/test/ecs.lua:%d+: comp bar is not defined")
+end)
 
+test("ecs/system", function()
 	local systemOrder = {}
 
-	System("d"):runBefore("p")              :onUpdateGlobal(function() table.insert(systemOrder, "d") end)
-	System("e"):runAfter("c"):runAfter("q") :onUpdateGlobal(function() table.insert(systemOrder, "e") end)
-	System("b"):runAfter("a")               :onUpdateGlobal(function() table.insert(systemOrder, "b") end)
-	System("c"):runAfter("a"):runBefore("d"):onUpdateGlobal(function() table.insert(systemOrder, "c") end)
-	System("a")                             :onUpdateGlobal(function() table.insert(systemOrder, "a") end)
+	local d = System("d"):runBefore("p")              :onUpdateGlobal(function() table.insert(systemOrder, "d") end)
+	local e = System("e"):runAfter("c"):runAfter("q") :onUpdateGlobal(function() table.insert(systemOrder, "e") end)
+	local b = System("b"):runAfter("a")               :onUpdateGlobal(function() table.insert(systemOrder, "b") end)
+	local c = System("c"):runAfter("a"):runBefore("d"):onUpdateGlobal(function() table.insert(systemOrder, "c") end)
+	local a = System("a")                             :onUpdateGlobal(function() table.insert(systemOrder, "a") end)
+	local x = System("x"):runAfter("b"):runBefore("c"):onUpdateGlobal(function() table.insert(systemOrder, "x") end)
 
-	assert.equal(System.update(0.02), 3)
-	assert.equivalent(systemOrder, {"a", "b", "c", "d", "e"})
+	assert.equal(System.update(0.02), 4)
+	assert.equivalent(systemOrder, {"a", "b", "x", "c", "d", "e"})
+
+	systemOrder = {}
+	assert.equal(System.update(0.02), 1)
+	assert.equivalent(systemOrder, {"a", "b", "x", "c", "d", "e"})
+
+	x = nil
+	collectgarbage()
 
 	systemOrder = {}
 	assert.equal(System.update(0.02), 1)
 	assert.equivalent(systemOrder, {"a", "b", "c", "d", "e"})
 
-	System("f"):runAfter("e"):runBefore("c")
+	local f = System("f"):runAfter("e"):runBefore("c")
 
 	assert.error(function()
 		System.update(0.02)
@@ -117,4 +137,21 @@ test("ecs", function()
 		.. "system d should run after c\n"
 		.. "system e should run after c\n"
 		.. "system f should run after e\n")
+end)
+
+test("ecs/comp_gc", function()
+	local c = Comp("test_comp"):setSchema({ foo = {} })
+
+	local e1 = Entity():setCallSign("e1")
+
+	comps(e1).test_comp = {foo = "bar"}
+
+	assert.equal(comps(e1).test_comp.foo, "bar")
+
+	c = nil
+	collectgarbage()
+
+	assert.error(function()
+		return comps(e1).test_comp
+	end, "./gn32/test/ecs.lua:%d+: comp test_comp is not defined")
 end)
