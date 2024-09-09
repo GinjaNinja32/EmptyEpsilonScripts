@@ -99,17 +99,38 @@ test("schema", function()
 	t.kvkv = {foo={bar=2}, baz={stuff=3,more=4}}
 	t.kvkv = {foo={bar=2}}
 
-	local ok = false
-	for k1, v1 in pairs(t.kvkv) do
-		assert.equal(k1, "foo")
-		assert.equal(v1, t.kvkv.foo)
-		for k2, v2 in pairs(v1) do
-			assert.equal(k2, "bar")
-			assert.equal(v2, 2)
-			ok = true
+	local function copyvalue(val)
+		if type(val) ~= "table" then
+			return val
 		end
+
+		local out = {}
+		for k, v in pairs(val) do
+			out[k] = copyvalue(v)
+		end
+		return out
 	end
-	assert(ok, "did not hit expected iterations")
+
+	local v = copyvalue(t)
+	v.with_ge = -1
+	v.nested.baz = "stuff"
+
+	assert.equivalent(v, {
+		nodefault = 42,
+		with_ge = -1,
+		with_gele = 10,
+		with_gele_dup = 10,
+		with_gelt = 10,
+		with_gt = 10,
+		with_gtle = 10,
+		with_gtlt = 10,
+		with_gtlt_dup = 10,
+		with_le = 100,
+		with_lt = 10,
+		nested = {foo = "x", bar = 2, baz = "stuff"},
+		kv = {foo = 1, bar = 2},
+		kvkv = {foo = {bar = 2}}
+	})
 
 	assert.error(function() t.nodefault = "foo"  end, "./gn32/test/schema.lua:%d+: nodefault: bad type string: expected number")
 	assert.error(function() t.with_ge = 0        end, "./gn32/test/schema.lua:%d+: with_ge: bad value 0: expected value >= 1")

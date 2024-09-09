@@ -208,7 +208,13 @@ local function getSchemaMetatable(sch)
 			end,
 			__pairs = function(tbl)
 				if sch._fields then
-					return next, {}, nil
+					local tnext = function(_, k)
+						k = next(sch._fields, k)
+						if k == nil then return k end
+						return k, tbl[k]
+					end
+
+					return tnext, tbl, nil
 				end
 				local n = function(_, k)
 					return next(tbl[dataIndex], k)
