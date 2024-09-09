@@ -14,16 +14,52 @@
 --	}
 --
 -- To enable a ship to carry cargo:
---	ship.cargo = {}            -- unlimited space
---	ship.cargo = {limit = 20}  -- can carry 20 items
+--	comps(ship).cargo = {}            -- unlimited space
+--	comps(ship).cargo = {limit = 20}  -- can carry 20 items
 --
 -- @pragma nostrip
 
 require "gn32/lang"
+require "gn32/ecs"
 
 G.cargo = {}
 
 cargo.items = {}
+
+--- Comps.
+-- See `ecs` for details of how to apply comps to an entity.
+-- @section Comps
+
+--- Allow an entity to hold cargo.
+-- @table cargo
+-- @bool[opt] infinite Whether this entity is an infinite source and sink of all cargo types. Default false.
+-- @number[opt] limit The maximum number of items this entity can carry, or zero for unlimited. Default zero.
+-- @tab[opt] items A map from cargo item ID to item quantity. Default empty.
+Comp("cargo"):setSchema{
+	infinite = {_type = "boolean", _default = false},
+	limit = {
+		_type = "number",
+		_default = 0,
+		_ge = 0,
+		_check = function(v) return math.floor(v) == v end,
+	},
+	items = {
+		_type = "table",
+		_default = function() return {} end,
+		_keys = {
+			_type = "string",
+			_check = function(v) return not not cargo.items[v] end,
+		},
+		_values = {
+			_type = "number",
+			_ge = 0,
+			_check = function(v) return math.floor(v) == v end,
+		},
+	}
+}
+
+--- Functions.
+-- @section functions
 
 --- Add items that can be carried by ships.
 -- @param ... A list of cargo item definitions.
@@ -79,14 +115,15 @@ end
 -- @return The number of instances of the cargo the ship has.
 function cargo.count(ship, entries, mult)
 	if not mult then mult = 1 end
-	if not ship.cargo then return 0 end
-	if ship.cargo.infinite then return 100 end
-	if ship.cargo.items == nil then return 0 end
+	local c = comps(ship).cargo
+	if not c then return 0 end
+	if c.infinite then return 100 end
+	if c.items == nil then return 0 end
 
 	local n
 
 	for material, count in pairs(entries) do
-		local amount = ship.cargo.items[material]
+		local amount = c.items[material]
 		if amount == nil then
 			return 0
 		end
@@ -107,12 +144,13 @@ end
 -- @return Whether the ship has at least the specified cargo.
 function cargo.has(ship, entries, mult)
 	if not mult then mult = 1 end
-	if not ship.cargo then return false end
-	if ship.cargo.infinite then return true end
-	if ship.cargo.items == nil then return false end
+	local c = comps(ship).cargo
+	if not c then return false end
+	if c.infinite then return true end
+	if c.items == nil then return false end
 
 	for material, count in pairs(entries) do
-		local amount = ship.cargo.items[material]
+		local amount = c.items[material]
 		if amount == nil or amount < count * mult then
 			return false
 		end
@@ -128,8 +166,9 @@ end
 -- @return Whether the ship has space for the specified cargo.
 function cargo.hasSpace(ship, n, mult)
 	if not mult then mult = 1 end
-	if not ship.cargo then return false end
-	if not ship.cargo.limit then return true end
+	local c = comps(ship).cargo
+	if not c then return false end
+	if not c.limit then return true end
 
 	if type(n) == "table" then
 		-- list of items to check space for
@@ -141,13 +180,13 @@ function cargo.hasSpace(ship, n, mult)
 	end
 
 	local currentSum = 0
-	if ship.cargo.items then
-		for k, v in pairs(ship.cargo.items) do
+	if c.items then
+		for k, v in pairs(c.items) do
 			currentSum = currentSum + v
 		end
 	end
 
-	if currentSum + n * mult > ship.cargo.limit then
+	if currentSum + n * mult > c.limit then
 		return false
 	end
 
@@ -173,31 +212,32 @@ end
 -- @return Whether the cargo was successfully adjusted.
 function cargo.adjust(ship, entries, mult)
 	if not mult then mult = 1 end
-	if not ship.cargo then return false end
-	if ship.cargo.infinite then return true end
-	if ship.cargo.items == nil then ship.cargo.items = {} end
+	local c = comps(ship).cargo
+	if not c then return false end
+	if c.infinite then return true end
+	if c.items == nil then c.items = {} end
 
 	local deltaSum = 0
 
 	for material, delta in pairs(entries) do
 		if delta * mult < 0 then
-			if (ship.cargo.items[material] or 0) < -delta * mult then return false end
+			if (c.items[material] or 0) < -delta * mult then return false end
 		end
 
 		deltaSum = deltaSum + delta * mult
 	end
 
-	if ship.cargo.limit then
+	if c.limit then
 		local currentSum = 0
-		for k, v in pairs(ship.cargo.items) do
+		for k, v in pairs(c.items) do
 			currentSum = currentSum + v
 		end
 
-		if currentSum + deltaSum > ship.cargo.limit then return false end
+		if currentSum + deltaSum > c.limit then return false end
 	end
 
 	for material, delta in pairs(entries) do
-		ship.cargo.items[material] = (ship.cargo.items[material] or 0) + delta * mult
+		c.items[material] = (c.items[material] or 0) + delta * mult
 	end
 
 	return true

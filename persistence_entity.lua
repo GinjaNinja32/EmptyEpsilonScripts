@@ -242,8 +242,8 @@ defineSystemField("sysCoolant",    "sC", "getSystemCoolant",        "setSystemCo
 --- Ship `cargo`.
 -- @table cargo
 persistence.entity.defineField("cargo", "C",
-	function(ship) return ship.cargo end,
-	function(ship, n) ship.cargo = n end
+	function(ship) return comps(ship).cargo end,
+	function(ship, n) comps(ship).cargo = n end
 )
 
 --- Functions.

@@ -11,13 +11,15 @@ position.defineAreaDefault("cargo", "Relay", "Operations", "Single")
 
 mainMenu:add {
 	sticky = true,
-	when = function(ship, station) return ship.cargo and (ship.cargo.display or {})[station] end,
+	when = function(ship, station)
+		return comps(ship).cargo and (ship.cargo_display or {})[station]
+	end,
 	expand = function(ship, station)
-		if ship.cargo.items == nil then return {} end
+		local c = comps(ship).cargo
 
 		local m = {}
 		for i, def in ipairs(cargo.items) do
-			local amt = ship.cargo.items[def.id] or 0
+			local amt = c.items[def.id] or 0
 
 			if amt > 0 then
 				table.insert(m, {
@@ -37,10 +39,11 @@ local function cargoTransferAction(ship, target)
 			return
 		end
 
+		local c = comps(ship).cargo
 		local menu = {}
 
 		for i, def in ipairs(cargo.items) do
-			local amt = (ship.cargo.items or {})[def.id] or 0
+			local amt = c.items[def.id] or 0
 
 			if amt > 0 then
 				table.insert(menu, {
@@ -74,7 +77,7 @@ end
 
 mainMenu:add {
 	button = "Cargo",
-	when = function(ship, station) return not not ship.cargo end,
+	when = function(ship, station) return not not comps(ship).cargo end,
 	action = {
 		{
 			button = "DEBUG",
@@ -83,14 +86,16 @@ mainMenu:add {
 				local menu = {
 					{
 						button = function(ship, station)
-							if ship.cargo.infinite then
+							local c = comps(ship).cargo
+							if c.infinite then
 								return "Infinite cargo: ON"
 							else
 								return "Infinite cargo: OFF"
 							end
 						end,
 						action = function(_, ship, station)
-							ship.cargo.infinite = not ship.cargo.infinite
+							local c = comps(ship).cargo
+							c.infinite = not c.infinite
 							return false
 						end,
 					}
@@ -146,10 +151,11 @@ mainMenu:add {
 			area = "cargo",
 			button = "Jettison Cargo...",
 			action = function(reopen, ship, station)
+				local c = comps(ship).cargo
 				local menu = {}
 
 				for i, def in ipairs(cargo.items) do
-					local amt = (ship.cargo.items or {})[def.id] or 0
+					local amt = c.items[def.id] or 0
 
 					if amt > 0 then
 						table.insert(menu, {
@@ -192,15 +198,15 @@ mainMenu:add {
 		},
 		{
 			button = function(ship, station)
-				if (ship.cargo.display or {})[station] then
+				if (ship.cargo_display or {})[station] then
 					return "Cargo Display: ON"
 				else
 					return "Cargo Display: OFF"
 				end
 			end,
 			action = function(reopen, ship, station)
-				if ship.cargo.display == nil then ship.cargo.display = {} end
-				ship.cargo.display[station] = not ship.cargo.display[station]
+				if ship.cargo_display == nil then ship.cargo_display = {} end
+				ship.cargo_display[station] = not ship.cargo_display[station]
 
 				return false
 			end,
@@ -208,14 +214,13 @@ mainMenu:add {
 		{
 			button = "View Cargo Details",
 			action = function(reopen, ship, station)
+				local c = comps(ship).cargo
 				local entries = {}
 
-				if ship.cargo.items then
-					for _, def in ipairs(cargo.items) do
-						local amt = ship.cargo.items[def.id]
-						if amt and amt > 0 then
-							table.insert(entries, amt .. " " .. def.name .. " (" .. def.id .. ")\n" .. def.desc)
-						end
+				for _, def in ipairs(cargo.items) do
+					local amt = c.items[def.id]
+					if amt and amt > 0 then
+						table.insert(entries, amt .. " " .. def.name .. " (" .. def.id .. ")\n" .. def.desc)
 					end
 				end
 
