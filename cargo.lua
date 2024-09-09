@@ -168,7 +168,7 @@ function cargo.hasSpace(ship, n, mult)
 	if not mult then mult = 1 end
 	local c = comps(ship).cargo
 	if not c then return false end
-	if not c.limit then return true end
+	if c.limit == 0 then return true end
 
 	if type(n) == "table" then
 		-- list of items to check space for
@@ -227,7 +227,7 @@ function cargo.adjust(ship, entries, mult)
 		deltaSum = deltaSum + delta * mult
 	end
 
-	if c.limit then
+	if c.limit > 0 then
 		local currentSum = 0
 		for k, v in pairs(c.items) do
 			currentSum = currentSum + v
