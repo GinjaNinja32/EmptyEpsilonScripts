@@ -55,7 +55,7 @@ local ecompMetatable = {
 			return
 		end
 
-		local t = schema.makeTable(def.schema, ("comps.%s."):format(key))
+		local t = schema.makeTable({_fields=def.schema}, ("comps.%s."):format(key))
 
 		local ok, e = pcall(function()
 			for k, v in pairs(val) do
@@ -66,7 +66,7 @@ local ecompMetatable = {
 			error(e:sub(e:find(": ")+2, -1), 2)
 		end
 
-		local e = schema.checkTable(t, def.schema)
+		local e = schema.checkValue(t, {_fields=def.schema})
 		if e then
 			error(("comps.%s.%s"):format(key, e), 2)
 		end

@@ -20,6 +20,8 @@
 -- @field[opt] _lt Value must be less than this value: `val < _lt`
 -- @field[opt] _check A function to check each value: `local v = _check(val); v == nil or v == true`
 -- @field[opt] _fields A `tableSchema` for the value, if it is a table.
+-- @field[opt] _keys A `valueSchema` for the keys of the value, if it is a table.
+-- @field[opt] _values A `valueSchema` for the values of the value, if it is a table.
 -- @table valueSchema
 local _ = {}
 
@@ -33,24 +35,6 @@ local pathIndex = {}
 
 --- Functions.
 -- @section functions
-
---- Check that a table satisfies a `tableSchema`.
--- @param tbl The table to check.
--- @param sch The `tableSchema` to validate against.
-function schema.checkTable(tbl, sch)
-	for key in pairs(tbl) do
-		if not sch[key] then
-			return key .. ": field not defined"
-		end
-	end
-
-	for key, field in pairs(sch) do
-		local err = schema.checkValue(tbl[key], field)
-		if err then
-			return key .. ": " .. err
-		end
-	end
-end
 
 local function describeValueBounds(sch)
 	local min, max, minEq, maxEq
@@ -82,11 +66,10 @@ local function describeValueBounds(sch)
 	end
 end
 
---- Check that a value satisfies a `valueSchema`.
+--- Check that a value satisfies a `schema`.
 -- @param val The value to check.
--- @param sch The `valueSchema` to validate against.
--- @param norecurse If set to true, ignore any `_fields` set in the schema.
-function schema.checkValue(val, sch, norecurse)
+-- @param sch The `schema` to validate against.
+function schema.checkValue(val, sch)
 	if val == nil then
 		val = sch._default
 		if type(val) == "function" then
@@ -125,8 +108,32 @@ function schema.checkValue(val, sch, norecurse)
 		end
 	end
 
-	if not norecurse and sch._fields and type(val) == "table" then
-		return schema.checkTable(val, sch._fields)
+	if type(val) == "table" then
+		if sch._fields then
+			for key in pairs(val) do
+				if not sch._fields[key] then
+					return key .. ": field not defined"
+				end
+			end
+
+			for key, field in pairs(sch._fields) do
+				local err = schema.checkValue(val[key], field)
+				if err then
+					return key .. ": " .. err
+				end
+			end
+		elseif sch._keys or sch._values then
+			for k, v in pairs(val) do
+				if sch._keys then
+					local e = schema.checkValue(k, sch._keys)
+					if e ~= nil then return ("%s (key): %s"):format(k, e) end
+				end
+				if sch._values then
+					local e = schema.checkValue(v, sch._values)
+					if e ~= nil then return ("%s: %s"):format(tostring(k), e) end
+				end
+			end
+		end
 	end
 end
 
@@ -136,47 +143,77 @@ local function getSchemaMetatable(sch)
 	if not mtCache[sch] then
 		mtCache[sch] = {
 			__index = function(tbl, k)
-				local s = sch[k]
-				if s == nil then
+				if sch._fields and not sch._fields[k] then
 					error(("%s%s: field not defined"):format(tbl[pathIndex], k), 2)
 				end
 
-				return tbl[dataIndex][k]
+				local v = tbl[dataIndex][k]
+
+				if v == nil and sch._values and sch._values._default then
+					v = sch._values._default
+					if type(v) == "function" then
+						v = v()
+					end
+				end
+
+				return v
 			end,
 			__newindex = function(tbl, k, v)
-				local s = sch[k]
-				if s == nil then
+				if sch._fields and not sch._fields[k] then
 					error(("%s%s: field not defined"):format(tbl[pathIndex], k), 2)
 				end
-				local e = schema.checkValue(v, s, true)
-				if e ~= nil then
-					error(("%s%s: %s"):format(tbl[pathIndex], k, e), 2)
+
+				if sch._keys then
+					local e = schema.checkValue(k, sch._keys)
+					if e ~= nil then error(("%s%s (key): %s"):format(tbl[pathIndex], tostring(k), e), 2) end
+				end
+				if sch._values then
+					local e = schema.checkValue(v, sch._values)
+					if e ~= nil then error(("%s%s: %s"):format(tbl[pathIndex], tostring(k), e), 2) end
 				end
 
-				if type(v) == "table" and s._fields then
-					local t = schema.makeTable(s._fields, ("%s%s."):format(tbl[pathIndex], k))
-
-					local ok, e = pcall(function()
-						for vk, vv in pairs(v) do
-							t[vk] = vv
-						end
-					end)
-					if not ok then
-						error(("%s%s: %s"):format(tbl[pathIndex], k, e), 2)
+				if type(v) == "table" then
+					local subsch
+					if sch._fields then
+						subsch = sch._fields[k]
+					else
+						subsch = sch._values
 					end
 
-					local e = schema.checkTable(t, s._fields)
+					if subsch._fields or subsch._keys or subsch._values then
+						local t = schema.makeTable(subsch, ("%s%s."):format(tbl[pathIndex], k))
+
+						local ok, e = pcall(function()
+							for vk, vv in pairs(v) do
+								t[vk] = vv
+							end
+						end)
+						if not ok then
+							error(e:gsub("^.?/?gn32/schema.lua:%d+: ", ""),  2)
+						end
+
+						v = t
+					end
+				end
+
+				if sch._fields then
+					local s = sch._fields[k]
+					local e = schema.checkValue(v, s)
 					if e ~= nil then
 						error(("%s%s: %s"):format(tbl[pathIndex], k, e), 2)
 					end
-
-					tbl[dataIndex][k] = t
-				else
-					tbl[dataIndex][k] = v
 				end
+
+				tbl[dataIndex][k] = v
 			end,
-			__pairs = function()
-				return next, {}, nil
+			__pairs = function(tbl)
+				if sch._fields then
+					return next, {}, nil
+				end
+				local n = function(_, k)
+					return next(tbl[dataIndex], k)
+				end
+				return n, {}, nil
 			end,
 			__metatable = "schema",
 		}
@@ -185,28 +222,35 @@ local function getSchemaMetatable(sch)
 	return mtCache[sch]
 end
 
---- Make a table that enforces the given `tableSchema` on edits.
+--- Make a table that enforces the given `valueSchema` on edits.
 -- The table may or may not initially satisfy the schema, depending on the default field values specified by the schema.
--- @param sch The `tableSchema` to enforce.
+-- @param sch The `valueSchema` to enforce.
 -- @param path The path to this table, for error messages. Empty or `nil` if this is a top-level table.
 function schema.makeTable(sch, path)
 	local data = {}
 
-	for k, s in pairs(sch) do
-		if s._default then
-			local v = s._default
-			if type(v) == "function" then
-				v = v()
-			end
-			if type(v) == "table" and s._fields then
-				local t = schema.makeTable(s._fields, ("%s%s."):format(path, k))
-				for vk, vv in pairs(v) do
-					t[vk] = vv
-				end
+	-- if there's nothing to enforce, just give a regular table back
+	if not sch or not sch._fields and not sch._keys and not sch._values then
+		return {}
+	end
 
-				data[k] = t
-			else
-				data[k] = v
+	if sch._fields then
+		for k, s in pairs(sch._fields) do
+			if s._default then
+				local v = s._default
+				if type(v) == "function" then
+					v = v()
+				end
+				if type(v) == "table" and s._fields then
+					local t = schema.makeTable(s, ("%s%s."):format(path, k))
+					for vk, vv in pairs(v) do
+						t[vk] = vv
+					end
+
+					data[k] = t
+				else
+					data[k] = v
+				end
 			end
 		end
 	end
