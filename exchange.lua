@@ -1,4 +1,4 @@
---- Utilities for exchanging one set of resources for another.
+--- Utilities for adding, removing, moving, and exchanging resources.
 --
 -- Terminology:
 --
@@ -39,6 +39,12 @@ local sourcesList = {}
 
 --- Functions.
 -- @section function
+
+--- Values.
+-- @section values
+
+--- A special value for all functions in this module; if passed in place of a `ship`, acts as an infinite source and sink for all sources.
+exchange.infinite = {}
 
 --- Sources
 -- @section sources
@@ -262,6 +268,7 @@ end
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
 -- @return true if the ship could provide the resources; otherwise false
 function exchange.canTake(ship, resources, mult) -- return true if the ship could supply the specified resources; otherwise, return false.
+	if ship == exchange.infinite then return true end
 	mult = mult or 1
 	local bad, why = exchange.each(resources, function(source, data)
 		local ok, why = source.canTake(ship, data, mult)
@@ -278,11 +285,13 @@ end
 -- @param resources The resource list to take.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
 function exchange.take(ship, resources, mult)
+	if ship == exchange.infinite then return true end
 	mult = mult or 1
 	exchange.each(resources, function(source, data) source.take(ship, data, mult) end)
 end
 
---- Attempt to take resources from a ship. This operation is atomic; if any resources cannot be taken, then no resources are taken.
+--- Attempt to take resources from a ship.
+-- This operation is atomic; if any resources cannot be taken, then no resources are taken.
 -- @param ship The ship to take from.
 -- @param resources The resource list to take.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
@@ -300,6 +309,7 @@ end
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
 -- @return true if the ship could accept the resources; otherwise false
 function exchange.canAdd(ship, resources, mult)
+	if ship == exchange.infinite then return true end
 	mult = mult or 1
 	local bad, why = exchange.each(resources, function(source, data)
 		local ok, why = source.canAdd(ship, data, mult)
@@ -316,11 +326,13 @@ end
 -- @param resources The resource list to add.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
 function exchange.add(ship, resources, mult)
+	if ship == exchange.infinite then return true end
 	mult = mult or 1
 	exchange.each(resources, function(source, data) source.add(ship, data, mult) end)
 end
 
---- Attempt to add resources to a ship. This operation is atomic; if any resources cannot be added, then no resources are added.
+--- Attempt to add resources to a ship.
+-- This operation is atomic; if any resources cannot be added, then no resources are added.
 -- @param ship The ship to add to.
 -- @param resources The resource list to add.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
@@ -357,7 +369,8 @@ function exchange.swap(ship, from, to, mult)
 	exchange.add(ship, to, mult)
 end
 
---- Attempt to swap resources on a ship. This operation is atomic; if any resources cannot be added or removed, then no resources are added or removed.
+--- Attempt to swap resources on a ship.
+-- This operation is atomic; if any resources cannot be added or removed, then no resources are added or removed.
 -- @param ship The ship to swap on.
 -- @param from The resource list to swap from.
 -- @param to The resource list to swap to.
@@ -367,5 +380,86 @@ function exchange.trySwap(ship, from, to, mult)
 	mult = mult or 1
 	if not exchange.canSwap(ship, from, to, mult) then return false end
 	exchange.swap(ship, from, to, mult)
+	return true
+end
+
+--- Check whether two ships could move resources from one to another.
+-- @param shipFrom The ship to move resources from.
+-- @param shipTo The ship to move resources to.
+-- @param resources The resource list to move.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the ships could move the resources; otherwise false
+function exchange.canMove(shipFrom, shipTo, resources, mult)
+	mult = mult or 1
+	local ok, why = exchange.canTake(shipFrom, resources, mult)
+	if not ok then return false, why end
+	return exchange.canAdd(shipTo, resources, mult)
+end
+
+--- Move resources from one ship to another.
+-- The behaviour of this function is undefined if `exchange.canMove` would return false given the same arguments.
+-- @param shipFrom The ship to move resources from.
+-- @param shipTo The ship to move resources to.
+-- @param resources The resource list to move.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+function exchange.move(shipFrom, shipTo, resources, mult)
+	mult = mult or 1
+	exchange.take(shipFrom, resources, mult)
+	exchange.add(shipTo, resources, mult)
+end
+
+--- Attempt to move resources from one ship to another.
+-- This operation is atomic; if any resources cannot be added or removed, then no resources are added or removed.
+-- @param shipFrom The ship to move resources from.
+-- @param shipTo The ship to move resources to.
+-- @param resources The resource list to move.
+-- @param mult A multiplier to apply to each entry in the resource list; default 1.
+-- @return true if the resources were successfully moved; otherwise false
+function exchange.tryMove(shipFrom, shipTo, resources, mult)
+	mult = mult or 1
+	if not exchange.canMove(shipFrom, shipTo, resources, mult) then return false end
+	exchange.move(shipFrom, shipTo, resources, mult)
+	return true
+end
+
+--- Check whether two ships could trade resources with each other.
+-- @param shipA The first ship involved in the trade.
+-- @param resourcesA The resources that shipA is providing to shipB.
+-- @param shipB The second ship involved in the trade.
+-- @param resourcesB The resources that shipB is providing to shipA.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+-- @return true if the ships could trade the resources; otherwise false
+function exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult)
+	mult = mult or 1
+	local ok, why = exchange.canSwap(shipA, resourcesA, resourcesB, mult)
+	if not ok then return false, why end
+	return exchange.canSwap(shipB, resourcesB, resourcesA, mult)
+end
+
+--- Trade resources between two ships.
+-- The behaviour of this function is undefined if `exchange.canTrade` would return false given the same arguments.
+-- @param shipA The first ship involved in the trade.
+-- @param resourcesA The resources that shipA is providing to shipB.
+-- @param shipB The second ship involved in the trade.
+-- @param resourcesB The resources that shipB is providing to shipA.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+function exchange.trade(shipA, resourcesA, shipB, resourcesB, mult)
+	mult = mult or 1
+	exchange.swap(shipA, resourcesA, resourcesB, mult)
+	exchange.swap(shipB, resourcesB, resourcesA, mult)
+end
+
+--- Attempt to trade resources between two ships.
+-- This operation is atomic; if any resources cannot be added or removed, then no resources are added or removed.
+-- @param shipA The first ship involved in the trade.
+-- @param resourcesA The resources that shipA is providing to shipB.
+-- @param shipB The second ship involved in the trade.
+-- @param resourcesB The resources that shipB is providing to shipA.
+-- @param mult A multiplier to apply to each entry in each resource list; default 1.
+-- @return true if the resources were successfully traded; otherwise false
+function exchange.tryTrade(shipA, resourcesA, shipB, resourcesB, mult)
+	mult = mult or 1
+	if not exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult) then return false end
+	exchange.trade(shipA, resourcesA, shipB, resourcesB, mult)
 	return true
 end
