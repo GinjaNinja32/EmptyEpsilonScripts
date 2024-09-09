@@ -3,6 +3,18 @@
 
 G.vector = {}
 
+function vector.canonicalDeg(deg, half)
+	deg = deg % 360
+	deg = deg + 360
+	deg = deg % 360
+
+	if half and deg > 180 then
+		deg = deg - 360
+	end
+
+	return deg
+end
+
 --- Convert an angle in degrees to radians.
 function vector.radFromDeg(deg)
 	return math.pi * deg / 180
