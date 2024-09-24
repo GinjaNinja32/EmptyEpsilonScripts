@@ -48,8 +48,13 @@ G.gmMenu = ActionBase {
 	end,
 }()
 
-hook.every[1] = function()
-	gmMenu:refreshMenu()
+local rtimer = 0
+function hook.on.update()
+	rtimer = rtimer + 1
+	if rtimer >= 20 then
+		rtimer = 0
+		gmMenu:refreshMenu()
+	end
 end
 
 -- Predefined entries
