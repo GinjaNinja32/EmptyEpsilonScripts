@@ -136,6 +136,21 @@ function G.STBO()
 		return self
 	end
 
+	function s:setSystemPower(sys, p)
+		self:getSystemData(sys).power = p
+		return self
+	end
+	function s:getSystemPower(sys)
+		return self:getSystemData(sys).power or 1
+	end
+	function s:setSystemPowerRequest(sys, p)
+		self:getSystemData(sys).power_req = p
+		return self
+	end
+	function s:getSystemPowerRequest(sys) -- TODO gn32-script branch only
+		return self:getSystemData(sys).power_req or 1
+	end
+
 	return s
 end
 
@@ -152,6 +167,8 @@ function G.SpaceShip()
 
 	addGetSet(s, "Energy", 1, 0)
 	addGetSet(s, "MaxEnergy", 1, 0)
+
+	addGetSet(s, "DockedWith", 1, nil)
 
 	return s
 end
@@ -232,3 +249,16 @@ end
 function G.addCommsReply(name, action)
 	table.insert(commsData.replies, {name=name, action=action})
 end
+
+
+G.Artifact = Entity
+G.Asteroid = Entity
+G.BlackHole = Entity
+G.Nebula = Entity
+G.Planet = Entity
+G.ScanProbe = Entity
+G.SupplyDrop = Entity
+G.VisualAsteroid = Entity
+G.WarpJammer = Entity
+G.WormHole = Entity
+G.Zone = Entity
