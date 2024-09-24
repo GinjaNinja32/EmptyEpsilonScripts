@@ -19,7 +19,7 @@ mainMenu:add {
 
 		local m = {}
 		for i, def in ipairs(cargo.items) do
-			local amt = c.items[def.id] or 0
+			local amt = c.items[def] or 0
 
 			if amt > 0 then
 				table.insert(m, {
@@ -27,6 +27,19 @@ mainMenu:add {
 					info = def.name .. " (" .. def.id .. "): " .. amt,
 				})
 			end
+		end
+
+		local n_other = 0
+		for item, count in pairs(c.items) do
+			if not item.id then
+				n_other = n_other + count
+			end
+		end
+		if n_other > 0 then
+			table.insert(m, {
+				order = #m - 1000,
+				info = "Other items: " .. n_other,
+			})
 		end
 
 		return m
@@ -43,7 +56,7 @@ local function cargoTransferAction(ship, target)
 		local menu = {}
 
 		for i, def in ipairs(cargo.items) do
-			local amt = c.items[def.id] or 0
+			local amt = c.items[def] or 0
 
 			if amt > 0 then
 				table.insert(menu, {
@@ -155,7 +168,7 @@ mainMenu:add {
 				local menu = {}
 
 				for i, def in ipairs(cargo.items) do
-					local amt = c.items[def.id] or 0
+					local amt = c.items[def] or 0
 
 					if amt > 0 then
 						table.insert(menu, {
@@ -218,10 +231,21 @@ mainMenu:add {
 				local entries = {}
 
 				for _, def in ipairs(cargo.items) do
-					local amt = c.items[def.id]
+					local amt = c.items[def]
 					if amt and amt > 0 then
 						table.insert(entries, amt .. " " .. def.name .. " (" .. def.id .. ")\n" .. def.desc)
 					end
+				end
+
+				local nf = {}
+				for item, count in pairs(c.items) do
+					if count > 0 and not item.id then
+						table.insert(nf, (count > 1 and count .. " " or "") .. item.name .. "\n" .. item.desc)
+					end
+				end
+				if nf[1] then
+					table.sort(nf)
+					table.insert(entries, table.concat(nf, "\n\n"))
 				end
 
 				ship:addCustomMessage(station, "Cargo Details", table.concat(entries, "\n\n"))
