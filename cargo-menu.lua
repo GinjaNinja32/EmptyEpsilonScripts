@@ -113,22 +113,64 @@ mainMenu:add {
 						end,
 					}
 				}
+
+				local cats = {}
+				local uncat = {}
+
 				for _, item in ipairs(cargo.items) do
+					if item.category then
+						cats[item.category] = true
+					else
+						table.insert(uncat, {
+							button = "Get 1" .. item.id,
+							action = function(_, ship, station)
+								cargo.adjust(ship, {[item.id]=1})
+								return false
+							end,
+						})
+						table.insert(uncat, {
+							button = "Get 10" .. item.id,
+							action = function(_, ship, station)
+								cargo.adjust(ship, {[item.id]=10})
+								return false
+							end,
+						})
+					end
+				end
+
+				local catsL = {}
+				for k in pairs(cats) do table.insert(catsL, k) end
+				table.sort(catsL)
+				for _, cat in ipairs(catsL) do
 					table.insert(menu, {
-						button = "Get 1" .. item.id,
+						button = cat,
 						action = function(_, ship, station)
-							cargo.adjust(ship, {[item.id]=1})
-							return false
-						end,
-					})
-					table.insert(menu, {
-						button = "Get 10" .. item.id,
-						action = function(_, ship, station)
-							cargo.adjust(ship, {[item.id]=10})
-							return false
+							local menu = {}
+							for _, item in ipairs(cargo.items) do
+								if item.category == cat then
+									table.insert(menu, {
+										button = "Get 1" .. item.id,
+										action = function(_, ship, station)
+											cargo.adjust(ship, {[item.id]=1})
+											return false
+										end,
+									})
+									table.insert(menu, {
+										button = "Get 10" .. item.id,
+										action = function(_, ship, station)
+											cargo.adjust(ship, {[item.id]=10})
+											return false
+										end,
+									})
+								end
+							end
+							return menu
 						end,
 					})
 				end
+
+				table.insert(menu, {expand = uncat})
+
 				return menu
 			end,
 		},
