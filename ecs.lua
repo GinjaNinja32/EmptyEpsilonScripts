@@ -304,6 +304,18 @@ function system:_update(delta)
 	end
 end
 
+--- Efficiently query entities that have a specified comp.
+-- @param comp The comp to query for.
+-- @return A table which when iterated over with `pairs()` will yield `ent, comps` pairs.
+function System.queryEntitiesWithComp(comp)
+	return setmetatable({
+		sys = {
+			requiredComps = {comp},
+			_entitySatisfiesRequirements = function() return true end,
+		}
+	}, queryMetatable)
+end
+
 function System.update(delta)
 	local doneList = {}
 	local doneMap = {}
