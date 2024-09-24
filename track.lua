@@ -116,3 +116,6 @@ end
 CpuShip = trackCreate(CpuShip, "cpuship", "ship")
 PlayerSpaceship = trackCreate(PlayerSpaceship, "playership", "ship")
 SpaceStation = trackCreate(SpaceStation, "station")
+function hook.on.probeLaunch(sh, pr)
+	track.set("probe", pr)
+end
