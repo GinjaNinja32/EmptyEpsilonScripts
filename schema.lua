@@ -247,7 +247,7 @@ function schema.makeTable(sch, path)
 				if type(v) == "function" then
 					v = v()
 				end
-				if type(v) == "table" and s._fields then
+				if type(v) == "table" and (s._fields or s._keys or s._values) then
 					local t = schema.makeTable(s, ("%s%s."):format(path, k))
 					for vk, vv in pairs(v) do
 						t[vk] = vv

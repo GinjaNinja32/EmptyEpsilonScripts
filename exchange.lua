@@ -273,7 +273,7 @@ function exchange.canTake(ship, resources, mult) -- return true if the ship coul
 	local bad, why = exchange.each(resources, function(source, data)
 		local ok, why = source.canTake(ship, data, mult)
 		if not ok then
-			return true, why or source.key
+			return true, why ~= "" and why or source.key
 		end
 	end)
 	return not bad, why
@@ -314,7 +314,7 @@ function exchange.canAdd(ship, resources, mult)
 	local bad, why = exchange.each(resources, function(source, data)
 		local ok, why = source.canAdd(ship, data, mult)
 		if not ok then
-			return true, why or source.key
+			return true, why ~= "" and why or source.key
 		end
 	end)
 	return not bad, why
@@ -459,7 +459,8 @@ end
 -- @return true if the resources were successfully traded; otherwise false
 function exchange.tryTrade(shipA, resourcesA, shipB, resourcesB, mult)
 	mult = mult or 1
-	if not exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult) then return false end
+	local ok, why = exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult)
+	if not ok then return false, why end
 	exchange.trade(shipA, resourcesA, shipB, resourcesB, mult)
 	return true
 end

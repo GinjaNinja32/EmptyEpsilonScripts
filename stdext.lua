@@ -11,6 +11,7 @@
 function table.defaulting(f, nostore)
 	return setmetatable({}, {
 		__index = function(tbl, idx)
+			if idx == nil then error("nil index", 2) end
 			local v = f()
 			if not nostore then
 				tbl[idx] = v
