@@ -1,21 +1,7 @@
 --- Adds inventory functionality to ships.
 --
--- Item definition format:
---	{
---		-- ID of the item.
---		-- Should be short and descriptive. Must not start with a number.
---		id = "Ti",
---
---		-- Name of the item. Should be in mid-sentence case.
---		name = "titanium",
---
---		-- Description of the item.
---		desc = "a strong metal",
---	}
---
--- To enable a ship to carry cargo:
---	comps(ship).cargo = {}            -- unlimited space
---	comps(ship).cargo = {limit = 20}  -- can carry 20 items
+-- To enable a ship to carry cargo, add the [cargo](#cargo) comp to it.  
+-- To define an item, see `cargo.addItems` for bulk cargo or `item_definition` for unique cargo.
 --
 -- @pragma nostrip
 
