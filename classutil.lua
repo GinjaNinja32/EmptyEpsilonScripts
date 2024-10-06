@@ -28,5 +28,7 @@ function G.makeClass()
 
 	setmetatable(static, static_mt)
 
+	static._instance = instance
+
 	return static, instance, instance_mt
 end
