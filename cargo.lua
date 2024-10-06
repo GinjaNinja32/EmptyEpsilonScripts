@@ -118,9 +118,12 @@ end
 -- @param timeout The timeout before this drop can be picked up; default 0.
 G.CargoDrop = function(ty, timeout)
 	local pickupAfter = getScenarioTime() + (timeout or 0)
+	local item = cargo.resolve(ty, 2)
+
 	return Artifact()
 		:setRadarTraceIcon("combatsat.png")
 		:setRadarTraceColor(200, 200, 255)
+		:setDescription("A cargo container.\nContents: " .. item.name)
 		:onPlayerCollision(function(self, ship)
 			if getScenarioTime() < pickupAfter then
 				return
