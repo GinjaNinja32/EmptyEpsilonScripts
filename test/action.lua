@@ -50,8 +50,10 @@ test("action/comms", function()
 			if b.name == btn then
 				resetCommsData()
 				b.action(source, target)
+				return
 			end
 		end
+		error("button '" .. btn .. "' not found", 2)
 	end
 
 	local homeMenu = {
@@ -215,8 +217,10 @@ test("action/gm", function()
 		for _, v in ipairs(gmFunctions) do
 			if v.name == btn then
 				v.action()
+				return
 			end
 		end
+		error("button '" .. btn .. "' not found", 2)
 	end
 
 	local homeMenu = {
@@ -291,8 +295,26 @@ test("action/gm", function()
 
 	press "Literal Action"
 	assert.equivalent(gmFunctions, literalMenu)
+	press "Empty"
+	assert.equivalent(gmFunctions, emptyMenu)
+	press "Back"
+	assert.equivalent(gmFunctions, literalMenu)
+	press "Home"
+	assert.equivalent(gmFunctions, homeMenu)
+
+	press "Literal Action"
+	assert.equivalent(gmFunctions, literalMenu)
 	press "Entries"
 	assert.equivalent(gmFunctions, entriesMenu)
+	press "Home"
+	assert.equivalent(gmFunctions, homeMenu)
+
+	press "Literal Action"
+	assert.equivalent(gmFunctions, literalMenu)
+	press "Entries"
+	assert.equivalent(gmFunctions, entriesMenu)
+	press "Back"
+	assert.equivalent(gmFunctions, literalMenu)
 	press "Home"
 	assert.equivalent(gmFunctions, homeMenu)
 
@@ -382,6 +404,17 @@ test("action/main", function()
 				}},
 				{button = "Regular", action = {
 					{info = "Baz"},
+					{button = "Up 0", action = 0},
+					{button = "Up 1", action = 1},
+					{button = "Up 2", action = 2},
+					{button = "Up 3", action = 3},
+					{button = "Up 4", action = 4},
+					{button = "X", action = function(reopen)
+						if not reopen then
+							return {{button = "Refresh", action = false}}
+						end
+						return 1
+					end},
 				}},
 			}},
 		},
@@ -560,6 +593,18 @@ test("action/main", function()
 		{ id="bEngineering0", station="Engineering", button="Home", action=equivalentAny },
 		{ id="bEngineering1", station="Engineering", button="Back", action=equivalentAny },
 		{ id="iEngineering2", station="Engineering", info="Baz" },
+		{ id="bEngineering3", station="Engineering", button="Up 0", action=equivalentAny },
+		{ id="bEngineering4", station="Engineering", button="Up 1", action=equivalentAny },
+		{ id="bEngineering5", station="Engineering", button="Up 2", action=equivalentAny },
+		{ id="bEngineering6", station="Engineering", button="Up 3", action=equivalentAny },
+		{ id="bEngineering7", station="Engineering", button="Up 4", action=equivalentAny },
+		{ id="bEngineering8", station="Engineering", button="X", action=equivalentAny },
+	}
+
+	local xMenu = {
+		{ id="bEngineering0", station="Engineering", button="Home", action=equivalentAny },
+		{ id="bEngineering1", station="Engineering", button="Back", action=equivalentAny },
+		{ id="bEngineering2", station="Engineering", button="Refresh", action=equivalentAny },
 	}
 
 	local tasksMenu = {
@@ -679,6 +724,63 @@ test("action/main", function()
 	press "Sub"
 	assert.equivalent(ship.customButtons, restrictedSubMenu)
 	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Home"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Restricted Navigation"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Sub"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Up 0"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Up 1"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	mainMenu:refreshMenu(ship, "Engineering")
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Home"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Restricted Navigation"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Sub"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Up 2"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Home"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Restricted Navigation"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Sub"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Up 3"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Restricted Navigation"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Sub"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "Up 4"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Restricted Navigation"
+	assert.equivalent(ship.customButtons, restrictedMenu)
+	press "Sub"
+	assert.equivalent(ship.customButtons, restrictedSubMenu)
+	press "Regular"
+	assert.equivalent(ship.customButtons, restrictedRegularMenu)
+	press "X"
+	assert.equivalent(ship.customButtons, xMenu)
+	press "Refresh"
 	assert.equivalent(ship.customButtons, restrictedRegularMenu)
 	press "Home"
 	assert.equivalent(ship.customButtons, homeMenu)

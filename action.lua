@@ -48,6 +48,7 @@
 --
 -- - `nil`: return to top-level menu.
 -- - `false`: re-display current menu.
+-- - number: go back N menus. Zero is equivalent to `false`. Values greater than the number of preceding menus are equivalent to `nil`.
 -- - menu list: display these items.
 -- @alias G
 
@@ -200,13 +201,39 @@ actionbase = {
 		end
 	end,
 
-	_resolveMenu = function(self, menu, reopen, ...)
+	_resolveMenu = function(self, menu, data, reopen, ...)
 		self:callDebug("_resolveMenu", {menu, reopen}, ...)
-		while type(menu) == "function" do
-			menu = safecall(errhandler, menu, reopen, ...)
-		end
 
-		return menu
+		local base = menu
+		local canPush = true
+
+		while true do
+			if type(menu) == "function" then
+				menu = safecall(errhandler, menu, reopen, ...)
+
+			elseif menu == false or menu == 0 then
+				menu = data.currentMenu
+				base = menu
+				canPush = false
+				reopen = true
+
+			elseif type(menu) == "number" then
+				if data.stack == nil or #data.stack + 1 <= menu then
+					return nil
+				end
+
+				for i = 1, menu do
+					self:_onPop(...)
+					menu = data.stack[#data.stack]
+					table.remove(data.stack, #data.stack)
+				end
+				base = menu
+				canPush = false
+
+			else
+				return menu, base, canPush
+			end
+		end
 	end,
 
 	_resolveExpand = function(self, expand, ...)
@@ -261,17 +288,7 @@ actionbase = {
 		elseif item.button then
 			local target = {...}
 
-			self:_addButton(self:_resolveLabel(item.button, ...), item.order, function(...)
-				local targetAndExtra = {}
-				for _, t in ipairs(target) do table.insert(targetAndExtra, t) end
-				for _, t in ipairs{...} do table.insert(targetAndExtra, t) end
-
-				if item.action and item.allowBack ~= false then
-					self:_pushMenu(item.action, table.unpack(targetAndExtra))
-				else
-					self:setMenu(item.action, table.unpack(targetAndExtra))
-				end
-			end, ...)
+			self:_addRawButton(self:_resolveLabel(item.button, ...), item.order, item.action, item.allowBack, ...)
 		elseif item.expand then
 			local expand = self:_resolveExpand(item.expand, ...)
 			if expand then
@@ -280,6 +297,21 @@ actionbase = {
 		else
 			print("Menu error: item has no info or button? " .. debug.dump(item))
 		end
+	end,
+
+	_addRawButton = function(self, label, order, action, allowBack, ...)
+		local target = {...}
+		self:_addButton(label, order, function(...)
+			local tx = {}
+			for _, t in ipairs(target) do table.insert(tx, t) end
+			for _, t in ipairs{ ...  } do table.insert(tx, t) end
+
+			if allowBack ~= false then
+				self:_setMenu(action, false, true, table.unpack(tx))
+			else
+				self:setMenu(action, table.unpack(tx))
+			end
+		end, ...)
 	end,
 
 	_addItems = function(self, items, ...)
@@ -291,24 +323,18 @@ actionbase = {
 
 	_setMenu = function(self, menu, reopen, push, ...)
 		self:callDebug("_setMenu", {menu, reopen, push}, ...)
-		local items = self:_resolveMenu(menu, reopen, ...)
 		local data = self:_dataFor(...)
+		local items, base, canPush = self:_resolveMenu(menu, data, reopen, ...)
 
-		if push and items then
+		if canPush and push then
 			self:_onPush(...)
-		end
-		if push and items and data.currentMenu then
-			if data.stack == nil then data.stack = {} end
-			table.insert(data.stack, data.currentMenu)
-		end
-
-		if items == false then
-			menu = data.currentMenu
-
-			items = self:_resolveMenu(menu, true, ...)
+			if data.currentMenu then
+				if data.stack == nil then data.stack = {} end
+				table.insert(data.stack, data.currentMenu)
+			end
 		end
 
-		data.currentMenu = menu
+		data.currentMenu = base
 		if items == nil then
 			if not reopen then
 				self:_onReset(...)
@@ -324,10 +350,10 @@ actionbase = {
 		if items then
 			local target = {...}
 			if items.allowHome ~= false then
-				self:_addButton("Home", nil, function() self:setMenu(nil, table.unpack(target)) end, ...)
+				self:_addRawButton("Home", nil, nil, nil, ...)
 			end
 			if #data.stack > 0 and items.allowBack ~= false then
-				self:_addButton("Back", nil, function() self:_popMenu(table.unpack(target)) end, ...)
+				self:_addRawButton("Back", nil, 1, nil, ...)
 			end
 			if items.allowSticky ~= false then
 				for _, item in ipairs(self.root) do
@@ -342,27 +368,6 @@ actionbase = {
 		end
 
 		self:_finishMenu(...)
-	end,
-
-	_pushMenu = function(self, menu, ...)
-		self:callDebug("_pushMenu", {menu}, ...)
-		local data = self:_dataFor(...)
-		self:_setMenu(menu, false, true, ...)
-	end,
-
-	_popMenu = function(self, ...)
-		self:callDebug("_popMenu", {}, ...)
-		local data = self:_dataFor(...)
-		if data.stack == nil or #data.stack == 0 then
-			self:_setMenu(nil, false, false, ...)
-			return
-		end
-
-		self:_onPop(...)
-		local menu = data.stack[#data.stack]
-		table.remove(data.stack, #data.stack)
-
-		self:_setMenu(menu, false, false, ...)
 	end,
 
 	--- Set the current menu to `menu` for the provided target.
