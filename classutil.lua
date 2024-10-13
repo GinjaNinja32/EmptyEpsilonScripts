@@ -32,3 +32,19 @@ function G.makeClass()
 
 	return static, instance, instance_mt
 end
+
+--- Create a new class type derived from another type.
+-- @param parent The static method table for the parent type.
+-- @return A table for static class methods.
+-- @return A table for class instance methods.
+-- @return The metatable for class instances.
+function G.deriveClass(parent)
+	local s, i, imt = makeClass()
+
+	getmetatable(s).__index = parent
+	setmetatable(i, {
+		__index = parent._instance
+	})
+
+	return s, i, imt
+end
