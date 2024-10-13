@@ -42,6 +42,14 @@ function vector.radialDegFromXY(x, y)
 	return math.sqrt(x^2 + y^2), vector.degFromRad(math.atan(y, x))
 end
 
+function vector.xyRotateRad(x, y, thetaRad)
+	return x * math.cos(thetaRad) + y * math.sin(thetaRad),
+	       y * math.cos(thetaRad) - x * math.sin(thetaRad)
+end
+function vector.xyRotateDeg(x, y, thetaDeg)
+	return vector.xyRotateRad(x, y, vector.radFromDeg(thetaDeg))
+end
+
 local function twopoints(name, ...)
 	local args = {...}
 
