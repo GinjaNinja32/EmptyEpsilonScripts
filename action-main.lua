@@ -94,7 +94,13 @@ G.mainMenu = ActionBase {
 	end,
 	_dataFor = function(self, ship, station)
 		if ship.__menu == nil then ship.__menu = {} end
-		if ship.__menu[station] == nil then ship.__menu[station] = {currentEntries={}} end
+		if ship.__menu[station] == nil then
+			ship.__menu[station] = {
+				currentEntries = {},
+				scrollstack = {},
+				offset = 0,
+			}
+		end
 		return ship.__menu[station]
 	end,
 	_startMenu = function(self, ship, station)
