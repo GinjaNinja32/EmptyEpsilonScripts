@@ -266,7 +266,8 @@ end
 -- @param ship The ship to check.
 -- @param resources The resource list to check.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the ship could provide the resources; otherwise false
+-- @treturn bool true if the ship could provide the resources; otherwise false
+-- @treturn string The reason the ship could not provide the resources, if any
 function exchange.canTake(ship, resources, mult) -- return true if the ship could supply the specified resources; otherwise, return false.
 	if ship == exchange.infinite then return true end
 	mult = mult or 1
@@ -295,10 +296,12 @@ end
 -- @param ship The ship to take from.
 -- @param resources The resource list to take.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the resources were successfully taken; otherwise false
+-- @treturn bool true if the resources were successfully taken; otherwise false
+-- @treturn string The reason the ship could not provide the resources, if any
 function exchange.tryTake(ship, resources, mult) -- if the ship can supply the specified resources, take them and return true; otherwise, return false.
 	mult = mult or 1
-	if not exchange.canTake(ship, resources, mult) then return false end
+	local ok, why = exchange.canTake(ship, resources, mult)
+	if not ok then return false, why end
 	exchange.take(ship, resources, mult)
 	return true
 end
@@ -307,7 +310,8 @@ end
 -- @param ship The ship to check.
 -- @param resources The resource list to check.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the ship could accept the resources; otherwise false
+-- @treturn bool true if the ship could accept the resources; otherwise false
+-- @treturn string The reason the ship could not accept the resources, if any
 function exchange.canAdd(ship, resources, mult)
 	if ship == exchange.infinite then return true end
 	mult = mult or 1
@@ -336,10 +340,12 @@ end
 -- @param ship The ship to add to.
 -- @param resources The resource list to add.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the resources were successfully added; otherwise false
+-- @treturn bool true if the resources were successfully added; otherwise false
+-- @treturn string The reason the ship could not accept the resources, if any
 function exchange.tryAdd(ship, resources, mult)
 	mult = mult or 1
-	if not exchange.canAdd(ship, resources, mult) then return false end
+	local ok, why = exchange.canAdd(ship, resources, mult)
+	if not ok then return false, why end
 	exchange.add(ship, resources, mult)
 	return true
 end
@@ -349,7 +355,8 @@ end
 -- @param from The resource list to swap from.
 -- @param to The resource list to swap to.
 -- @param mult A multiplier to apply to each entry in each resource list; default 1.
--- @return true if the ship could swap the resources; otherwise false
+-- @treturn bool true if the ship could swap the resources; otherwise false
+-- @treturn string The reason the ship could not swap the resources, if any
 function exchange.canSwap(ship, from, to, mult)
 	mult = mult or 1
 	local ok, why = exchange.canTake(ship, from, mult)
@@ -375,10 +382,12 @@ end
 -- @param from The resource list to swap from.
 -- @param to The resource list to swap to.
 -- @param mult A multiplier to apply to each entry in each resource list; default 1.
--- @return true if the resources were successfully added; otherwise false
+-- @treturn bool true if the resources were successfully swapped; otherwise false
+-- @treturn string The reason the ship could not swap the resources, if any
 function exchange.trySwap(ship, from, to, mult)
 	mult = mult or 1
-	if not exchange.canSwap(ship, from, to, mult) then return false end
+	local ok, why = exchange.canSwap(ship, from, to, mult)
+	if not ok then return false, why end
 	exchange.swap(ship, from, to, mult)
 	return true
 end
@@ -388,7 +397,8 @@ end
 -- @param shipTo The ship to move resources to.
 -- @param resources The resource list to move.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the ships could move the resources; otherwise false
+-- @treturn bool true if the ships could move the resources; otherwise false
+-- @treturn string The reason the ships could not move the resources, if any
 function exchange.canMove(shipFrom, shipTo, resources, mult)
 	mult = mult or 1
 	local ok, why = exchange.canTake(shipFrom, resources, mult)
@@ -414,10 +424,12 @@ end
 -- @param shipTo The ship to move resources to.
 -- @param resources The resource list to move.
 -- @param mult A multiplier to apply to each entry in the resource list; default 1.
--- @return true if the resources were successfully moved; otherwise false
+-- @treturn bool true if the resources were successfully moved; otherwise false
+-- @treturn string The reason the ships could not move the resources, if any
 function exchange.tryMove(shipFrom, shipTo, resources, mult)
 	mult = mult or 1
-	if not exchange.canMove(shipFrom, shipTo, resources, mult) then return false end
+	local ok, why = exchange.canMove(shipFrom, shipTo, resources, mult)
+	if not ok then return false, why end
 	exchange.move(shipFrom, shipTo, resources, mult)
 	return true
 end
@@ -428,7 +440,8 @@ end
 -- @param shipB The second ship involved in the trade.
 -- @param resourcesB The resources that shipB is providing to shipA.
 -- @param mult A multiplier to apply to each entry in each resource list; default 1.
--- @return true if the ships could trade the resources; otherwise false
+-- @treturn bool true if the ships could trade the resources; otherwise false
+-- @treturn string The reason the ships could not trade the resources, if any
 function exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult)
 	mult = mult or 1
 	local ok, why = exchange.canSwap(shipA, resourcesA, resourcesB, mult)
@@ -456,7 +469,8 @@ end
 -- @param shipB The second ship involved in the trade.
 -- @param resourcesB The resources that shipB is providing to shipA.
 -- @param mult A multiplier to apply to each entry in each resource list; default 1.
--- @return true if the resources were successfully traded; otherwise false
+-- @treturn bool true if the resources were successfully traded; otherwise false
+-- @treturn string The reason the ships could not trade the resources, if any
 function exchange.tryTrade(shipA, resourcesA, shipB, resourcesB, mult)
 	mult = mult or 1
 	local ok, why = exchange.canTrade(shipA, resourcesA, shipB, resourcesB, mult)
