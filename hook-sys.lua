@@ -158,8 +158,8 @@ local timers = {}
 
 --- Register to receive a callback on an interval. This function depends on the `update` hook being triggered regularly.
 -- @function hook.every
--- @param interval The interval to call on.
--- @param callback The callback to register.
+-- @tparam number interval The interval to call on.
+-- @tparam function callback The callback to register.
 local addTimer = function(_, time, fn)
 	table.insert(timers, {
 		interval = time,
@@ -173,11 +173,26 @@ hook.every = setmetatable({}, {
 	__newindex = addTimer,
 })
 
+--- Register to receive a callback after a delay. This function depends on the `update` hook being triggered regularly.
+-- @function hook.afterDelay
+-- @tparam number time The delay after which to call the function.
+-- @tparam function callback The callback to register.
+hook.afterDelay = function(time, fn)
+	table.insert(timers, {
+		next = getScenarioTime() + time,
+		fn = fn,
+	})
+end
+
 function hook.on.update(delta)
 	local now = getScenarioTime()
-	for _, timer in ipairs(timers) do
+	for idx, timer in pairs(timers) do
 		if timer.next <= now then
-			timer.next = timer.next + timer.interval
+			if timer.interval then
+				timer.next = timer.next + timer.interval
+			else
+				timers[idx] = nil
+			end
 			local ok, res = pcall(timer.fn)
 			if not ok then
 				print("Timer error:", res)
