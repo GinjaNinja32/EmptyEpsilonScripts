@@ -1,29 +1,20 @@
 --- Enables writing schemas and enforcing their validity on tables.
 -- @pragma nostrip
 
---- Schema Kinds.
--- Schemas are represented as tables. The permitted keys and values of these tables are documented in the specific schema kinds below.
--- @section schemas
-
---- A schema enforceable against a value of type `"table"`.
---
--- Keys in the table correspond to keys of the target table.  
--- Values in the table are [`valueSchemas`](#valueSchema).
--- @table tableSchema
-
---- A schema enforceable against a value of any type.
--- @field[opt] _default The default value if no value is provided. If a function, it will be invoked each time a default is required.
--- @field[opt] _type The type that the value must have: `type(val) == _type`
--- @field[opt] _ge Value must be greater than or equal to this value: `val >= _ge`
--- @field[opt] _gt Value must be greater than this value: `val > _gt`
--- @field[opt] _le Value must be less than or equal to this value: `val <= _le`
--- @field[opt] _lt Value must be less than this value: `val < _lt`
--- @field[opt] _check A function to check each value: `local v = _check(val); v == nil or v == true`
--- @field[opt] _fields A `tableSchema` for the value, if it is a table.
--- @field[opt] _keys A `valueSchema` for the keys of the value, if it is a table.
--- @field[opt] _values A `valueSchema` for the values of the value, if it is a table.
+--- A table defining a set of allowed values. All operations are performed in the order they are defined here, so e.g. you do not need to check `type(v)` in `_check` if you have specified `_type`, but `_fields` will not have been checked yet.
+-- @within Types
+-- @field[opt] _default The default value if the target is nil. If a function, it will be invoked with no arguments each time a default is required. Default values are not exempt from further validation.
+-- @tfield[opt] boolean _optional If true, the target may be `nil` without triggering further validation.
+-- @tfield[opt] string _type The type that the target must have: `type(val) == _type`
+-- @field[opt] _ge The target must be greater than or equal to this value: `val >= _ge`
+-- @field[opt] _gt The target must be greater than this value: `val > _gt`
+-- @field[opt] _le The target must be less than or equal to this value: `val <= _le`
+-- @field[opt] _lt The target must be less than this value: `val < _lt`
+-- @tfield[opt] function(val) _check A function to check the target: `local v = _check(val); v == nil or v == true`
+-- @tfield[opt] table _fields Ignored if the target is not a table. A map from keys (which must equal the keys of the target) to [valueSchemas](#valueSchema) for the corresponding value in the target.
+-- @tfield[opt] valueSchema _keys Ignored if the target is not a table. A schema for the keys of the target.
+-- @tfield[opt] valueSchema _values Ignored if the target is not a table. A schema for the values of the target.
 -- @table valueSchema
-local _ = {}
 
 require "gn32/lang"
 
@@ -66,15 +57,31 @@ local function describeValueBounds(sch)
 	end
 end
 
---- Check that a value satisfies a `schema`.
+--- Assert that a value satisfies a schema.
+-- @tparam string name The name of the value, for the error message.
+-- @param val The value to check
+-- @tparam valueSchema sch The schema to assert.
+-- @tparam[opt] number level The level to error at. Interpreted equivalently to `error`'s level parameter.
+function schema.assertValue(name, val, sch, level)
+	local err = schema.checkValue(val, sch)
+	if err then
+		error(name .. ": " .. err, level == 0 and 0 or (level or 1) + 1)
+	end
+end
+
+--- Check that a value satisfies a schema.
 -- @param val The value to check.
--- @param sch The `schema` to validate against.
+-- @tparam valueSchema sch The schema to validate against.
 function schema.checkValue(val, sch)
 	if val == nil then
 		val = sch._default
 		if type(val) == "function" then
 			val = val()
 		end
+	end
+
+	if val == nil and sch._optional then
+		return
 	end
 
 	if sch._type ~= nil and sch._type ~= type(val) then
@@ -228,10 +235,10 @@ local function getSchemaMetatable(sch)
 	return mtCache[sch]
 end
 
---- Make a table that enforces the given `valueSchema` on edits.
+--- Make a table that enforces the given schema on edits.
 -- The table may or may not initially satisfy the schema, depending on the default field values specified by the schema.
--- @param sch The `valueSchema` to enforce.
--- @param path The path to this table, for error messages. Empty or `nil` if this is a top-level table.
+-- @tparam valueSchema sch The schema to enforce.
+-- @tparam[opt] string path The path to this table, for error messages. Empty or `nil` if this is a top-level table.
 function schema.makeTable(sch, path)
 	local data = {}
 
