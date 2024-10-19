@@ -33,7 +33,7 @@ local ecompMetatable = {
 		if not def then error("comp " .. key .. " is not defined", 2) end
 
 		local ent = ecomp_entity[ecomp]
-		if not ent or not ent:isValid() then error("attempt to access comps of destroyed entity", 2) end
+		if not ent or not ent.isValid or not ent:isValid() then error("attempt to access comps of destroyed entity", 2) end
 
 		local data = map_ent_comp_data[ent] and map_ent_comp_data[ent][def]
 		if not data then return nil end
@@ -98,6 +98,8 @@ G.comps = nil
 -- @param e the entity to get comps for
 -- @return The `EntityComps` for the entity.
 function comps(e)
+	if not e or not e.isValid or not e:isValid() then error("attempt to access comps of destroyed entity", 2) end
+
 	local ec = setmetatable({}, ecompMetatable)
 
 	ecomp_entity[ec] = e
