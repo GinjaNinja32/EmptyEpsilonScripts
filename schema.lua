@@ -1,8 +1,10 @@
 --- Enables writing schemas and enforcing their validity on tables.
 -- @pragma nostrip
 
+--- Types.
+-- @section types
+
 --- A table defining a set of allowed values. All operations are performed in the order they are defined here, so e.g. you do not need to check `type(v)` in `_check` if you have specified `_type`, but `_fields` will not have been checked yet.
--- @within Types
 -- @field[opt] _default The default value if the target is nil. If a function, it will be invoked with no arguments each time a default is required. Default values are not exempt from further validation.
 -- @tfield[opt] boolean _optional If true, the target may be `nil` without triggering further validation.
 -- @tfield[opt] string _type The type that the target must have: `type(val) == _type`
