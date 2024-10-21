@@ -4,6 +4,8 @@
 -- - Global variables must now be declared to be used. This is achieved by assigning to `G.<varname>` instead of just `<varname>`.
 --   Once declared, the variable can be accessed by `<varname>` as normal, even if set to nil.
 
+---
+
 local declared = {}
 
 local function ensuremetatable(tbl)
