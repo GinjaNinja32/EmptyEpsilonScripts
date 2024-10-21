@@ -164,4 +164,4 @@ position.defineArea("hack",       "Relay",                         "AltRelay")
 position.defineArea("map",        "Relay",                         "AltRelay")
 --- Hail other ships and stations, receive incoming hails.
 -- @table comms
-position.defineArea("comms",      "Relay",                         "Single") -- plus CommsOnly, but that doesn't get custom buttons
+position.defineArea("comms",      "Relay",        "Operations",    "Single") -- plus CommsOnly, but that doesn't get custom buttons
