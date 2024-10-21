@@ -20,6 +20,7 @@ require "gn32/ecs"
 -- @string[opt] id The id of the item. Required if this definition is passed to `cargo.addItems`, otherwise forbidden. If present, should be short and descriptive, and must not start with a digit.
 -- @string name The name of the item, in mid-sentence case.
 -- @string desc The description of the item. May contain newlines.
+local _ = {} -- if the above doc comment is attached to itemSchema, ldoc spits out a bunch of warnings.
 local itemSchema = {
 	_type = "table",
 	-- _check rather than _fields so that a) other fields are permitted, and b) ecs doesn't turn the definition table into a schema-checking proxy

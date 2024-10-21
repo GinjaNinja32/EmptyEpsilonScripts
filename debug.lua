@@ -3,32 +3,30 @@
 
 require "gn32/lang"
 
+G.debug = {}
+
 --- Toggle for debug printing. Default false.
--- @field debug.global
+debug.global = false
 
 --- Mapping from category to whether debug is enabled for that category.
 -- When reading, if a category is not present, the value of `debug.global` is returned.
 -- @table debug.enabled
+debug.enabled = setmetatable({}, {
+	__index = function(_, cat)
+		debug.cats[cat] = true
+		return debug.global
+	end,
+	__newindex = function(t, cat, v)
+		rawset(t, cat, v)
+		debug.cats[cat] = true
+	end,
+})
 
 --- Table of all categories that have been accessed or set in `debug.enabled`.
 -- Accessed categories are mapped to `true`.
 -- @table debug.cats
-local _ = {}
+debug.cats = {}
 
-G.debug = {
-	global = false,
-	enabled = setmetatable({}, {
-		__index = function(_, cat)
-			debug.cats[cat] = true
-			return debug.global
-		end,
-		__newindex = function(t, cat, v)
-			rawset(t, cat, v)
-			debug.cats[cat] = true
-		end,
-	}),
-	cats = {},
-}
 
 --- Print a message if global debug is enabled.
 -- @param ... The args to pass to `print`.
@@ -38,11 +36,24 @@ function debug.print(...)
 	end
 end
 
--- TODO improve params and document
+local dump
 
---- Dump a value as a string.
--- @param t The value to dump.
-function debug.dump(t, nl, id, ids, gseen)
+
+local function dump_tkey(ident, id, nlids, gseen)
+	if type(ident) == "number" then
+		return "[" .. ident .. "]"
+	end
+
+	if type(ident) == "string" then
+		if string.match(ident, "^%a%w*$") then
+			return ident
+		end
+	end
+
+	return "[" .. dump(ident, id, nlids, gseen) .. "]"
+end
+
+dump = function(t, id, nlids, gseen)
 	if t == nil then
 		return "nil"
 	end
@@ -61,19 +72,6 @@ function debug.dump(t, nl, id, ids, gseen)
 		return "" .. t
 	end
 
-	if nl == true then
-		nl = "\n"
-		id = "    "
-		ids = ""
-	elseif nl == nil then
-		nl = ""
-		id = ""
-		ids = ""
-	end
-	if id == nil then id = "" end
-	if ids == nil then ids = "" end
-
-	if gseen == nil then gseen = {} end
 	if gseen[t] then return "..." end
 	gseen[t] = true
 
@@ -82,14 +80,14 @@ function debug.dump(t, nl, id, ids, gseen)
 	for k = 1, #t do
 		local v = rawget(t, k)
 		if v == nil then break end
-		table.insert(ientries, debug.dump(v, nl, id, ids .. id, gseen))
+		table.insert(ientries, dump(v, id, nlids .. id, gseen))
 		seen[k] = true
 	end
 
 	local entries = {}
 	for k, v in next, t do
 		if not seen[k] then
-			table.insert(entries, "[" .. debug.dump(k, nl, id, ids .. id, gseen) .. "]=" .. debug.dump(v, nl, id, ids .. id, gseen))
+			table.insert(entries, dump_tkey(k, id, nlids .. id, gseen) .. "=" .. dump(v, id, nlids .. id, gseen))
 		end
 	end
 
@@ -101,5 +99,32 @@ function debug.dump(t, nl, id, ids, gseen)
 	if #ientries == 0 then
 		return "{}"
 	end
-	return "{" .. nl .. ids .. id .. table.concat(ientries, "," .. nl .. ids .. id) .. nl .. ids .. "}"
+	local comma = ", "
+	local trailingComma = ""
+	if id ~= "" then
+		comma = ","
+		trailingComma = ","
+	end
+	return "{" .. nlids .. id .. table.concat(ientries, comma .. nlids .. id) .. trailingComma .. nlids .. "}"
+end
+
+--- Dump a value as a string.
+-- @param t The value to dump.
+-- @tparam[opt] boolean|string indent
+--
+-- - `false` or `nil`: Format entire value on a single line.
+-- - `true`: Format table values on multiple lines; indent by four spaces per level
+-- - ***string***: Format table values on multiple lines; indent by this string for each level.
+function debug.dump(t, indent)
+	local id, nlids = "", "", ""
+	if indent then
+		nlids = "\n"
+		if type(indent) == "string" then
+			id = indent
+		else
+			id = "    "
+		end
+	end
+
+	return dump(t, id, nlids, {})
 end

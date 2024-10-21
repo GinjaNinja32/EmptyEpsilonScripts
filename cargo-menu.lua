@@ -1,12 +1,17 @@
 --- [`action-main`] Provides an `action-main`-driven menu for interacting with `cargo`.
---
--- Defines defaults for an area `"cargo"` for cargo transfer/jettison menu items. See `position` for details on areas, including how to override the default stations.
 
 require "gn32/action-main"
 require "gn32/drag"
 require "gn32/cargo"
 require "gn32/vector"
 
+--- Areas.
+-- See `position` for details on areas, including how to override the default stations.
+-- @section areas
+
+--- Transfer and jettison cargo.  
+-- Default stations: Relay, Operations, Single Pilot.
+-- @table cargo
 position.defineAreaDefault("cargo", "Relay", "Operations", "Single")
 
 mainMenu:add {

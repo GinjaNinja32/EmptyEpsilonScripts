@@ -2,23 +2,46 @@
 -- For documentation on how to call the library, see `hook-sys`.
 --
 -- Modules targeting this library that do not use predefined entity hooks should import `hook-sys` and specify the hooks they require, to allow them to be used in scripts that do not wish to integrate `hook`.
---
--- Global hooks:
---
--- - `init`: on scenario initialisation (no args)
--- - `update`: on scenario update (args: delta)
--- - `newPlayerShip`: on new player ship creation (args: ship)
--- - `probeLaunch`: when a player ship launches a probe (args: ship, probe)
---
--- Entity hooks:
---
--- - `destroyed`: when the entity is removed from the game by any means (args: entity)
--- - `destruction`: when the entity is destroyed by damage (args: entity)
--- - `expiration`: when the scan probe expires (args: entity)
+
+--- Global hooks.
+-- @section globalhooks
+
+--- Triggered on scenario initialisation.
+-- @function init
+
+--- Triggered on scenario update.
+-- @function update
+-- @tparam number delta
+
+--- Triggered when a player ship is created.
+-- @function newPlayerShip
+-- @tparam PlayerSpaceship ship
+
+--- Triggered when a scan probe is launched from any ship.
+-- @function probeLaunch
+-- @tparam PlayerSpaceship ship
+-- @tparam ScanProbe probe
+
+
+--- Entity hooks.
+-- @section entityhooks
+
+--- Triggered when an entity is removed from the game by any means.
+-- @function destroyed
+-- @tparam entity entity
+
+--- Triggered when an entity is destroyed by damage.
+-- @function destruction
+-- @tparam entity entity
+
+--- Triggered when a scan probe expires.
+-- @function expiration
+-- @tparam entity entity
 
 require "gn32/lang"
 
 require "gn32/hook-sys"
+require "gn32/fnhook"
 
 hook.entityEventRegistrationName = {
 	destroyed = "onDestroyed",
@@ -37,11 +60,8 @@ end
 if G.createEntity then
 	local new_ps = {}
 	-- TODO: ECS onNewPlayerShip does not work
-	local ps = PlayerSpaceship
-	PlayerSpaceship = function()
-		local e = ps()
+	fnhook.PlayerSpaceship = function(e)
 		table.insert(new_ps, e)
-		return e
 	end
 
 	hook.on.update = function()
