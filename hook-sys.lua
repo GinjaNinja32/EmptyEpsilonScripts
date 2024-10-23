@@ -40,16 +40,18 @@ end
 --- Entity.
 -- @section Entity
 
+local e_hook = setmetatable({}, {__mode="k"})
+
 --- Access hooks for an entity.
 -- This table should be indexed with the entity you wish to set or trigger hooks for.
 -- The remaining functions in this section are accessed on the table returned from this index operation.
 -- @table hook.entity
 hook.entity = setmetatable({}, {
 	__index = function(t, entity)
-		if entity.__hooks == nil then
-			entity.__hooks = {}
+		if e_hook[entity] == nil then
+			e_hook[entity] = {}
 		end
-		local h = entity.__hooks
+		local h = e_hook[entity]
 
 		local ehook = {}
 
