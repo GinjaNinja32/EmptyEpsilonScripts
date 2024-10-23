@@ -9,6 +9,33 @@ local registered = {}
 local registeredAfter = {}
 
 hook.entityEventRegistrationName = {}
+hook.entityEventCallbackPath = {}
+
+local function registerEntityEventCallback(entity, event, callback)
+	if G.createEntity then
+		local path = hook.entityEventCallbackPath[event]
+		if path then
+			local cur = entity.components
+			for i = 1, #path - 1 do
+				if cur == nil then
+					error(("callback path %s missing at %s (%s) on %s"):format(table.concat(path, "."), i, path[i], entity:getCallSign()))
+				end
+				cur = cur[path[i]]
+			end
+
+			cur[path[#path]] = callback
+			return
+		end
+	end
+
+	local methodName = hook.entityEventRegistrationName[event]
+	if methodName then
+		if not entity[methodName] then
+			error(("registration function %s missing on %s"):format(methodName, entity:getCallSign()))
+		end
+		entity[methodName](entity, callback)
+	end
+end
 
 --- Entity.
 -- @section Entity
@@ -36,10 +63,7 @@ hook.entity = setmetatable({}, {
 						h[event] = {}
 					end
 
-					local methodName = hook.entityEventRegistrationName[event]
-					if methodName then
-						entity[methodName](entity, ehook.trigger[event])
-					end
+					registerEntityEventCallback(entity, event, ehook.trigger[event])
 
 					table.insert(h[event], callback)
 
