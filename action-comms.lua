@@ -5,7 +5,7 @@
 -- Differences from `action` docs:
 --
 -- - `info` entries will be merged and used as the comms message.
--- - Menu items support a `requiredDockState` bool; if set, the item will only display when the source is (`true`) or is not (`false`) docked with the target.
+-- - Menu items support a `requiredDockState` boolean; if set, the item will only display when the source is (`true`) or is not (`false`) docked with the target.
 --
 -- To create a comms menu, add entries to it, and set it as an entity's comms function:
 --	local commsMenu = CommsMenu()
