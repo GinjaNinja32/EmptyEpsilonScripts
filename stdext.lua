@@ -26,13 +26,19 @@ end
 -- @param entry The entry to check for.
 -- @return `true` if there is some index `i` between 1 and `#tbl` such that `tbl[i] == entry`, otherwise `false`.
 function table.contains(tbl, entry)
+	return table.indexOf(tbl, entry) ~= nil
+end
+
+--- Find the index of an entry in a table.
+-- @tparam table tbl The table to search.
+-- @param entry The entry to find.
+-- @return The index of `entry` in `table`, or nil if it is not present.
+function table.indexOf(tbl, entry)
 	for i = 1, #tbl do
 		if tbl[i] == entry then
-			return true
+			return i
 		end
 	end
-
-	return false
 end
 
 --- global.
