@@ -3,6 +3,12 @@ require "gn32/utils"
 
 require "gn32/track"
 
+local function getEnts(name)
+	local t = {}
+	track.each(name, function(e) table.insert(t, e) end)
+	return t
+end
+
 test("track", function()
 	local e1 = Entity():setCallSign("e1")
 	local e2 = Entity():setCallSign("e2")
@@ -16,9 +22,9 @@ test("track", function()
 	assert(track.get("bar", e1) == "e1b")
 	assert(track.get("bar", e2) == nil)
 
-	assert(table.equals(track.get("foo"), {e1, e2}))
-	assert(table.equals(track.get("bar"), {e1}))
-	assert(table.equals(track.get("baz"), {}))
+	assert(table.equals(getEnts("foo"), {e1, e2}))
+	assert(table.equals(getEnts("bar"), {e1}))
+	assert(table.equals(getEnts("baz"), {}))
 
 	local visited = {}
 	track.each("foo", function(e) table.insert(visited, e) end)
@@ -39,10 +45,6 @@ test("track", function()
 	assert(track.get("bar", e1) == nil)
 	assert(track.get("bar", e2) == nil)
 
-	assert(table.equals(track.get("foo"), {e2}))
-	assert(table.equals(track.get("bar"), {}))
-	assert(table.equals(track.get("baz"), {}))
-
 	local visited = {}
 	track.each("foo", function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {e2}))
@@ -55,6 +57,8 @@ test("track", function()
 	track.each("baz", function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {}))
 
+	e1 = Entity():setCallSign("e1")
+
 	local list = {[e1]=1, [e2]=2}
 	local N = 10
 	track.set("foo", e1)
@@ -65,9 +69,9 @@ test("track", function()
 		track.set("foo", e)
 	end
 
-	assert.equal(N, #track.get("foo"))
+	assert.equal(N, #getEnts("foo"))
 
 	track.each("foo", function(e) e:destroy() end)
 
-	assert.equal(0, #track.get("foo"))
+	assert.equal(0, #getEnts("foo"))
 end)

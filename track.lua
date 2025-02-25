@@ -1,126 +1,232 @@
---- [`hook`] Utility for tracking collections of entities.
+--- [`hook-sys`] Utility for tracking collections of entities.
+-- Required hooks: `newPlayerShip`, `probeLaunch`.
 -- @pragma nostrip
 
 require "gn32/lang"
+require "gn32/classutil"
+require "gn32/fnhook"
+require "gn32/hook-sys"
 
-require "gn32/hook"
+local function checkEntity(e)
+	if e == nil then
+		return false
+	end
+	if e.isValid and not e:isValid() then
+		return false
+	end
+	return true
+end
 
-G.track = {}
+local function assertEntity(e)
+	if e == nil then
+		error("nil entity", 3)
+	end
+	if e.isValid and not e:isValid() then
+		error("destroyed entity", 3)
+	end
+end
 
-local tracked = {}
+local tracker
+G.Tracker, tracker = makeClass()
 
---- Set tracking on an entity.
--- @param coll The collection to track the entity in.
+--- Tracker
+-- @section tracker
+
+--- Create a new entity tracker.
+-- @function Tracker
+function tracker:_init()
+	self.entities = {}
+	self.data = {}
+end
+
+--- Add an entity to the tracked set.
 -- @param entity The entity to track.
--- @param data Optional; data to store along with this tracking entry.
-function track.set(coll, entity, data)
-	if entity == nil then error("nil entity", 2) end
+-- @param[opt] data The data to associate with the entity.
+function tracker:set(entity, data)
+	assertEntity(entity)
 
-	local e, d = track.get(coll)
+	self.data[entity] = data
 
-	d[entity] = data
-
-	for i, ent in ipairs(e) do
+	for _, ent in ipairs(self.entities) do
 		if ent == entity then
 			return
 		end
 	end
 
-	table.insert(e, entity)
-
-	hook.entity[entity].on.destroyed(function()
-		track.remove(coll, entity)
-	end)
+	table.insert(self.entities, entity)
 end
 
---- Stop tracking an entity.
--- @param coll The collection to stop tracking the entity in.
+--- Remove an entity from the tracked set.
 -- @param entity The entity to stop tracking.
-function track.remove(coll, entity)
-	local e, d = track.get(coll)
-	for i, ent in pairs(e) do
+function tracker:remove(entity)
+	for i, ent in ipairs(self.entities) do
 		if ent == entity then
-			table.remove(e, i)
+			table.remove(self.entities, i)
 			break
 		end
 	end
-	d[entity] = nil
+	self.data[entity] = nil
 end
 
---- Get the set of entities in a collection, or get the data associated with a specific entity.
--- @param coll The collection to read.
--- @param entity The entity to read data for, or omitted/nil to get the set of entities in the collection.
--- @return The data for the entity if passed, otherwise the collection of entities and mapping of data for this collection.
-function track.get(coll, entity)
-	if tracked[coll] == nil then
-		tracked[coll] = {
-			entities = {},
-			data = {},
-		}
+--- Get the associated data for a tracked entity.
+-- @param entity The entity to get data for.
+-- @return The associated data for the entity, if tracked; otherwise `nil`.
+function tracker:get(entity)
+	if not checkEntity(entity) then
+		return nil
 	end
-
-	if entity ~= nil then
-		return tracked[coll].data[entity]
-	end
-
-	return tracked[coll].entities, tracked[coll].data
+	return self.data[entity]
 end
 
---- Do something for each tracked entity in a collection.
--- @param coll The collection to iterate.
--- @param f The function to call for each entity. Will be called with `(entity, data)`.
-function track.each(coll, f)
-	local e, d = track.get(coll)
+--- Call a function for each tracked entity.
+-- Entities may not be added or removed from the tracked set during execution, with the exception that `f` may remove its argument entity from the tracked set.
+-- @param f A `function(entity, data)` to call for each tracked entity.
+function tracker:each(f)
+	-- manual loop rather than ipairs to enable removing data during iteration
 
-	-- manual `ipairs`-like to allow entities to be removed/deleted while iterating
 	local i = 1
 	local ent = nil
 	while true do
-		if e[i] == ent then
+		if self.entities[i] == ent then
 			i = i + 1
 		end
 
-		ent = e[i]
+		ent = self.entities[i]
+		while ent and not checkEntity(ent) do
+			table.remove(self.entities, i)
+			self.data[ent] = nil
+			ent = self.entities[i]
+		end
+
 		if ent == nil then
 			break
 		end
 
-		f(ent, d[ent])
+		f(ent, self.data[ent])
 	end
 end
 
 --- Check whether any entity in a collection matches a predicate.
--- @param coll The collection to check.
--- @param f The predicate to check for each entity.
--- @return The return value of the first invocation of `f` that returned a non-`false` non-`nil` value, if present; otherwise `nil`.
-function track.any(coll, f)
-	local e, d = track.get(coll)
-
-	for i, ent in pairs(e) do
-		local v = f(ent, d[ent])
-		if v then return v end
-	end
-end
-
-local function trackCreate(f, ...)
-	local colls = {...}
-	return function()
-		local e = f()
-		for _, coll in ipairs(colls) do
-			track.set(coll, e)
+-- Entities may not be added or removed from the tracked set during execution.
+-- @param f A `function(entity, data)` to call for each tracked entity.
+-- @return The return values of the first invocation of `f` whose first return value was not `nil` or `false`, if any; otherwise `nil`.
+function tracker:any(f)
+	local i = 1
+	while true do
+		local ent = self.entities[i]
+		while ent and not checkEntity(ent) do
+			table.remove(self.entities, i)
+			self.data[ent] = nil
+			ent = self.entities[i]
 		end
-		return e
+		if not ent then
+			break
+		end
+
+		local vals = {f(ent, self.data[ent])}
+		if vals[1] then
+			return table.unpack(vals)
+		end
 	end
 end
 
-CpuShip = trackCreate(CpuShip, "cpuship", "ship")
-PlayerSpaceship = trackCreate(PlayerSpaceship, "playership", "ship")
-SpaceStation = trackCreate(SpaceStation, "station")
+
+local named = {}
+
+local function getNamed(name)
+	if not named[name] then
+		named[name] = Tracker()
+	end
+
+	return named[name]
+end
+
+--- Functions
+-- @section functions
+
+G.track = {}
+
+--- Add an entity to the tracked set of a named tracker.
+-- @tparam string name The name of the tracker.
+-- @tparam entity entity The entity to track.
+-- @param[opt] data The data to associate with the entity.
+function track.set(name, entity, data)
+	getNamed(name):set(entity, data)
+end
+
+--- Remove an entity from the tracked set of a named tracker.
+-- @tparam string name The name of the tracker.
+-- @tparam entity entity The entity to remove.
+function track.remove(name, entity)
+	getNamed(name):remove(entity)
+end
+
+--- Get the data associated with a tracked entity in a named tracker.
+-- @tparam string name The name of the tracker.
+-- @tparam entity entity The entity to get data for.
+function track.get(name, entity)
+	return getNamed(name):get(entity)
+end
+
+--- Call a function for each tracked entity in a named tracker.
+-- This function has the same concurrency requirements as `tracker:each`.
+-- @tparam string name The name of the tracker.
+-- @param f A `function(entity, data)` to call for each tracked entity.
+function track.each(name, f)
+	getNamed(name):each(f)
+end
+
+--- Check whether any entity in a collection matches a predicate.
+-- This function has the same concurrency requirements as `tracker:any`.
+-- @tparam string name The name of the tracker.
+-- @param f A `function(entity, data)` to call for each tracked entity.
+-- @return The return values of the first invocation of `f` whose first return value was not `nil` or `false`, if any; otherwise `nil`.
+function track.any(name, f)
+	return getNamed(name):any(f)
+end
+
+--- Predefined named trackers.
+-- Entities should not be added or removed from these trackers. They are provided for read access only.
+-- @section named
+
+--- Contains all existing instances of `CpuShip`.
+-- @table cpuship
+
+--- Contains all existing instances of `PlayerSpaceship`.
+-- @table playership
+
+--- Contains all existing instances of `CpuShip` or `PlayerSpaceship`.
+-- @table ship
+
+--- Contains all existing instances of `SpaceStation`.
+-- @table station
+
+--- Contains all existing instances of `ScanProbe`.
+-- @table probe
+
+function fnhook.CpuShip(sh)
+	track.set("cpuship", sh)
+	track.set("ship", sh)
+end
+
+function fnhook.PlayerSpaceship(sh)
+	track.set("playership", sh)
+	track.set("ship", sh)
+end
+
+function fnhook.SpaceStation(st)
+	track.set("station", st)
+end
 
 function hook.on.newPlayerShip(sh)
 	track.set("playership", sh)
 	track.set("ship", sh)
 end
+
+function fnhook.ScanProbe(pr)
+	track.set("probe", pr)
+end
+
 function hook.on.probeLaunch(sh, pr)
 	track.set("probe", pr)
 end
