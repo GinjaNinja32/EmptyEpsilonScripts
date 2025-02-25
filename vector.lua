@@ -222,4 +222,13 @@ do -- Point/vector operations
 
 		return math.sqrt((x1-x2)^2 + (y1-y2)^2)
 	end
+
+	--- Floor the elements of a vector.
+	-- @tparam xy xy The vector to floor.
+	-- @treturn integer The x coordinate of the result.
+	-- @treturn integer The y coordinate of the result.
+	function vector.xyFloor(...)
+		local x, y = getargs("xyFloor", "xy")(...)
+		return math.floor(x), math.floor(y)
+	end
 end
