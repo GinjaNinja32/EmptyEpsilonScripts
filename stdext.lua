@@ -61,3 +61,53 @@ function G.safecall(errorhandler, f, ...)
 		return errorhandler(err, ...)
 	end
 end
+
+--- The options accepted by `string.title`.
+-- @table titleopts
+-- @tfield[opt="^%p%s"] string wchar The set of characters to consider as word characters; the default is any non-punctuation non-space character. See [the Lua manual's patterns section](https://www.lua.org/manual/5.4/manual.html#6.4.1) for details on character sets; the value will be placed in `[]` for use as a character class.
+-- @tfield[opt=string.lower] function lower The function to lowercase the input.
+-- @tfield[opt=string.upper] function upper The function to uppercase the input.
+
+--- Return a copy of the input string with all words changed to title case.
+-- Word characters immediately preceded by a non-word character or the start of the string will be uppercased; all other characters will be lowercased.
+-- @tparam string s The string to titlecase.
+-- @tparam[opt] titleopts opts The options to use.
+-- @treturn string The string with all words changed to title case.
+function string.title(s, opts)
+	opts = opts or {}
+	local wchar = opts.wchar or "^%p%s"
+	local upper = opts.upper or string.upper
+	local lower = opts.lower or string.lower
+
+	return (
+		string.gsub(
+			upper(string.sub(s, 1, 1)) -- Uppercase first char.
+			.. lower(string.sub(s, 2)), -- Lowercase the rest.
+			"%f["..wchar.."]["..wchar.."]", -- Word after non-word...
+			upper -- get uppercased if applicable.
+		)
+	)
+end
+
+--- Split a string by a separator.
+-- @tparam string s The string to split.
+-- @tparam string sep The pattern to split on.
+-- @tparam[opt] integer n The maximum number of times to split the string, or zero/nil for unlimited.
+-- @treturn table A list of all substrings between the separators, including leading/trailing empty strings if the original string contained leading/trailing separators.
+function string.split(s, sep, n)
+	n = n or 0
+
+	local t = {}
+	local i = 1
+	repeat
+		local start, _end = string.find(s, sep, i)
+
+		if start then
+			table.insert(t, string.sub(s, i, start-1))
+			i = _end+1
+			n = n - 1
+		end
+	until not start or n == 0
+	table.insert(t, string.sub(s, i))
+	return t
+end
