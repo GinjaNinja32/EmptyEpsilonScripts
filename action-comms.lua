@@ -42,6 +42,9 @@ G.CommsMenu = ActionBase {
 			setCommsMessage("We have nothing for you.")
 			return
 		end
+		if data.message == "" then
+			return
+		end
 		setCommsMessage(data.message or "[Menu Error]\nno message set")
 	end,
 	_addButton = function(self, button, order, act, source, target)
