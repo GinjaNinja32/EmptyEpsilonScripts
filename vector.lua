@@ -203,6 +203,37 @@ do -- Point/vector operations
 		return x1 + x2, y1 + y2
 	end
 
+	--- Multiply a vector by a scalar.
+	-- @tparam xy v The vector.
+	-- @tparam number s The number to multiply by.
+	-- @treturn number The x coordinate of the result.
+	-- @treturn number The y coordinate of the result.
+	function vector.xyMul(...)
+		local x, y, s = getargs("xyAdd", "xy", "number")(...)
+		return x * s, y * s
+	end
+
+	--- Normalise a vector.
+	-- @tparam xy v The vector.
+	-- @treturn number The x coordinate of the result.
+	-- @treturn number The y coordinate of the result.
+	function vector.xyNormalise(...)
+		local x, y = getargs("xyNormalise", "xy")(...)
+		local m = math.sqrt(x^2 + y^2)
+		if m == 0 then
+			error("zero-length vector passed to normalise()", 2)
+		end
+		return x / m, y / m
+	end
+
+	--- Calculate the length of a vector.
+	-- @tparam xy v The vector.
+	-- @treturn number The length of the vector.
+	function vector.xyLength(...)
+		local x, y = getargs("xyLength", "xy")(...)
+		return math.sqrt(x^2 + y^2)
+	end
+
 	--- Subtract a vector from another, or find the vector between two points.
 	-- @tparam xy v1 The vector to subtract from, or the target point.
 	-- @tparam xy v2 The vector to subtract, or the start point.
