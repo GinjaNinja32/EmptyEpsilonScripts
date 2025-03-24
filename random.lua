@@ -114,6 +114,7 @@ function random.weighted(opts, raw)
 
 	for _, opt in ipairs(optsList) do
 		local weight = opts[opt]
+		if type(weight) ~= "number" then error("non-number weight", 2) end
 		sum = sum + weight
 		table.insert(copts, {sum = sum, opt = opt})
 	end
@@ -143,6 +144,19 @@ function random.removeWeighted(opts, raw)
 		return sel
 	end
 	return table.unpack(sel)
+end
+
+--- Select one option from opts, either as a list or as a table of value-weight pairs depending on opts.
+-- If all keys in opts are consecutive integers, then this function behaves as `random.choice`.
+-- Otherwise, it behaves as `random.weighted`.
+function random.select(opts)
+	local n = #opts
+	for k in pairs(opts) do
+		if type(k) ~= "number" or k > n then
+			return random.weighted(opts)
+		end
+	end
+	return random.choice(opts)
 end
 
 --- Combine a skew factor with a list of options to produce a weighted set of options.
