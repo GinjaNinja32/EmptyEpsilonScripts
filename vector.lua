@@ -26,7 +26,7 @@ function argtypes.rtheta(n, args, ent)
 	if ent then
 		orEnt = ", an entity"
 	end
-	return nil, ("at argument %d: expected two numbers%s, or a table containing two numbers"):format(n, orEnt)
+	return nil, ("expected two numbers%s, or a table containing two numbers"):format(orEnt)
 end
 
 --- A point in a Cartesian coordinate space.
