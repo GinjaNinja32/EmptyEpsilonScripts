@@ -79,7 +79,7 @@ G.mainMenu = ActionBase {
 			return false
 		end
 
-		if item.area and not table.contains(position.area_to_pos[item.area], station) then
+		if item.area and not table.contains(position.area_to_pos[item.area] or {}, station) then
 			return false
 		end
 
