@@ -2,6 +2,7 @@
 -- @pragma nostrip
 
 require "gn32/lang"
+require "gn32/vector"
 
 --- Return a random integer between min and max, inclusive.
 -- This function matches the behaviour of the standard EmptyEpsilon `irandom` function, but uses the seedable RNG provided by this module.
@@ -200,4 +201,26 @@ function random.skewToWeights(skew, opts, middle)
 	end
 
 	return w
+end
+
+--- Generate a random radius on a disc or ring such that the resulting distribution, when combined with a uniform random angle, is uniform in the disc's area.
+-- @tparam[opt] number inner The inner radius of the ring.
+-- @tparam number outer The (outer) radius of the disc or ring.
+-- @treturn number The resulting radius.
+function random.sampleDiscRadius(inner, outer)
+	if outer == nil then
+		inner, outer = 0, inner
+	end
+
+	local f = inner / outer
+	return outer * (f + math.sqrt(random(0, 1) * (1 - f)^2))
+end
+
+--- Generate a uniform random point on a disc or ring.
+-- @tparam[opt] number inner The inner radius of the ring.
+-- @tparam number outer The (outer) radius of the disc or ring.
+-- @treturn number The x coordinate of the result.
+-- @treturn number The y coordinate of the result.
+function random.sampleDisc(inner, outer)
+	return vector.xyFromRadialDeg(random.sampleDiscRadius(inner, outer), random(0, 360))
 end
