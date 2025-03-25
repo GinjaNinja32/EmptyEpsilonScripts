@@ -62,6 +62,9 @@ function G.safecall(errorhandler, f, ...)
 	end
 end
 
+--- string.
+-- @section string
+
 --- The options accepted by `string.title`.
 -- @table titleopts
 -- @tfield[opt="^%p%s"] string wchar The set of characters to consider as word characters; the default is any non-punctuation non-space character. See [the Lua manual's patterns section](https://www.lua.org/manual/5.4/manual.html#6.4.1) for details on character sets; the value will be placed in `[]` for use as a character class.

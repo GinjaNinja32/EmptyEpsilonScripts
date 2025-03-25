@@ -114,11 +114,12 @@ G.getargs = function(fname, ...)
 	return p
 end
 
---- Get a function that parses its args then calls f.
--- `withargs(fname, args, fn)` is equivalent to `function(...) return fn(getargs(fname, table.unpack(args))(...)) end`
+--- Get a function that parses its args then tail-calls f.
+-- `withargs(fname, args, f)` is equivalent to `function(...) return f(getargs(fname, table.unpack(args))(...)) end`
 -- @function withargs
 -- @tparam string fname The name of the function to parse arguments for.
 -- @tparam table args The list of argument types to parse.
+-- @tparam function(...) f The function to call with the parsed arguments.
 -- @treturn function(...) A function that parses its arguments then calls f with the parsed arguments.
 G.withargs = function(fname, args, fn)
 	local p = makeParser(fname, args, 2, 3)
