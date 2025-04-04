@@ -41,6 +41,20 @@ function table.indexOf(tbl, entry)
 	end
 end
 
+--- Merge multiple list-like tables into one new table.
+-- @param ... The tables to merge.
+-- @treturn table The merged table.
+function table.mergeLists(...)
+	local out = {}
+	local i = 1
+	for _, t in ipairs{...} do
+		local l = #t
+		table.move(t, 1, l, i, out)
+		i = i + l
+	end
+	return out
+end
+
 --- global.
 -- @section global
 

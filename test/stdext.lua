@@ -34,6 +34,22 @@ test("stdext/table.contains", function()
 	assert.equal(table.indexOf(t, "h"), nil)
 end)
 
+test("stdext/table.mergeLists", function()
+	local t1 = {1}
+	local t2 = {2, 3}
+	local t3 = {4, 5, 6}
+	local t4 = {7, 8, 9, 10}
+
+	assert.equivalent(table.mergeLists(), {})
+	assert.equivalent(table.mergeLists({}, {}, {}, {}), {})
+
+	assert.equivalent(table.mergeLists(t1), t1)
+	assert.equivalent(table.mergeLists(t1, t2), {1, 2, 3})
+	assert.equivalent(table.mergeLists(t1, t2, t3), {1, 2, 3, 4, 5, 6})
+	assert.equivalent(table.mergeLists(t1, t2, t3, t4), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+	assert.equivalent(table.mergeLists(t4, t2, t1, t3), {7, 8, 9, 10, 2, 3, 1, 4, 5, 6})
+end)
+
 test("stdext/string.title", function()
 	assert.equal(string.title("foo bar baz"), "Foo Bar Baz")
 	assert.equal(string.title("FOO BaR bAZ"), "Foo Bar Baz")
