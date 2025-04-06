@@ -14,9 +14,10 @@ function require(lib)
 	if _LOADED[lib] then return modules[lib] end
 	_LOADED[lib] = true
 
+	local req = lib
 	if not string.find(lib, ".lua", -4) then
-		lib = lib .. ".lua"
+		req = lib .. ".lua"
 	end
-	modules[lib] = orig_require(lib)
+	modules[lib] = orig_require(req)
 	return modules[lib]
 end
