@@ -3,75 +3,85 @@ require "gn32/utils"
 
 require "gn32/track"
 
-local function getEnts(name)
-	local t = {}
-	track.each(name, function(e) table.insert(t, e) end)
-	return t
+local function getEnts(tracker)
+	local t1 = {}
+	tracker:each(function(e) table.insert(t1, e) end)
+
+	local t2 = {}
+	for e in pairs(tracker) do table.insert(t2, e) end
+
+	assert.equivalent(t1, t2)
+
+	return t1
 end
 
 test("track", function()
+	local foo = Tracker()
+	local bar = Tracker()
+	local baz = Tracker()
+
 	local e1 = Entity():setCallSign("e1")
 	local e2 = Entity():setCallSign("e2")
 
-	track.set("foo", e1, "e1f")
-	track.set("foo", e2, "e2f")
-	track.set("bar", e1, "e1b")
+	foo:set(e1, "e1f")
+	foo:set(e2, "e2f")
+	bar:set(e1, "e1b")
 
-	assert(track.get("foo", e1) == "e1f")
-	assert(track.get("foo", e2) == "e2f")
-	assert(track.get("bar", e1) == "e1b")
-	assert(track.get("bar", e2) == nil)
+	assert(foo:get(e1) == "e1f")
+	assert(foo:get(e2) == "e2f")
+	assert(bar:get(e1) == "e1b")
+	assert(bar:get(e2) == nil)
 
-	assert(table.equals(getEnts("foo"), {e1, e2}))
-	assert(table.equals(getEnts("bar"), {e1}))
-	assert(table.equals(getEnts("baz"), {}))
+	assert(table.equals(getEnts(foo), {e1, e2}))
+	assert(table.equals(getEnts(bar), {e1}))
+	assert(table.equals(getEnts(baz), {}))
 
 	local visited = {}
-	track.each("foo", function(e) table.insert(visited, e) end)
+	foo:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {e1, e2}))
 
 	local visited = {}
-	track.each("bar", function(e) table.insert(visited, e) end)
+	bar:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {e1}))
 
 	local visited = {}
-	track.each("baz", function(e) table.insert(visited, e) end)
+	baz:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {}))
 
 	e1:destroy()
 
-	assert(track.get("foo", e1) == nil)
-	assert(track.get("foo", e2) == "e2f")
-	assert(track.get("bar", e1) == nil)
-	assert(track.get("bar", e2) == nil)
+	assert(foo:get(e1) == nil)
+	assert(foo:get(e2) == "e2f")
+	assert(bar:get(e1) == nil)
+	assert(bar:get(e2) == nil)
 
 	local visited = {}
-	track.each("foo", function(e) table.insert(visited, e) end)
+	foo:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {e2}))
 
 	local visited = {}
-	track.each("bar", function(e) table.insert(visited, e) end)
+	bar:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {}))
 
 	local visited = {}
-	track.each("baz", function(e) table.insert(visited, e) end)
+	baz:each(function(e) table.insert(visited, e) end)
 	assert(table.equals(visited, {}))
 
 	e1 = Entity():setCallSign("e1")
 
 	local list = {[e1]=1, [e2]=2}
 	local N = 10
-	track.set("foo", e1)
-	track.set("foo", e2)
+	foo:set(e1)
+	foo:set(e2)
 	for i = 3, N do
 		local e = Entity():setCallSign("e" .. tostring(i))
 		list[e] = i
-		track.set("foo", e)
+		foo:set(e)
 	end
 
-	assert.equal(N, #getEnts("foo"))
+	assert.equal(N, #getEnts(foo))
 
-	track.each("foo", function(e) e:destroy() end)
+	foo:each(function(e) e:destroy() end)
 
-	assert.equal(0, #getEnts("foo"))
+	assert.equal(0, #getEnts(foo))
 end)

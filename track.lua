@@ -26,8 +26,8 @@ local function assertEntity(e)
 	end
 end
 
-local tracker
-G.Tracker, tracker = makeClass()
+local tracker, tracker_mt
+G.Tracker, tracker, tracker_mt = makeClass()
 
 --- Tracker
 -- @section tracker
@@ -78,31 +78,37 @@ function tracker:get(entity)
 	return self.data[entity]
 end
 
+tracker_mt.__pairs = function(self)
+	local idx = 1
+	return function(self, last)
+		if self.entities[idx] == last then
+			idx = idx + 1
+		end
+
+		local ent = self.entities[idx]
+		while ent and not checkEntity(ent) do
+			table.remove(self.entities, idx)
+			self.data[ent] = nil
+			ent = self.entities[idx]
+		end
+		if not ent then
+			return nil
+		end
+		return ent, self.data[ent]
+	end, self, nil
+end
+
 --- Call a function for each tracked entity.
 -- Entities may not be added or removed from the tracked set during execution, with the exception that `f` may remove its argument entity from the tracked set.
+--
+-- Note that trackers support `pairs`, iterating the same data; this function is equivalent to:
+-- 	for entity, data in pairs(tracker) do
+-- 		f(entity, data)
+-- 	end
 -- @param f A `function(entity, data)` to call for each tracked entity.
 function tracker:each(f)
-	-- manual loop rather than ipairs to enable removing data during iteration
-
-	local i = 1
-	local ent = nil
-	while true do
-		if self.entities[i] == ent then
-			i = i + 1
-		end
-
-		ent = self.entities[i]
-		while ent and not checkEntity(ent) do
-			table.remove(self.entities, i)
-			self.data[ent] = nil
-			ent = self.entities[i]
-		end
-
-		if ent == nil then
-			break
-		end
-
-		f(ent, self.data[ent])
+	for e, d in pairs(self) do
+		f(e, d)
 	end
 end
 
@@ -111,19 +117,8 @@ end
 -- @param f A `function(entity, data)` to call for each tracked entity.
 -- @return The return values of the first invocation of `f` whose first return value was not `nil` or `false`, if any; otherwise `nil`.
 function tracker:any(f)
-	local i = 1
-	while true do
-		local ent = self.entities[i]
-		while ent and not checkEntity(ent) do
-			table.remove(self.entities, i)
-			self.data[ent] = nil
-			ent = self.entities[i]
-		end
-		if not ent then
-			break
-		end
-
-		local vals = {f(ent, self.data[ent])}
+	for e, d in pairs(self) do
+		local vals = {f(e, d)}
 		if vals[1] then
 			return table.unpack(vals)
 		end
