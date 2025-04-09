@@ -4,46 +4,17 @@
 -- require "gn32/utils"
 
 -- utils for EE functions
-local function makeCallback(asMethod)
+local function makeCallback()
 	local cb
 
-	local set
-	if asMethod then
-		set = function(self, callback)
-			cb = callback
-		end
-	else
-		set = function(callback)
-			cb = callback
-		end
+	local set = function(callback)
+		cb = callback
 	end
 	local trigger = function(...)
 		if cb then cb(...) end
 	end
 
 	return set, trigger
-end
-local function makeGetSet(asMethod, argn, ...)
-	local v = {...}
-
-	local get = function()
-		return table.unpack(v)
-	end
-	local set = function(...)
-		v = {}
-		table.move({...}, 1, argn, 1, v)
-	end
-
-	if not asMethod then
-		return get, set
-	end
-
-	return
-		function(e) return get() end,
-		function(e, ...) set(...); return e end
-end
-local function addGetSet(ent, field, argn, ...)
-	ent["get"..field], ent["set"..field] = makeGetSet(true, argn, ...)
 end
 
 
@@ -79,108 +50,113 @@ function G.removeGMFunction(name)
 	end
 end
 
--- Entity
-function G.Entity()
-	local e = {}
+local entity = {}
+local entity_mt = {__index=entity}
 
-	function e:isValid()
-		return not self.destroyed
+local function add_cb(target, onAction, act, extra_fn)
+	local cb_key = "cb_" .. act
+	target[onAction] = function(self, cb)
+		self[cb_key] = cb
+		return self
 	end
-	local onDestroy
-	function e:onDestroyed(cb)
-		onDestroy = cb
+	target[act] = function(self, ...)
+		if extra_fn then extra_fn(self) end
+		if self[cb_key] then self[cb_key](self, ...) end
 	end
-	function e:destroy()
-		self.destroyed = true
-		if onDestroy then onDestroy(e) end
+end
+local function add_getset(target, field, argn, ...)
+	target[field] = {...}
+	target["get"..field] = function(self)
+		return table.unpack(self[field])
 	end
-
-	e.onDestruction, e.destruct = makeCallback(true)
-	e.onExpiration,  e.expire   = makeCallback(true)
-
-	addGetSet(e, "Velocity",        2, 0, 0)
-	addGetSet(e, "AngularVelocity", 1, 0)
-	addGetSet(e, "Position",        2, 0, 0)
-	addGetSet(e, "Rotation",        1, 0)
-	addGetSet(e, "CallSign",        1, nil)
-
-	return e
+	target["set"..field] = function(self, ...)
+		local t = {}
+		table.move({...}, 1, argn, 1, t)
+		self[field] = t
+		return self
+	end
 end
 
+-- Entity
+function entity:isValid() return not self.destroyed end
+add_cb(entity, "onDestroyed", "destroy", function(e) e.destroyed = true end)
+add_cb(entity, "onDestruction", "destruct")
+add_cb(entity, "onExpiration", "expire")
+add_getset(entity, "Velocity", 2, 0, 0)
+add_getset(entity, "AngularVelocity", 1, 0)
+add_getset(entity, "Position", 2, 0, 0)
+add_getset(entity, "Rotation", 1, 0)
+add_getset(entity, "CallSign", 1, nil)
+
+local upvalueid = debug.upvalueid
+
+function G.Entity()
+	local ptr; ptr = upvalueid(function() return ptr end, 1)
+	return setmetatable({__ptr=ptr}, entity_mt)
+end
+
+-- STBO
+local stbo = setmetatable({}, entity_mt)
+local stbo_mt = {__index=stbo}
+
+add_getset(stbo, "Hull", 1, 0)
+add_getset(stbo, "HullMax", 1, 0)
+
+function stbo:getSystemData(sys)
+	if self.systems == nil then
+		self.systems = {}
+	end
+	if self.systems[sys] == nil then
+		self.systems[sys] = {}
+	end
+	return self.systems[sys]
+end
+local function add_system_getset(field, default)
+	stbo["getSystem"..field] = function(self, sys)
+		return self:getSystemData(sys)[field] or default
+	end
+	stbo["setSystem"..field] = function(self, sys, v)
+		self:getSystemData(sys)[field] = v
+		return self
+	end
+end
+
+add_system_getset("HealthMax", 1)
+add_system_getset("Health", 1)
+add_system_getset("Power", 1)
+add_system_getset("PowerRequest", 1) -- gn32-script only
+
 function G.STBO()
-	local s = Entity():setCallSign("STBO" .. math.random(100, 999))
-
-	addGetSet(s, "Hull", 1, 0)
-	addGetSet(s, "HullMax", 1, 0)
-
-	s.systemData = {}
-	s.getSystemData = function(s, sys)
-		if not s.systemData[sys] then
-			s.systemData[sys] = {}
-		end
-		return s.systemData[sys]
-	end
-
-	function s:getSystemHealthMax(sys)
-		return self:getSystemData(sys).max or 1
-	end
-	function s:setSystemHealthMax(sys, h)
-		self:getSystemData(sys).max = h
-		return self
-	end
-	function s:getSystemHealth(sys)
-		return self:getSystemData(sys).cur or 1
-	end
-	function s:setSystemHealth(sys, h)
-		self:getSystemData(sys).cur = h
-		return self
-	end
-
-	function s:setSystemPower(sys, p)
-		self:getSystemData(sys).power = p
-		return self
-	end
-	function s:getSystemPower(sys)
-		return self:getSystemData(sys).power or 1
-	end
-	function s:setSystemPowerRequest(sys, p)
-		self:getSystemData(sys).power_req = p
-		return self
-	end
-	function s:getSystemPowerRequest(sys) -- TODO gn32-script branch only
-		return self:getSystemData(sys).power_req or 1
-	end
-
-	return s
+	return setmetatable({}, stbo_mt)
+		:setCallSign("STBO" .. math.random(100, 999))
 end
 
 -- SpaceStation
 function G.SpaceStation()
-	local s = STBO():setCallSign("SS" .. math.random(100, 999))
-
-	return s
+	return setmetatable({}, stbo_mt)
+		:setCallSign("SS" .. math.random(100, 999))
 end
 
 -- SpaceShip
+local spaceship = setmetatable({}, stbo_mt)
+local spaceship_mt = {__index=spaceship}
+
+add_getset(spaceship, "Energy", 1, 0)
+add_getset(spaceship, "MaxEnergy", 1, 0)
+add_getset(spaceship, "DockedWith", 1, nil)
+
 function G.SpaceShip()
-	local s = STBO():setCallSign("SH" .. math.random(100, 999))
-
-	addGetSet(s, "Energy", 1, 0)
-	addGetSet(s, "MaxEnergy", 1, 0)
-
-	addGetSet(s, "DockedWith", 1, nil)
-
-	return s
+	return setmetatable({}, spaceship_mt)
+		:setCallSign("SH" .. math.random(100, 999))
 end
 
 -- CpuShip
 function G.CpuShip()
-	local s = SpaceShip():setCallSign("CPU" .. math.random(100, 999))
-
-	return s
+	return setmetatable({}, spaceship_mt)
+		:setCallSign("CPU" .. math.random(100, 999))
 end
 
--- PlayerShip
+-- PlayerSpaceship
 G.onNewPlayerShip, G.newPlayerShip = makeCallback()
 G.activePlayerShips = {}
 
@@ -188,52 +164,56 @@ function G.getActivePlayerShips()
 	return activePlayerShips
 end
 
+local playership = setmetatable({}, spaceship_mt)
+local playership_mt = {__index=playership}
+
 function G.PlayerSpaceship()
-	local s = SpaceShip():setCallSign("PS" .. math.random(100, 999))
+	return setmetatable({}, playership_mt)
+		:setCallSign("PS" .. math.random(100, 999))
+end
 
-	s.onProbeLaunch, s.probeLaunch = makeCallback(true)
+add_cb(playership, "onProbeLaunch", "probeLaunch")
 
-	addGetSet(s, "MaxCoolant", 1, 10)
-	addGetSet(s, "MaxScanProbeCount", 1, 10)
-	addGetSet(s, "ScanProbeCount", 1, 10)
+add_getset(playership, "MaxCoolant", 1, 10)
+add_getset(playership, "MaxScanProbeCount", 1, 10)
+add_getset(playership, "ScanProbeCount", 1, 10)
 
-	s.customButtons = {}
-	function s:addCustomButton(station, id, button, action)
-		for _, v in ipairs(self.customButtons) do
-			if v.id == id then
-				v.station = station
-				v.button = button
-				v.action = action
-				v.info = nil
-				return
-			end
-		end
-
-		table.insert(self.customButtons, {id=id, station=station, button=button, action=action})
-	end
-	function s:addCustomInfo(station, id, info)
-		for _, v in ipairs(self.customButtons) do
-			if v.id == id then
-				v.station = station
-				v.button = nil
-				v.action = nil
-				v.info = info
-				return
-			end
-		end
-
-		table.insert(self.customButtons, {id=id, station=station, info=info})
-	end
-	function s:removeCustom(id)
-		for i, v in ipairs(self.customButtons) do
-			if v.id == id then
-				table.remove(self.customButtons, i)
-				return
-			end
+function playership:addCustomButton(station, id, button, action)
+	if not self.customButtons then self.customButtons = {} end
+	for _, v in ipairs(self.customButtons) do
+		if v.id == id then
+			v.station = station
+			v.button = button
+			v.action = action
+			v.info = nil
+			return
 		end
 	end
 
-	return s
+	table.insert(self.customButtons, {id=id, station=station, button=button, action=action})
+end
+function playership:addCustomInfo(station, id, info)
+	if not self.customButtons then self.customButtons = {} end
+	for _, v in ipairs(self.customButtons) do
+		if v.id == id then
+			v.station = station
+			v.button = nil
+			v.action = nil
+			v.info = info
+			return
+		end
+	end
+
+	table.insert(self.customButtons, {id=id, station=station, info=info})
+end
+function playership:removeCustom(id)
+	if not self.customButtons then return end
+	for i, v in ipairs(self.customButtons) do
+		if v.id == id then
+			table.remove(self.customButtons, i)
+			return
+		end
+	end
 end
 
 -- comms

@@ -1,7 +1,6 @@
 require "gn32/lang-strict"
-require "gn32/debug"
-
 require "gn32/test/min-ee"
+require "gn32/debug"
 
 G.testcode = 0
 
@@ -45,12 +44,14 @@ local function rawEquivalent(a, b, checked, path, path_idx, why)
 	end
 
 	if type(a) ~= type(b) then
+		path[path_idx] = nil
 		why(path, a, b)
 		return false
 	end
 
 	if type(a) ~= "table" then
 		if a ~= b then
+			path[path_idx] = nil
 			why(path, a, b)
 			return false
 		end
@@ -113,7 +114,7 @@ assert = setmetatable({}, {
 						p = debug.dump(e)
 					end
 				end
-				err = "values not equivalent at " .. (p or "$root") .. ": " .. debug.dump(x) .. " ~= " .. debug.dump(y) .. "\na = " .. debug.dump(a, "\n", "  ") .. "\nb = " .. debug.dump(b, "\n", "  ")
+				err = "values not equivalent at " .. (p or "$root") .. ": " .. debug.dump(x) .. " ~= " .. debug.dump(y) .. "\na = " .. debug.dump(a, true) .. "\nb = " .. debug.dump(b, true)
 			end) then
 				error(err, 2)
 			end

@@ -93,46 +93,46 @@ test("persistence.entity", function()
 	do -- Load sysHealth
 		local e2 = STBO()
 		persistence.entity.load(e2, {"sysHealth"}, {sH={[6]=0.9}, sh={0.5, nil, 0.8}})
-		assert.equivalent(e2.systemData, {
-			reactor       = { cur = 0.5 },
-			beamweapons   = { cur = 1.0 },
-			missilesystem = { cur = 0.8 },
-			maneuver      = { cur = 1.0 },
-			impulse       = { cur = 1.0 },
-			warp          = { cur = 1.0 },
-			jumpdrive     = { cur = 1.0 },
-			frontshield   = { cur = 1.0 },
-			rearshield    = { cur = 1.0 },
+		assert.equivalent(e2.systems, {
+			reactor       = { Health = 0.5 },
+			beamweapons   = { Health = 1.0 },
+			missilesystem = { Health = 0.8 },
+			maneuver      = { Health = 1.0 },
+			impulse       = { Health = 1.0 },
+			warp          = { Health = 1.0 },
+			jumpdrive     = { Health = 1.0 },
+			frontshield   = { Health = 1.0 },
+			rearshield    = { Health = 1.0 },
 		})
 	end
 	do -- Load sysHealthMax
 		local e2 = STBO()
 		persistence.entity.load(e2, {"sysHealthMax"}, {sH={[6]=0.9}, sh={0.5, nil, 0.8}})
-		assert.equivalent(e2.systemData, {
-			reactor       = { max = 1.0 },
-			beamweapons   = { max = 1.0 },
-			missilesystem = { max = 1.0 },
-			maneuver      = { max = 1.0 },
-			impulse       = { max = 1.0 },
-			warp          = { max = 0.9 },
-			jumpdrive     = { max = 1.0 },
-			frontshield   = { max = 1.0 },
-			rearshield    = { max = 1.0 },
+		assert.equivalent(e2.systems, {
+			reactor       = { HealthMax = 1.0 },
+			beamweapons   = { HealthMax = 1.0 },
+			missilesystem = { HealthMax = 1.0 },
+			maneuver      = { HealthMax = 1.0 },
+			impulse       = { HealthMax = 1.0 },
+			warp          = { HealthMax = 0.9 },
+			jumpdrive     = { HealthMax = 1.0 },
+			frontshield   = { HealthMax = 1.0 },
+			rearshield    = { HealthMax = 1.0 },
 		})
 	end
 	do -- Load sysHealthMax, sysHealth
 		local e2 = STBO()
 		persistence.entity.load(e2, {"sysHealthMax", "sysHealth"}, {sH={[6]=0.9}, sh={0.5, nil, 0.8}})
-		assert.equivalent(e2.systemData, {
-			reactor       = { max = 1.0, cur = 0.5 },
-			beamweapons   = { max = 1.0, cur = 1.0 },
-			missilesystem = { max = 1.0, cur = 0.8 },
-			maneuver      = { max = 1.0, cur = 1.0 },
-			impulse       = { max = 1.0, cur = 1.0 },
-			warp          = { max = 0.9, cur = 0.9 },
-			jumpdrive     = { max = 1.0, cur = 1.0 },
-			frontshield   = { max = 1.0, cur = 1.0 },
-			rearshield    = { max = 1.0, cur = 1.0 },
+		assert.equivalent(e2.systems, {
+			reactor       = { HealthMax = 1.0, Health = 0.5 },
+			beamweapons   = { HealthMax = 1.0, Health = 1.0 },
+			missilesystem = { HealthMax = 1.0, Health = 0.8 },
+			maneuver      = { HealthMax = 1.0, Health = 1.0 },
+			impulse       = { HealthMax = 1.0, Health = 1.0 },
+			warp          = { HealthMax = 0.9, Health = 0.9 },
+			jumpdrive     = { HealthMax = 1.0, Health = 1.0 },
+			frontshield   = { HealthMax = 1.0, Health = 1.0 },
+			rearshield    = { HealthMax = 1.0, Health = 1.0 },
 		})
 	end
 end)
