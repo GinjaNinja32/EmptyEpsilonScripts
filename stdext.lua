@@ -55,6 +55,26 @@ function table.mergeLists(...)
 	return out
 end
 
+--- Check whether all keys and values are equal in two tables.
+-- @tparam table a The first table to check.
+-- @tparam table b The second table to check.
+-- @treturn bool True if all keys and values are equal in the two tables, i.e. there is no value v such that `a[v] ~= b[v]`.
+function table.equals(a, b)
+	-- lazy method: iterate both tables
+	for k, v in pairs(a) do
+		if b[k] ~= v then
+			return false
+		end
+	end
+	for k, v in pairs(b) do
+		if a[k] ~= v then
+			return false
+		end
+	end
+
+	return true
+end
+
 --- global.
 -- @section global
 

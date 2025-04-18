@@ -1,5 +1,5 @@
 require "gn32/test/test"
-require "gn32/utils"
+require "gn32/stdext"
 
 require "gn32/track"
 
