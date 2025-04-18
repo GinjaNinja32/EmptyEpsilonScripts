@@ -49,12 +49,12 @@ jobs:
         run: cd gn32 && make docs
 
       - name: Upload artifact
-        if: ${{ github.ref == "refs/heads/master" }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./gn32/docs
 
       - name: Deploy to GitHub Pages
-        if: ${{ github.ref == "refs/heads/master" }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: deployment
         uses: actions/deploy-pages@v4
