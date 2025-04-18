@@ -26,6 +26,7 @@ jobs:
           path: ./gn32
 
       - name: Checkout batteries
+        uses: actions/checkout@v4
         with:
           repository: 1bardesign/batteries
           path: ./batteries
