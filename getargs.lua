@@ -87,7 +87,7 @@ local function parse(fname, defids, defs, err_n, ...)
 		error(("%s: bad args %s: at argument %d: too many arguments"):format(formatExpected(fname, defids), formatActual(defids, args), ncur-noff), err_n)
 	end
 
-	return table.unpack(res, 1, rcur)
+	return table.unpack(res, 1, rcur-1)
 end
 
 local function makeParser(fname, defids, defids_err_n, err_n)

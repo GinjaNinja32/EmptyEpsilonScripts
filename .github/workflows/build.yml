@@ -1,4 +1,4 @@
-name: LDoc to GitHub Pages
+name: Build
 on:
   push:
     branches: [ "master" ]
@@ -23,7 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ./ees
+          path: ./gn32
+
+      - name: Checkout batteries
+        with:
+          repository: 1bardesign/batteries
+          path: ./batteries
 
       - name: Setup Lua
         uses: leafo/gh-actions-lua@v8
@@ -36,14 +41,19 @@ jobs:
       - name: Setup dependencies
         run: luarocks install ldoc
 
+      - name: Run tests
+        run: cd gn32 && make ci
+
       - name: Build docs
-        run: cd ees && make docs
+        run: cd gn32 && make docs
 
       - name: Upload artifact
+        if: ${{ github.ref == "refs/heads/master" }}
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./ees/docs
+          path: ./gn32/docs
 
       - name: Deploy to GitHub Pages
+        if: ${{ github.ref == "refs/heads/master" }}
         id: deployment
         uses: actions/deploy-pages@v4

@@ -26,7 +26,9 @@ function G.test(name, f)
 		end
 	end
 
-	if ok then
+	if ok and err == "SKIP" then
+		testPrint(name .. " SKIP")
+	elseif ok then
 		testPrint(name .. " OK")
 	else
 		if err == nil then err = "<nil>" end
