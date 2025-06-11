@@ -209,7 +209,13 @@ actionbase = {
 
 		while true do
 			if type(menu) == "function" then
-				menu = safecall(errhandler, menu, reopen, ...)
+				local ok, ret = pcall(menu, reopen, ...)
+				if ok then
+					menu = ret
+				else
+					menu = errhandler(ret)
+					base = menu
+				end
 
 			elseif menu == false or menu == 0 then
 				menu = data.currentMenu
