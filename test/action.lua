@@ -380,6 +380,10 @@ test("action/main", function()
 			{button = "Empty", action = function() return {} end},
 			{button = "Entries", action = function() return entries end},
 			{button = "Error", action = function() strerror("bang") end},
+			{button = "Error or False", action = function(reopen)
+				if not reopen then strerror("bang") end
+				return false
+			end},
 		},
 	}
 	mainMenu:add {
@@ -534,6 +538,7 @@ test("action/main", function()
 		{ id="bEngineering3", station="Engineering", button="Empty", action=equivalentAny },
 		{ id="bEngineering4", station="Engineering", button="Entries", action=equivalentAny },
 		{ id="bEngineering5", station="Engineering", button="Error", action=equivalentAny },
+		{ id="bEngineering6", station="Engineering", button="Error or False", action=equivalentAny },
 	}
 
 	local emptyMenu = {
@@ -684,6 +689,15 @@ test("action/main", function()
 	press "Error"
 	assert.equivalent(ship.customButtons, errorMenu)
 	assert.equivalent(consumePrinted(), {{"Menu error: bang"}})
+	press "Home"
+	assert.equivalent(ship.customButtons, homeMenu)
+
+	press "Function Action"
+	assert.equivalent(ship.customButtons, functionMenu)
+	press "Error or False"
+	assert.equivalent(ship.customButtons, errorMenu)
+	assert.equivalent(consumePrinted(), {{"Menu error: bang"}})
+	mainMenu:refreshMenu(ship, "Engineering")
 	press "Home"
 	assert.equivalent(ship.customButtons, homeMenu)
 
