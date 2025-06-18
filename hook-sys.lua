@@ -2,11 +2,14 @@
 -- Anywhere the text EVENT appears in the function documentation below, this should be substituted for the name of an event, such as `init` or `destroyed`.
 
 require "gn32/lang"
+require "gn32/debug"
 
 G.hook = {}
 
 local registered = {}
 local registeredAfter = {}
+
+local functionSource = setmetatable({}, {__mode="k"})
 
 hook.entityEventRegistrationName = {}
 hook.entityEventCallbackPath = {}
@@ -114,18 +117,19 @@ hook.entity = setmetatable({}, {
 -- @param callback The callback to register.
 hook.on = setmetatable({}, {
 	__index = function(t, event)
-		return function(callback)
+		return function(callback, n)
 			if registered[event] == nil then
 				registered[event] = {}
 			end
 
 			table.insert(registered[event], callback)
+			functionSource[callback] = debug.caller(n or 2)
 
 			return hook
 		end
 	end,
 	__newindex = function(t, event, callback)
-		hook.on[event](callback)
+		hook.on[event](callback, 3)
 	end
 })
 
@@ -140,6 +144,7 @@ hook.after = setmetatable({}, {
 			end
 
 			table.insert(registeredAfter[event], callback)
+			functionSource[callback] = debug.caller(2)
 
 			return hook
 		end
@@ -156,8 +161,10 @@ hook.trigger = setmetatable({}, {
 	__index = function(t, event)
 		return function(...)
 			local results = {}
+			if debug.enabled.hook then print("[hook: " .. event .. "]", "trigger") end
 			if registered[event] then
-				for _, c in ipairs(registered[event]) do
+				for i, c in ipairs(registered[event]) do
+					if debug.enabled.hook then print("[hook: " .. event .. "]", "invoke handler", i .. "/" .. #registered[event], "from", functionSource[c]) end
 					local ok, res = pcall(c, ...)
 					if not ok then
 						print("Hook error:", event, res)
@@ -167,7 +174,8 @@ hook.trigger = setmetatable({}, {
 				end
 			end
 			if registeredAfter[event] then
-				for _, c in ipairs(registeredAfter[event]) do
+				for i, c in ipairs(registeredAfter[event]) do
+					if debug.enabled.hook then print("[hook: " .. event .. "]", "invoke after-handler", i .. "/" .. #registeredAfter[event], "from", functionSource[c]) end
 					local ok, res = pcall(c, ...)
 					if not ok then
 						print("Hook error:", event, res)
@@ -175,6 +183,7 @@ hook.trigger = setmetatable({}, {
 				end
 			end
 
+			if debug.enabled.hook then print("[hook: " .. event .. "]", "done") end
 			return results
 		end
 	end,
@@ -191,6 +200,7 @@ local addTimer = function(_, time, fn)
 		interval = time,
 		next = getScenarioTime(),
 		fn = fn,
+		source = debug.caller(2),
 	})
 end
 
@@ -207,6 +217,7 @@ hook.afterDelay = function(time, fn)
 	table.insert(timers, {
 		next = getScenarioTime() + time,
 		fn = fn,
+		source = debug.caller(2),
 	})
 end
 
@@ -219,6 +230,7 @@ function hook.on.update(delta)
 			else
 				timers[idx] = nil
 			end
+			if debug.enabled.hook then print("[hook timer]", "invoke handler", idx .. "/" .. #timers, "from", timer.source) end
 			local ok, res = pcall(timer.fn)
 			if not ok then
 				print("Timer error:", res)
