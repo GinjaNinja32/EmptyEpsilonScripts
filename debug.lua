@@ -160,3 +160,23 @@ function debug.dump(t, indent)
 
 	return dump(t, id, nlids, {})
 end
+
+--- Get the file:line source of the function call at position `n` in the stack.
+-- The value of `n` is interpreted equivalently to `error`'s `level` parameter, i.e. 0 returns a file:line within `debug.caller`, 1 returns the file:line where `debug.caller` was invoked, 2 returns the file:line where _that_ function was invoked, etc.
+-- @tparam number n The position in the stack trace to get the source location for.
+-- @treturn string The file and line of the function call at the given position, or the string `"unknown"` if no file and line are available.
+function debug.caller(n)
+	local _, err = pcall(error, "", n+2)
+
+	-- legacy EE pattern
+	local file, line = string.match(err, "^%[string \"([^\"]+)\"%]:(%d+):")
+	if file and line then return file .. ":" .. line end
+
+	-- standard Lua pattern
+	file, line = string.match(err, "([^:]+):(%d+):")
+	if file and line then return file .. ":" .. line end
+
+	-- what did we get?
+	print("debug.caller: unknown error pattern in string '" .. err .. "'")
+	return "unknown"
+end
