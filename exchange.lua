@@ -35,6 +35,13 @@ G.exchange = {}
 
 local sourcesList = {}
 
+exchange.resourceListSchema = {
+	_keys = {
+		_type = "string",
+		_check = function(v) return sourcesList[v] ~= nil end
+	},
+}
+
 -- define functions first so that it goes above sources in the output
 
 --- Functions.
