@@ -249,7 +249,7 @@ function procmap:_process(budget)
 	end
 
 	if self.probeRadius then
-		track.any("probe", function(probe)
+		for probe in track.pairs("probe") do
 			local px, py = probe:getPosition()
 
 			local rr = 5000 -- probe radar range fixed in code
@@ -260,13 +260,12 @@ function procmap:_process(budget)
 				for y = cy0, cy1 do
 					if self:load(x, y) then
 						budget = budget - self.opCost
-						if budget <= 0 then return true end -- break out of `track.any`, recheck budget afterwards
+						if budget <= 0 then return budget end
 					end
 					keep[_key(x, y)] = true
 				end
 			end
-		end)
-		if budget <= 0 then return budget end
+		end
 	end
 
 	if self.unloadRadius then

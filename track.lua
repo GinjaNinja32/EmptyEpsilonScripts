@@ -29,7 +29,10 @@ end
 local tracker, tracker_mt
 G.Tracker, tracker, tracker_mt = makeClass()
 
---- Tracker
+--- Tracker.
+-- Tracks a set of entities, with optional data associated with each tracked entity. Deleted entities are automatically removed.
+--
+-- Tracker supports `pairs()`, producing `entity, data` pairs. Entities may not be added or removed from the tracked set during execution of such a loop, with the exception that the current iteration's `entity` may be removed from the tracked set.
 -- @section tracker
 
 --- Create a new entity tracker.
@@ -178,6 +181,14 @@ end
 -- @return The return values of the first invocation of `f` whose first return value was not `nil` or `false`, if any; otherwise `nil`.
 function track.any(name, f)
 	return getNamed(name):any(f)
+end
+
+--- Iterate over entities in a collection.
+-- This function has the same concurrency requirements as `pairs(tracker)`.
+-- @tparam string name The name of the tracker.
+-- @return Values suitable for an iteration loop `for entity, data in track.pairs(...) do`
+function track.pairs(name)
+	return pairs(getNamed(name))
 end
 
 --- Predefined named trackers.
