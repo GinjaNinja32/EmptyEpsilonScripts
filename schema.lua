@@ -176,7 +176,7 @@ local function getSchemaMetatable(sch)
 					local e = schema.checkValue(k, sch._keys)
 					if e ~= nil then error(("%s%s (key): %s"):format(tbl[pathIndex], tostring(k), e), 2) end
 				end
-				if sch._values then
+				if v ~= nil and sch._values then
 					local e = schema.checkValue(v, sch._values)
 					if e ~= nil then error(("%s%s: %s"):format(tbl[pathIndex], tostring(k), e), 2) end
 				end

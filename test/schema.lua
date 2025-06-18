@@ -95,9 +95,10 @@ test("schema", function()
 	t.with_ge = 1
 	t.with_le = 100
 	t.nested = {foo="x", bar=2}
-	t.kv = {foo=1, bar=2}
+	t.kv = {foo=1, bar=2, baz=3}
 	t.kvkv = {foo={bar=2}, baz={stuff=3,more=4}}
 	t.kvkv = {foo={bar=2}}
+	t.kv.baz = nil
 
 	local function copyvalue(val)
 		if type(val) ~= "table" then
@@ -132,20 +133,20 @@ test("schema", function()
 		kvkv = {foo = {bar = 2}}
 	})
 
-	assert.error(function() t.nodefault = "foo"  end, "./gn32/test/schema.lua:%d+: nodefault: bad type string: expected number")
-	assert.error(function() t.with_ge = 0        end, "./gn32/test/schema.lua:%d+: with_ge: bad value 0: expected value >= 1")
-	assert.error(function() t.with_le = 101      end, "./gn32/test/schema.lua:%d+: with_le: bad value 101: expected value <= 100")
-	assert.error(function() t.nested = {foo="y"} end, "./gn32/test/schema.lua:%d+: nested: bar: field is required, expected number")
-	assert.error(function() t.nested.foo = 3     end, "./gn32/test/schema.lua:%d+: nested%.foo: bad type number: expected string")
-	assert.error(function() t.nested.baz = 4     end, "./gn32/test/schema.lua:%d+: nested%.baz: field not defined")
-	assert.error(function() t.kv = {1}           end, "./gn32/test/schema.lua:%d+: kv.1 %(key%): bad type number: expected string")
-	assert.error(function() t.kv.foo = "bar"     end, "./gn32/test/schema.lua:%d+: kv.foo: bad type string: expected number")
-	assert.error(function() t.kv[1] = 1          end, "./gn32/test/schema.lua:%d+: kv.1 %(key%): bad type number: expected string")
-	assert.error(function() t.kvkv = {f=1}       end, "./gn32/test/schema.lua:%d+: kvkv.f: bad type number: expected table")
-	assert.error(function() t.kvkv = {f={1}}     end, "./gn32/test/schema.lua:%d+: kvkv.f: 1 %(key%): bad type number: expected string")
-	assert.error(function() t.kvkv = {f={b="x"}} end, "./gn32/test/schema.lua:%d+: kvkv.f: b: bad type string: expected number")
-	assert.error(function() t.kvkv.f = {1}       end, "./gn32/test/schema.lua:%d+: kvkv.f: 1 %(key%): bad type number: expected string")
-	assert.error(function() t.kvkv.f = {b="x"}   end, "./gn32/test/schema.lua:%d+: kvkv.f: b: bad type string: expected number")
+	assert.errorat(function() t.nodefault = "foo"  end, "nodefault: bad type string: expected number")
+	assert.errorat(function() t.with_ge = 0        end, "with_ge: bad value 0: expected value >= 1")
+	assert.errorat(function() t.with_le = 101      end, "with_le: bad value 101: expected value <= 100")
+	assert.errorat(function() t.nested = {foo="y"} end, "nested: bar: field is required, expected number")
+	assert.errorat(function() t.nested.foo = 3     end, "nested%.foo: bad type number: expected string")
+	assert.errorat(function() t.nested.baz = 4     end, "nested%.baz: field not defined")
+	assert.errorat(function() t.kv = {1}           end, "kv.1 %(key%): bad type number: expected string")
+	assert.errorat(function() t.kv.foo = "bar"     end, "kv.foo: bad type string: expected number")
+	assert.errorat(function() t.kv[1] = 1          end, "kv.1 %(key%): bad type number: expected string")
+	assert.errorat(function() t.kvkv = {f=1}       end, "kvkv.f: bad type number: expected table")
+	assert.errorat(function() t.kvkv = {f={1}}     end, "kvkv.f: 1 %(key%): bad type number: expected string")
+	assert.errorat(function() t.kvkv = {f={b="x"}} end, "kvkv.f: b: bad type string: expected number")
+	assert.errorat(function() t.kvkv.f = {1}       end, "kvkv.f: 1 %(key%): bad type number: expected string")
+	assert.errorat(function() t.kvkv.f = {b="x"}   end, "kvkv.f: b: bad type string: expected number")
 
 	assert.equal(t.nodefault, 42)
 	assert.equal(t.with_ge, 1)
