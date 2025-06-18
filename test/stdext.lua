@@ -71,3 +71,26 @@ test("stdext/string.split", function()
 	assert.equivalent(string.split("foo bar baz stuff", " ", 2), {"foo", "bar", "baz stuff"})
 	assert.equivalent(string.split("foo bar baz stuff", " ", 1), {"foo", "bar baz stuff"})
 end)
+
+test("stdext/table.readonly", function()
+	local t = {x=1, y=2, z=3}
+	local t_ro = table.readonly(t)
+
+	assert.equivalent(t, t_ro)
+
+	assert.equal(t.x, t_ro.x)
+	assert.equal(t.y, t_ro.y)
+	assert.equal(t.z, t_ro.z)
+
+	local copy = {}
+	for k, v in pairs(t_ro) do
+		copy[k] = v
+	end
+	assert.equivalent(t, copy)
+
+	assert.errorat(function() t_ro.x = 2 end, "attempt to write to read%-only table")
+	assert.equal(t_ro.x, 1)
+	assert.equal(t.x, 1)
+
+	assert.equal(getmetatable(t_ro), "table.readonly")
+end)

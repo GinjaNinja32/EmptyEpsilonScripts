@@ -1,5 +1,6 @@
 require "gn32/lang-strict"
 G.traceback = debug.traceback
+local lua_debug = debug
 require "gn32/test/min-ee"
 require "gn32/debug"
 
@@ -90,6 +91,11 @@ function G.equivalent(a, b, why)
 	return rawEquivalent(a, b, {}, {}, 1, why)
 end
 
+function G.getcallsite(n)
+	local trace = lua_debug.traceback("", n+1)
+	return string.match(trace, "stack traceback:\n\t([^:]+:[^:]+): ")
+end
+
 assert = setmetatable({}, {
 	__call = function(tbl, arg, msg)
 		if not arg then
@@ -143,6 +149,16 @@ assert = setmetatable({}, {
 				error("function did not throw an error", 2)
 			end
 			if not string.match(tostring(actual), "^" .. expect .. "$") then
+				error("function threw unexpected error: " .. tostring(actual), 2)
+			end
+		end,
+		errorat = function(f, expect)
+			local loc = getcallsite(2)
+			local ok, actual = pcall(f, function() loc = getcallsite(2) end)
+			if ok then
+				error("function did not throw an error", 2)
+			end
+			if not string.match(tostring(actual), "^" .. loc .. ": " .. expect .. "$") then
 				error("function threw unexpected error: " .. tostring(actual), 2)
 			end
 		end,

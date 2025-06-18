@@ -41,6 +41,38 @@ function table.indexOf(tbl, entry)
 	end
 end
 
+local proxy_to_real = setmetatable({}, {__mode = "k"})
+local proxy_mt = {
+	__index = function(proxy, key)
+		local t = proxy_to_real[proxy]
+		if not t then error("bad table", 2) end
+
+		local v = t[key]
+		if type(v) == table then
+			return table.readonly(v)
+		end
+		return v
+	end,
+	__newindex = function(proxy, key, val)
+		error("attempt to write to read-only table", 2)
+	end,
+	__pairs = function(proxy)
+		local t = proxy_to_real[proxy]
+		return function(_, k) return next(t, k) end, proxy, nil
+	end,
+	__metatable = "table.readonly"
+}
+
+--- Create a read-only proxy for a table. Nested tables are also read-only, unless they are used as keys.
+-- Proxy tables are lightweight; the only allocation is an empty table with a shared metatable.
+-- @tparam table tbl The table to make a read-only proxy for.
+-- @return A read-only proxy for the table, which acts as the table when indexed or iterated.
+function table.readonly(tbl)
+	local proxy = setmetatable({}, proxy_mt)
+	proxy_to_real[proxy] = tbl
+	return proxy
+end
+
 --- Merge multiple list-like tables into one new table.
 -- @param ... The tables to merge.
 -- @treturn table The merged table.
