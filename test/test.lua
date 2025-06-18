@@ -1,4 +1,5 @@
 require "gn32/lang-strict"
+G.traceback = debug.traceback
 require "gn32/test/min-ee"
 require "gn32/debug"
 
