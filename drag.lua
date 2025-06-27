@@ -36,7 +36,7 @@ end
 s_drag:onUpdateEntity(function(delta, ent, comps)
 	local x, y
 	if G.createEntity then
-		x, y = table.unpack(ent.components.physics.linear_velocity)
+		x, y = table.unpack(ent.components.physics.velocity)
 	else
 		x, y = comps.velocity.x, comps.velocity.y
 
@@ -56,7 +56,7 @@ s_drag:onUpdateEntity(function(delta, ent, comps)
 	end
 
 	if G.createEntity then
-		ent.components.physics.linear_velocity = {x, y}
+		ent.components.physics.velocity = {x, y}
 	elseif x ~= 0 or y ~= 0 then
 		comps.velocity.x = x
 		comps.velocity.y = y

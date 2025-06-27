@@ -233,7 +233,7 @@ mainMenu:add {
 										:setPosition(ship:getPosition())
 
 									if G.createEntity then
-										d:setVelocity(vx, vy)
+										d.components.physics.velocity = {vx, vy}
 									else
 										comps(d).velocity = {x = vx, y = vy}
 									end
