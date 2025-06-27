@@ -167,7 +167,7 @@ hook.trigger = setmetatable({}, {
 					if debug.enabled.hook then print("[hook: " .. event .. "]", "invoke handler", i .. "/" .. #registered[event], "from", functionSource[c]) end
 					local ok, res = pcall(c, ...)
 					if not ok then
-						print("Hook error:", event, res)
+						print("Hook error: " .. event .. ":", res)
 					else
 						table.insert(results, res)
 					end
