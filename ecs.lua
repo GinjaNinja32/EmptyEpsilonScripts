@@ -383,7 +383,11 @@ function System.update(delta)
 		end
 
 		if canRunNow then
-			sys:_update(delta)
+			if debug.enabled.ecs then print("[ecs: " .. sys.name .. "]", "update") end
+			local ok, err = pcall(sys._update, sys, delta)
+			if not ok then
+				print("gn32/ecs: update error in system: " .. sys.name .. ": " .. err)
+			end
 			table.insert(doneList, sys)
 			doneMap[sys.name] = true
 			progress = true
