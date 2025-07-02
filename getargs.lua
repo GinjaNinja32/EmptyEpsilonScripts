@@ -173,7 +173,7 @@ for _, ty in ipairs{"number", "string", "boolean", "table", "userdata"} do
 	end
 end
 
---- Any non-destroyed entity. On master, this is a SpaceObject; on ECS, an Entity.
+--- Any non-destroyed entity. On non-ECS, this is a SpaceObject; on ECS, an Entity.
 -- @table entity
 function argtypes.entity(n, args)
 	if (type(args[n]) == "table" or type(args[n]) == "userdata") and args[n].isValid then

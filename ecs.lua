@@ -24,7 +24,7 @@ local map_comp_ent_data = setmetatable({}, {__mode = "k"})
 local ecomp_entity = setmetatable({}, {__mode = "kv"})
 
 --- Entity.
--- An entity is a thing that exists in the world of EmptyEpsilon. On `master`, this is a SpaceObject; on `ECS`, an Entity.
+-- An entity is a thing that exists in the world of EmptyEpsilon. On non-`ECS`, this is a SpaceObject; on `ECS`, an Entity.
 -- @section Entity
 
 local ecompMetatable = {
@@ -84,7 +84,7 @@ local ecompMetatable = {
 if G.createEntity then
 	local entity = getLuaEntityFunctionTable()
 
-	--- [ECS] Get the comps associated with this entity.
+	--- [`ECS`] Get the comps associated with this entity.
 	-- @return The `EntityComps` for the entity.
 	function entity:comps()
 		local ec = setmetatable({}, ecompMetatable)
@@ -181,7 +181,7 @@ function system:_init(name)
 	systems_by_name[name] = self
 end
 
---- [ECS] Add EE ECS components that are required on each entity this system processes.
+--- [`ECS`] Add EE ECS components that are required on each entity this system processes.
 -- @param ... The component names that are required.
 -- @return self
 function system:addRequiredComponents(...)

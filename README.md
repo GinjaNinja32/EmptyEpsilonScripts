@@ -11,8 +11,10 @@ Note that all modules have an implicit dependency on `require`.
 
 Documentation description tags:
 
-- [`master`]: This item is only available on the `master` branch of EmptyEpsilon.
-- [`ECS`]: This item is only available on the `ECS` branch of EmptyEpsilon.
+- [non-`ECS`]: This item is only available on versions of EmptyEpsilon prior to the implementation of [ECS][ecs] (stable releases up to and including `EE-2024.12.08`).
+- [`ECS`]: This item is only available on versions of EmptyEpsilon that contain [ECS][ecs] features (prereleases from `EE-2024.10.03PR` onwards).
 - [`hook`]: This module uses `hook`.
 - [`hook-sys`]: This module uses `hook-sys` (possibly by a transitive dependency) and requires certain hooks to be triggered manually unless `hook` is used. These hooks will be listed in the first section of the module's documentation.
 - [`action-main`]: This module uses `action-main` (possibly by a transitive dependency) and requires certain hooks to be triggered manually unless `hook` is used. These hooks are listed in the first section of `action-main`'s documentation.
+
+[ecs]: https://github.com/daid/EmptyEpsilon/wiki/ECS

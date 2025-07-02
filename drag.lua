@@ -1,7 +1,7 @@
 --- [`hook-sys`] Slows down specified entities over time, eventually stopping them.
 -- Required hooks: `update`.
 --
--- When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On `master`, its velocity comp is also removed.
+-- When an entity's speed drops below 1 game unit per update (~0.06U/s), its speed is set to zero and its drag comp is removed. On non-ECS builds, its velocity comp is also removed.
 
 require "gn32/ecs"
 
@@ -21,7 +21,7 @@ local s_drag = System("drag")
 
 local c_velocity
 if not G.createEntity then
-	--- [`master`] Move an entity at a specified velocity.
+	--- [non-`ECS`] Move an entity at a specified velocity.
 	-- @table velocity
 	-- @number x The x component of the velocity.
 	-- @number y The y component of the velocity.
