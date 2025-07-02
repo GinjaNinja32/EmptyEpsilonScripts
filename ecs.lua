@@ -50,6 +50,8 @@ local ecompMetatable = {
 		if val == nil then
 			if map_ent_comp_data[ent] then
 				map_ent_comp_data[ent][def] = nil
+			end
+			if map_comp_ent_data[def] then
 				map_comp_ent_data[def][ent] = nil
 			end
 			return
