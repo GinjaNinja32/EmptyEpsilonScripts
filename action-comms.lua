@@ -1,4 +1,5 @@
 --- Adds an `action`-driven comms menu system.
+-- This module uses `batteries/sort`.
 -- For details of the menu item format, see `action`.
 --
 -- Target arguments: `source, target`  
@@ -22,6 +23,8 @@ require "gn32/lang"
 
 require "gn32/action"
 
+require("batteries/sort"):export()
+
 --- Create a new comms menu.  
 -- CommsMenu is derived from `action.ActionBase` and inherits some instance functions from there.
 -- @function CommsMenu
@@ -33,7 +36,7 @@ G.CommsMenu = ActionBase {
 	end,
 	_startMenu = function(self, source, target)
 		local data = self:_dataFor(source, target)
-		data.message = nil
+		data.message = {}
 		data.button = nil
 	end,
 	_finishMenu = function(self, source, target)
@@ -42,10 +45,16 @@ G.CommsMenu = ActionBase {
 			setCommsMessage("We have nothing for you.")
 			return
 		end
-		if data.message == "" then
+		if #data.message == 0 then
+			setCommsMessage("[Menu Error]\nno message set")
 			return
 		end
-		setCommsMessage(data.message or "[Menu Error]\nno message set")
+		table.stable_sort(data.message, function(a, b) return a.order < b.order end)
+		local s = {}
+		for _, entry in ipairs(data.message) do
+			table.insert(s, entry.msg)
+		end
+		setCommsMessage(table.concat(s, "\n"))
 	end,
 	_addButton = function(self, button, order, act, source, target)
 		local data = self:_dataFor(source, target)
@@ -64,11 +73,7 @@ G.CommsMenu = ActionBase {
 	end,
 	_addInfo = function(self, info, order, source, target)
 		local data = self:_dataFor(source, target)
-		if data.message then
-			data.message = data.message .. "\n" .. info
-		else
-			data.message = info
-		end
+		table.insert(data.message, {msg=info, order=order or 0})
 	end,
 
 	--- Get a comms function that will show this menu.
