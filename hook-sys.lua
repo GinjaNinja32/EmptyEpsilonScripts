@@ -138,19 +138,19 @@ hook.on = setmetatable({}, {
 -- @param callback The callback to register.
 hook.after = setmetatable({}, {
 	__index = function(t, event)
-		return function(callback)
+		return function(callback, n)
 			if registeredAfter[event] == nil then
 				registeredAfter[event] = {}
 			end
 
 			table.insert(registeredAfter[event], callback)
-			functionSource[callback] = debug.caller(2)
+			functionSource[callback] = debug.caller(n or 2)
 
 			return hook
 		end
 	end,
 	__newindex = function(t, event, callback)
-		hook.after[event](callback)
+		hook.after[event](callback, 3)
 	end
 })
 
