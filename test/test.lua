@@ -133,6 +133,11 @@ assert = setmetatable({}, {
 				error("value " .. v .. " should be between " .. lo .. " and " .. hi .. " inclusive", 2)
 			end
 		end,
+		less = function(v, bound)
+			if v >= bound then
+				error("value " .. v .. " should be less than " .. bound, 2)
+			end
+		end,
 		contained = function(val, set, allowNil)
 			if val == nil then
 				if allowNil then return end
