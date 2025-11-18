@@ -209,7 +209,7 @@ do -- Point/vector operations
 	-- @treturn number The x coordinate of the result.
 	-- @treturn number The y coordinate of the result.
 	function vector.xyMul(...)
-		local x, y, s = getargs("xyAdd", "xy", "number")(...)
+		local x, y, s = getargs("xyMul", "xy", "number")(...)
 		return x * s, y * s
 	end
 
