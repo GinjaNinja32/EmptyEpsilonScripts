@@ -336,10 +336,24 @@ function hook.on.update()
 	end
 end
 
-hook.every[1] = function()
-	for _, ship in ipairs(getActivePlayerShips()) do
-		for _, station in ipairs(position.all) do
+do
+	local i_ship = 1
+	local i_station = 1
+
+	function hook.on.update()
+		for i = 1, 4 do
+			local ship = getActivePlayerShips()[i_ship]
+			local station = position.all[i_station]
 			mainMenu:refreshMenu(ship, station)
+			i_station = i_station + 1
+			if i_station > #position.all then
+				i_station = 1
+
+				i_ship = i_ship + 1
+				if i_ship > #getActivePlayerShips() then
+					i_ship = 1
+				end
+			end
 		end
 	end
 end
