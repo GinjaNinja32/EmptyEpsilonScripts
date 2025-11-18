@@ -12,11 +12,11 @@ require "gn32/ecs"
 --- Sync waypoints from `source` to this ship.
 -- @table sync_waypoints
 -- @field source The entity to sync from.
-local c_wp = Comp("sync_waypoints"):setSchema({
+Comp("sync_waypoints"):setSchema({
 	source = {_check = function(e) return e and type(e.isValid) == "function" and e:isValid() and type(e.getWaypointCount) == "function" end},
 })
 
-local s_wp = System("sync_waypoints")
+System("sync_waypoints")
 	:addRequiredComps("sync_waypoints")
 	:onUpdateEntity(function(delta, ent, comps)
 		local src = comps.sync_waypoints.source
@@ -25,7 +25,6 @@ local s_wp = System("sync_waypoints")
 			comps.sync_waypoints = nil
 			return
 		end
-
 
 		local cur = ent:getWaypointCount()
 		local trg = src:getWaypointCount()
