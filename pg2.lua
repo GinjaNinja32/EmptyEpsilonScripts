@@ -470,7 +470,7 @@ gmMenu:add {
 									function() return math.floor(map.loadRadius / 1000) .. "U" end,
 									function(n)
 										map.loadRadius = math.max(1000, n)
-										if map.unloadRadius < map.loadRadius then
+										if map.unloadRadius and map.unloadRadius < map.loadRadius then
 											map.unloadRadius = map.loadRadius
 										end
 										return false
@@ -485,10 +485,10 @@ gmMenu:add {
 									function() return math.floor(map.unloadRadius / 1000) .. "U" end,
 									function(n)
 										map.unloadRadius = math.max(1000, n)
-										if map.unloadRadius < map.loadRadius then
+										if map.loadRadius and map.unloadRadius < map.loadRadius then
 											map.loadRadius = map.unloadRadius
 										end
-										if map.unloadRadius < map.probeRadius then
+										if map.probeRadius and map.unloadRadius < map.probeRadius then
 											map.probeRadius = map.unloadRadius
 										end
 										return false
@@ -503,7 +503,7 @@ gmMenu:add {
 									function() return math.floor(map.probeRadius / 1000) .. "U" end,
 									function(n)
 										map.probeRadius = math.max(1000, n)
-										if map.unloadRadius < map.probeRadius then
+										if map.unloadRadius and map.unloadRadius < map.probeRadius then
 											map.unloadRadius = map.probeRadius
 										end
 										return false
