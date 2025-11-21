@@ -343,6 +343,10 @@ do
 	function hook.on.update()
 		for i = 1, 4 do
 			local ship = getActivePlayerShips()[i_ship]
+			if not ship then
+				i_ship = 1
+				return
+			end
 			local station = position.all[i_station]
 			mainMenu:refreshMenu(ship, station)
 			i_station = i_station + 1
