@@ -112,6 +112,11 @@ assert = setmetatable({}, {
 				error("values not equal: " .. debug.dump(a) .. " ~= " .. debug.dump(b), 2)
 			end
 		end,
+		match = function(str, pat)
+			if not string.match(str, pat) then
+				error("value does not match: " .. debug.dump(str) .. " vs pattern " .. debug.dump(pat), 2)
+			end
+		end,
 		equivalent = function(a, b)
 			local err
 			if not equivalent(a, b, function(path, x, y)

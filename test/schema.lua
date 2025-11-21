@@ -40,6 +40,10 @@ test("schema", function()
 					_values = {_type = "number"},
 				},
 			},
+			meta = {
+				_optional = true,
+				_metatable = "asdf",
+			},
 		}
 	}
 
@@ -88,6 +92,11 @@ test("schema", function()
 	assert.equal(schema.checkValue({nodefault=2, kvkv={foo={bar=2}, baz=42}}, sch), "kvkv: baz: bad type number: expected table")
 	assert.equal(schema.checkValue({nodefault=2, kvkv={foo={bar=2}, baz={stuff=3,more="x"}}}, sch), "kvkv: baz: more: bad type string: expected number")
 	assert.equal(schema.checkValue({nodefault=2, kvkv={foo={bar=2}, baz={3, more=4}}}, sch), "kvkv: baz: 1 (key): bad type number: expected string")
+
+	assert.match(schema.checkValue({nodefault=2, meta={}}, sch), "^meta: bad value table: 0x[0-9a-f]+: expected metatable asdf$")
+	assert.match(schema.checkValue({nodefault=2, meta=setmetatable({}, {})}, sch), "^meta: bad value table: 0x[0-9a-f]+: expected metatable asdf$")
+	assert.match(schema.checkValue({nodefault=2, meta=setmetatable({}, {__metatable="foo"})}, sch), "^meta: bad value table: 0x[0-9a-f]+: expected metatable asdf$")
+	assert.equal(schema.checkValue({nodefault=2, meta=setmetatable({}, {__metatable="asdf"})}, sch), nil)
 
 	local t = schema.makeTable(sch)
 

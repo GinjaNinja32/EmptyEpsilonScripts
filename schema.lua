@@ -12,6 +12,7 @@
 -- @field[opt] _gt The target must be greater than this value: `val > _gt`
 -- @field[opt] _le The target must be less than or equal to this value: `val <= _le`
 -- @field[opt] _lt The target must be less than this value: `val < _lt`
+-- @field[opt] _metatable The target must return this value from getmetatable: `getmetatable(val) == _metatable`
 -- @tfield[opt] function(val) _check A function to check the target: `local v = _check(val); v == nil or v == true`
 -- @tfield[opt] table _fields Ignored if the target is not a table. A map from keys (which must equal the keys of the target) to [valueSchemas](#valueSchema) for the corresponding value in the target.
 -- @tfield[opt] valueSchema _keys Ignored if the target is not a table. A schema for the keys of the target.
@@ -108,6 +109,10 @@ function schema.checkValue(val, sch)
 
 	if sch._lt ~= nil and not (val < sch._lt) then
 		return ("bad value %s: expected %s"):format(tostring(val), describeValueBounds(sch))
+	end
+
+	if sch._metatable and getmetatable(val) ~= sch._metatable then
+		return ("bad value %s: expected metatable %s"):format(tostring(val), tostring(sch._metatable))
 	end
 
 	if sch._check ~= nil then
