@@ -72,6 +72,10 @@ local function unpackComparator(a, b)
 		return ta < tb
 	end
 
+	if ta == "userdata" then
+		return tostring(a) < tostring(b)
+	end
+
 	if ta ~= "table" then
 		return a < b
 	end
